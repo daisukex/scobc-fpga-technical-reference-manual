@@ -1,0 +1,6 @@
+#+TITLE: Space Cubics OBC (SC-OBC-A1) FPGA
+#+PROPERTY: header-args:emacs-lisp :results silent
+
+Space Cubics 1 OBC module 1 is a single board computer for spacecraft, especially for 3U CubeSats. The board is based on Xilinx Artix-7 FPGA and implements ARM Cortex M3 as the main CPU.
+
+This repository manages data about the Space Cubics OBC RTL implemented in Xilinx Artix-7 FPGAs.
