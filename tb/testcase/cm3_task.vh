@@ -1,5 +1,5 @@
-wire [239:0] CM3_ISR = tb_top.dut.cm3_ss.cpu_wrapper.CORTEXM3INTEGRATION.INTISR;
-wire [239:0] CM3_CLK = tb_top.dut.cm3_ss.cpu_wrapper.CORTEXM3INTEGRATION.HCLK;
+wire [239:0] CM3_ISR = tb_top.dut.obc_core.cm3_ss.cpu_wrapper.CORTEXM3INTEGRATION.INTISR;
+wire [239:0] CM3_CLK = tb_top.dut.obc_core.cm3_ss.cpu_wrapper.CORTEXM3INTEGRATION.HCLK;
 
 task cm3_isr_check;
   input [7:0] isr;
