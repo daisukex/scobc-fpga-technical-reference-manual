@@ -1,0 +1,19 @@
+* Install Environment
+#+BEGIN_SRC
+make generate_ip
+#+END_SRC
+
+Copy the Verilog model released by the memory vendor to the bench directory.
+#+BEGIN_SRC
+cp {Verilog model path} ./bench/flash_model
+#+END_SRC
+
+This verification environment requires the cy15b104 and s25fl256l Verilog models.
+It can be downloaded from the infineon website.
+
+* Execute Simulation
+#+BEGIN_SRC
+make TESTCASE={testcase name}
+#+END_SRC
+
+

@@ -1,0 +1,5 @@
+xsim*
+xvlog*
+xelab*
+bench/glbl.v
+sim_wave.tcl
