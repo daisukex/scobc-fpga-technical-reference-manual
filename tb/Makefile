@@ -24,7 +24,8 @@ CP           := cp
 XIL_ROOT             := $(dir $(shell which xsim))..
 IP_DIR_ROOT          := ../vivado/ip
 AXI_CROSSBAR_IP_DIR  := ../vivado/ip/axi_crossbar
-AXI_CROSSBAR_IP       = main_axi_crossbar
+MAIN_AXI_CROSSBAR_IP  = main_axi_crossbar
+UDL_AXI_CROSSBAR_IP   = udl_axi_crossbar
 
 # RTL Directory
 SC_VERILOG_DIR       := ../rtl/sc-veri-lib ../rtl/common
@@ -33,7 +34,7 @@ AHBIP_RTL_DIR        := ../rtl/sc-ahbip
 UARTLITE_RTL_DIR     := ../rtl/sc-uartlite ../rtl/sc-uartlite/uart_core
 I2CM_RTL_DIR         := ../rtl/sc-i2cm
 LPAHB_SS_RTL_DIR     := ../rtl/lpahb_ss $(AXIM2AHBA_RTL_DIR) $(AHBIP_RTL_DIR) $(UARTLITE_RTL_DIR) $(I2CM_RTL_DIR)
-MAIN_AXI_CROSSBAR_DIR:= $(AXI_CROSSBAR_IP_DIR)/$(AXI_CROSSBAR_IP)/sim $(AXI_CROSSBAR_IP_DIR)/$(AXI_CROSSBAR_IP)/hdl 
+MAIN_AXI_CROSSBAR_DIR:= $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/sim $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/hdl 
 QSPI_RTL_DIR         := ../rtl/sc-qspim
 CAN_RTL_DIR          := ../rtl/sc-can/reg ../rtl/sc-can/can_core ../rtl/sc-can/data_sync ../rtl/sc-can
 MAINAXI_SS_RTL_DIR   := ../rtl/main_axi_ss $(QSPI_RTL_DIR) $(CAN_RTL_DIR) $(MAIN_AXI_CROSSBAR_DIR)
@@ -83,7 +84,8 @@ sim_preparation:
 	echo '*' > $(SDB_DIR)/.gitignore
 
 generate_ip:
-	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(AXI_CROSSBAR_IP)
+	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(MAIN_AXI_CROSSBAR_IP)
+	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(UDL_AXI_CROSSBAR_IP)
 
 # Compile Design
 PHONY += dut_compile
