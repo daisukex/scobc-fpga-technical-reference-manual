@@ -24,6 +24,7 @@ CP           := cp
 XIL_ROOT             := $(dir $(shell which xsim))..
 IP_DIR_ROOT          := ../vivado/ip
 AXI_CROSSBAR_IP_DIR  := ../vivado/ip/axi_crossbar
+CORTEX_M3_IP_DIR     := $(IP_DIR_ROOT)/cortex_m3/cortex_m3
 MAIN_AXI_CROSSBAR_IP  = main_axi_crossbar
 UDL_AXI_CROSSBAR_IP   = udl_axi_crossbar
 
@@ -39,11 +40,12 @@ UDL_AXI_CROSSBAR_DIR := $(AXI_CROSSBAR_IP_DIR)/$(UDL_AXI_CROSSBAR_IP)/sim
 QSPI_RTL_DIR         := ../rtl/sc-qspim
 CAN_RTL_DIR          := ../rtl/sc-can/reg ../rtl/sc-can/can_core ../rtl/sc-can/data_sync ../rtl/sc-can
 MAINAXI_SS_RTL_DIR   := ../rtl/main_axi_ss $(QSPI_RTL_DIR) $(CAN_RTL_DIR) $(MAIN_AXI_CROSSBAR_DIR) $(UDL_AXI_CROSSBAR_DIR)
+CORTEX_M3_RTL_DIR    := $(CORTEX_M3_IP_DIR)/rtl
 SC_CM3_SS_RTL_DIR    := ../rtl/sc-cm3-ss
 SC_OBC_CORE_RTL_DIR  := ../rtl/sc-obc-core
 SYSCTRL_RTL_DIR      := ../rtl/scobca1-sysctrl
 FPGA_TOP_RTL_DIR     := ../rtl/sc-obc-a1-fpga
-RTL_DIR_LIST         := $(SC_VERILOG_DIR) $(XILINX_IP_MODEL_DIR)
+RTL_DIR_LIST         := $(SC_VERILOG_DIR) $(XILINX_IP_MODEL_DIR)  $(CORTEX_M3_RTL_DIR)
 RTL_DIR_LIST         += $(LPAHB_SS_RTL_DIR) $(MAINAXI_SS_RTL_DIR) $(SC_CM3_SS_RTL_DIR) $(SC_OBC_CORE_RTL_DIR)
 RTL_DIR_LIST         += $(SYSCTRL_RTL_DIR) $(FPGA_TOP_RTL_DIR)
 RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
@@ -87,6 +89,7 @@ sim_preparation:
 generate_ip:
 	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(MAIN_AXI_CROSSBAR_IP)
 	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(UDL_AXI_CROSSBAR_IP)
+	cd $(CORTEX_M3_IP_DIR) && make
 
 # Compile Design
 PHONY += dut_compile
