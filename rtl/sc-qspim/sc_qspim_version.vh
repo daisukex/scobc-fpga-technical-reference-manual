@@ -1,0 +1,3 @@
+`define QSPI_MAJVERVAL    8'h00
+`define QSPI_MINVERVAL    8'h01
+`define QSPI_PATVERVAL 16'h0001

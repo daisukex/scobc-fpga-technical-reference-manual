@@ -1,0 +1,3 @@
+`define CAN_MAJVERVAL    8'h00
+`define CAN_MINVERVAL    8'h01
+`define CAN_PATVERVAL 16'h0001

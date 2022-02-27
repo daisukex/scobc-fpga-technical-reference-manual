@@ -1,0 +1,3 @@
+`define I2CM_MAJVERVAL    8'h00
+`define I2CM_MINVERVAL    8'h01
+`define I2CM_PATVERVAL 16'h0001
