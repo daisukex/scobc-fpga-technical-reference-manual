@@ -1,0 +1,37 @@
+#+TITLE: AXI Crossbar IP Core
+#+PROPERTY: header-args:emacs-lisp :results silent
+
+AXI Crossbarは、複数のマスターと複数のスレーブをクロスバー形式で接続するためのインターコネクター回路です。
+
+* Build IP Core
+AXI Crossbarは、コンフィギュレーション設定を作成し、Vivadoにて .xci (Xilinx Core Instance)を生成する事で構築します。
+.xciファイルは、Vivadoによる IPコアの合成の入力ファイルです。
+
+** Configuration file
+環境にある sample_axi_crossbarを参考に {module name}.configを生成します。
+{module name}はコンフィギュレーションしたモジュールのモジュール名となります。
+
+#+BEGIN_SRC
+make MODULE={module name}
+#+END_SRC
+
+Makefileに定義されている"generate_target"ターゲットを使用する事で、Vivadoの generate_targetコマンドを実行する事ができます。
+このターゲットを実行すると、論理合成用ファイルとシミュレーション用ファイルを {module name}ディレクトリに出力します。
+
+#+BEGIN_SRC
+make generate_target MODULE={module name}
+#+END_SRC
+
+
+** Parameter
+sample_axi_crossbarに設定されている、モジュールパラメータの設定値は以下の通りです。
+
+| Key                                   | Description                                                                                                                                                                                                                    |
+|---------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| CONFIG.NUM_SI                         | Slave Interfaceの数を設定します. つまり、このバスに生成される Master Interfaceの数を設定します.                                                                                                                                |
+| CONFIG.NUM_MI                         | Master Interfaceの数を設定します. つまり、このバスに生成される Slave Interfaceの数を設定します.                                                                                                                                |
+| CONFIG.ID_WIDTH                       | AWID, BID, ARID, RIDのバス幅を設定します. この AXI Crossbarが構築するシステムの Master数, Thread数を考慮し設定する必要があります.                                                                                              |
+| CONFIG.S{number}_THREAD_ID_WIDTH      | 各Slave Interfaceの ID幅を設定します. CONFIG.NUM_SIの設定が 2の場合 CONFIG.S00_THREAD_ID_WIDTHと CONFIG.S01_THREAD_ID_WIDTHを設定します.                                                                                       |
+| CONFIG.ADDR_RANGES                    | Master Interfaceに設定する Address Windowの数を設定します. 例えば、接続する Slaveに 2つのアドレス空間を設定する場合は 2を設定します.                                                                                           |
+| CONFIG.M{number}_A{number}_ADDR_WIDTH | 接続する Slaveへの アドレス幅を設定します. M{number}は 00から CONFIG.NUM_MI-1まで設定します. A{number}は 00から CONFIG.ADDR_RANGES -1まで設定します. アドレス空間が 1つの場合は A01の設定値をデフォルトのままに設定します.     |
+| CONFIG.M{number}_A{number}_BASE_ADDR  | 接続する Slaveへの Base Address値を設定します. M{number}は 00から CONFIG.NUM_MI-1まで設定します. A{number}は 00から CONFIG.ADDR_RANGES -1まで設定します. アドレス空間が 1つの場合は A01の設定値をデフォルトのままに設定します. |
