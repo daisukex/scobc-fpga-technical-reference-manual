@@ -1,0 +1,8 @@
+*~
+*.log
+*.jou
+output/*
+log/*
+.Xil/*
+AhbSToAxi_design.v
+sc_cm3_wrapper.dcp
