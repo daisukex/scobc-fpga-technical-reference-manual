@@ -40,9 +40,10 @@ MAINAXI_SS_RTL_DIR   := ../rtl/main_axi_ss $(QSPI_RTL_DIR) $(CAN_RTL_DIR) $(MAIN
 SC_CM3_SS_RTL_DIR    := ../rtl/sc-cm3-ss
 SC_OBC_CORE_RTL_DIR  := ../rtl/sc-obc-core
 SYSCTRL_RTL_DIR      := ../rtl/scobca1-sysctrl
+FPGA_TOP_RTL_DIR     := ../rtl/sc-obc-a1-fpga
 RTL_DIR_LIST         := $(SC_VERILOG_DIR) $(XILINX_IP_MODEL_DIR)
 RTL_DIR_LIST         += $(LPAHB_SS_RTL_DIR) $(MAINAXI_SS_RTL_DIR) $(SC_CM3_SS_RTL_DIR) $(SC_OBC_CORE_RTL_DIR)
-RTL_DIR_LIST         += $(SYSCTRL_RTL_DIR)
+RTL_DIR_LIST         += $(SYSCTRL_RTL_DIR) $(FPGA_TOP_RTL_DIR)
 RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
 RTL_HEADER_LIST      := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.vh)))
 
