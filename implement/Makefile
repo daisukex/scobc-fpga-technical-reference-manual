@@ -39,7 +39,7 @@ CF                   += vivado* .Xil .hbs
 
 
 PHONY := all
-all: place_top
+all: route_top
 
 # Synthesis Cortex-M3
 # ---------------------------------------------------------------------------
@@ -89,6 +89,12 @@ place: $(DESIGN_DIR)/place/$(TOPMODULE)_place.dcp
 
 $(DESIGN_DIR)/place/$(TOPMODULE)_place.dcp: $(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp $(CONSTRAINTS_DIR)/$(TOPMODULE)_io.xdc
 	$(VIVADOTCL) -source tcl/place.tcl -log $(LOG_DIR)/$(TOPMODULE)_place.log -tclargs $(TOPMODULE) $<
+
+PHONY += route
+route: $(DESIGN_DIR)/route/$(TOPMODULE)_route.dcp
+
+$(DESIGN_DIR)/route/$(TOPMODULE)_route.dcp: $(DESIGN_DIR)/place/$(TOPMODULE)_place.dcp
+	$(VIVADOTCL) -source tcl/route.tcl -log $(LOG_DIR)/$(TOPMODULE)_route.log -tclargs $(TOPMODULE) $<
 
 # clean target
 # ---------------------------------------------------------------------------
