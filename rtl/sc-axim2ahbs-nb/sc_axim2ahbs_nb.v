@@ -260,6 +260,8 @@ always @ (posedge ACLK or negedge ARESETN) begin
         ARREADY <= 1'b1;
         xrad_valid <= 0;
       end
+      else if (log_rd_valid)
+        reg_arlen <= reg_arlen - 1;
     end
     else if (hrdt_comp) begin
       ARREADY <= 1'b1;
@@ -340,7 +342,6 @@ always @ (posedge ACLK or negedge ARESETN) begin
       else begin
         if (reg_arlen == 1)
           RLAST <= 1'b1;
-        reg_arlen <= reg_arlen - 1;
       end
     end
   end
