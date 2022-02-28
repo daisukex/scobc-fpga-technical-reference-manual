@@ -52,7 +52,7 @@ always @ (*) begin
   MHRESP = DHRESP;
   for (sn=0; sn<SC_AHBIP_NUMBER_OF_SLAVE; sn=sn+1) begin: shrsp_logic
     if (henable[sn])
-      MHRESP = SHRESP[2*sn +:32];
+      MHRESP = SHRESP[2*sn +:2];
   end
 end
 
