@@ -5,7 +5,7 @@
 //-----------------------------------------------
 // Copyright © 2022 Space Cubics, LLC.
 //-----------------------------------------------
-module sc_obc_fpga # (
+module sc_obc_a1_fpga # (
   parameter SYSCTRL_USER_CLK1_DIVIDE = 100,
   parameter SYSCTRL_USER_CLK1_MODE = 0,
   parameter SYSCTRL_USER_CLK2_DIVIDE = 100,
