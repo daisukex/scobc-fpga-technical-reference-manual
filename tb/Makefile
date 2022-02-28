@@ -23,38 +23,26 @@ CP           := cp
 # Xilinx Root
 XIL_ROOT             := $(dir $(shell which xsim))..
 IP_DIR_ROOT          := ../vivado/ip
-AXI_CROSSBAR_IP_DIR  := ../vivado/ip/axi_crossbar
-CORTEX_M3_IP_DIR     := $(IP_DIR_ROOT)/cortex_m3/cortex_m3
+CORTEX_M3_IP         := cortex_m3
+CORTEX_M3_IP_DIR     := $(IP_DIR_ROOT)/$(CORTEX_M3_IP)
+AXI_CROSSBAR_IP_DIR  := $(IP_DIR_ROOT)/axi_crossbar
 MAIN_AXI_CROSSBAR_IP  = main_axi_crossbar
 UDL_AXI_CROSSBAR_IP   = udl_axi_crossbar
 
 # RTL Directory
-SC_VERILOG_DIR       := ../rtl/sc-veri-lib ../rtl/common
-AXIM2AHBA_RTL_DIR    := ../rtl/sc-axim2ahbs-nb
-AHBIP_RTL_DIR        := ../rtl/sc-ahbip
-UARTLITE_RTL_DIR     := ../rtl/sc-uartlite ../rtl/sc-uartlite/uart_core
-I2CM_RTL_DIR         := ../rtl/sc-i2cm
-LPAHB_SS_RTL_DIR     := ../rtl/lpahb_ss $(AXIM2AHBA_RTL_DIR) $(AHBIP_RTL_DIR) $(UARTLITE_RTL_DIR) $(I2CM_RTL_DIR)
-MAIN_AXI_CROSSBAR_DIR:= $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/sim $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/hdl 
+DUT_ROOT_DIR         := ../rtl
+DUT_DIR_LIST         := $(shell find $(DUT_ROOT_DIR) -type d)
+MAIN_AXI_CROSSBAR_DIR:= $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/sim $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/hdl
 UDL_AXI_CROSSBAR_DIR := $(AXI_CROSSBAR_IP_DIR)/$(UDL_AXI_CROSSBAR_IP)/sim
-QSPI_RTL_DIR         := ../rtl/sc-qspim
-CAN_RTL_DIR          := ../rtl/sc-can/reg ../rtl/sc-can/can_core ../rtl/sc-can/data_sync ../rtl/sc-can
-MAINAXI_SS_RTL_DIR   := ../rtl/main_axi_ss $(QSPI_RTL_DIR) $(CAN_RTL_DIR) $(MAIN_AXI_CROSSBAR_DIR) $(UDL_AXI_CROSSBAR_DIR)
-CORTEX_M3_RTL_DIR    := $(CORTEX_M3_IP_DIR)/rtl
-SC_CM3_SS_RTL_DIR    := ../rtl/sc-cm3-ss
-SC_OBC_CORE_RTL_DIR  := ../rtl/sc-obc-core
-SYSCTRL_RTL_DIR      := ../rtl/scobca1-sysctrl
-FPGA_TOP_RTL_DIR     := ../rtl/sc-obc-a1-fpga
-RTL_DIR_LIST         := $(SC_VERILOG_DIR) $(XILINX_IP_MODEL_DIR)  $(CORTEX_M3_RTL_DIR)
-RTL_DIR_LIST         += $(LPAHB_SS_RTL_DIR) $(MAINAXI_SS_RTL_DIR) $(SC_CM3_SS_RTL_DIR) $(SC_OBC_CORE_RTL_DIR)
-RTL_DIR_LIST         += $(SYSCTRL_RTL_DIR) $(FPGA_TOP_RTL_DIR)
+CORTEX_M3_DIR        := $(CORTEX_M3_IP_DIR)/$(CORTEX_M3_IP)/rtl
+
+RTL_DIR_LIST         := $(DUT_DIR_LIST) $(MAIN_AXI_CROSSBAR_DIR) $(UDL_AXI_CROSSBAR_DIR) $(CORTEX_M3_DIR)
 RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
 RTL_HEADER_LIST      := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.vh)))
 
 # Testbench Directory
 TB_DIR               := ./bench
-TB_SUB_DIR           := $(wildcard $(TB_DIR)/*)
-TB_DIR_LIST          := $(TB_DIR) $(TB_SUB_DIR)
+TB_DIR_LIST          := $(shell find $(TB_DIR) -type d)
 TB_LIST              := $(foreach list, $(TB_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
 AHBVIP_DIR           := ./bench/scvip_ahb_master
 TC_DIR               := ./testcase
