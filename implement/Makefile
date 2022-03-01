@@ -50,7 +50,7 @@ $(CIP_DIR)/$(CM3_IP)/script/$(CM3_IP)_genxci.tcl:
 $(CIP_DIR)/$(CM3_IP)/$(CM3_IP).xci: $(CIP_DIR)/$(CM3_IP)/script/$(CM3_IP)_genxci.tcl
 	cd $(CIP_DIR)/$(CM3_IP) && make
 
-$(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp $(CM3_SYNTH_DIR)/AhbSToAxi_design.v: $(CIP_DIR)/cortex_m3/cortex_m3.xci
+$(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp $(CM3_SYNTH_DIR)/AhbSToAxi_design.v: $(RTL_ROOT_DIR)/sc-cm3-ss/sc_cm3_wrapper.v $(CIP_DIR)/cortex_m3/cortex_m3.xci
 	cd $(CM3_SYNTH_DIR) && make
 
 # Synthesis Xilinx IP (AXI Crossbar)
