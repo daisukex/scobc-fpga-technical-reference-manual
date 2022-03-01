@@ -7,6 +7,8 @@
 # Target Device  : Xilinx Artix-7 (XC7A200T-FBG676-1)
 # ---------------------------------------------------------------------------
 
+TOPMODULE            := sc_obc_a1_fpga
+
 # Command variables
 VIVADOTCL            := vivado -mode batch
 CP                   := cp -rf
@@ -18,10 +20,16 @@ IP_ROOT_DIR          := ../vivado/ip
 CIP_DIR              := ip
 CM3_SYNTH_DIR        := cm3
 CM3_IP               := cortex_m3
+CM3_RTL              := $(CM3_SYNTH_DIR)/AhbSToAxi_design.v
 MAIN_AXI_CROSSBAR    := main_axi_crossbar
 UDL_AXI_CROSSBAR     := udl_axi_crossbar
 AXI_CROSSBAR_DIR     := $(CIP_DIR)/axi_crossbar
 AXI_CROSSBAR_DCP      = $(DESIGN_DIR)/$(MAIN_AXI_CROSSBAR)/$(MAIN_AXI_CROSSBAR).dcp $(DESIGN_DIR)/$(UDL_AXI_CROSSBAR)/$(UDL_AXI_CROSSBAR).dcp
+
+RTL_ROOT_DIR         := ../rtl
+RTL_DIR_LIST          = $(shell find $(RTL_ROOT_DIR) -type d)
+RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(wildcard $(list)/*.v)) $(CM3_RTL)
+
 LOG_DIR              := log
 DESIGN_DIR           := output
 CF                   := $(CIP_DIR) $(DESIGN_DIR) $(LOG_DIR)
@@ -29,7 +37,7 @@ CF                   += vivado* .Xil .hbs
 
 
 PHONY := all
-all: main_axi_crossbar.dcp udl_axi_crossbar.dcp
+all: synthesis_top
 
 # Synthesis Cortex-M3
 # ---------------------------------------------------------------------------
@@ -61,6 +69,16 @@ $(DESIGN_DIR)/$(UDL_AXI_CROSSBAR)/$(UDL_AXI_CROSSBAR).dcp: $(AXI_CROSSBAR_DIR)/$
 	$(VIVADOTCL) -source tcl/synthesis_axi_crossbar_ip.tcl -log $(LOG_DIR)/$(basename $(<F))_synthesis.log -tclargs $(<F)
 	echo '*' > $(LOG_DIR)/.gitignore
 	echo '*' > $(DESIGN_DIR)/.gitignore
+
+# Synthesis TOP Module
+# ---------------------------------------------------------------------------
+PHONY += synthesis_top
+synthesis_top: $(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp
+
+$(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp: $(RTL_LIST) $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp $(AXI_CROSSBAR_DCP)
+	@echo $(filter-out %sc_cm3_wrapper.v,${RTL_LIST}) > rtl.list
+	$(VIVADOTCL) -source tcl/synthesis.tcl -log $(LOG_DIR)/$(TOPMODULE)_synthesis.log\
+		-tclargs $(TOPMODULE) rtl.list $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp  $(AXI_CROSSBAR_DCP)
 
 # clean target
 # ---------------------------------------------------------------------------
