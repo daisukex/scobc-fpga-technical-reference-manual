@@ -122,7 +122,7 @@ assign w_rd_cfgmemctl = (w_hit_cfgmemctl & w_reg_read) ?
 reg clkmode_change;
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
-    CLKMODE <= 2'b10;
+    CLKMODE <= 2'b01;
     clkmode_change <= 1'b1;
   end
   else begin
