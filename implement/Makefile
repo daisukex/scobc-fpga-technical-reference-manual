@@ -33,13 +33,14 @@ RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(wildcard $(list)/*.v)
 LOG_DIR              := log
 DESIGN_DIR           := output
 CONSTRAINTS_DIR      := constraints
+BIT_DIR              := bitstream
 
-CF                   := $(CIP_DIR) $(DESIGN_DIR) $(LOG_DIR) rtl.list
+CF                   := $(CIP_DIR) $(DESIGN_DIR) $(LOG_DIR) $(BIT_DIR) rtl.list
 CF                   += vivado* .Xil .hbs
 
 
 PHONY := all
-all: route_top
+all: write_mcs
 
 # Synthesis Cortex-M3
 # ---------------------------------------------------------------------------
@@ -95,6 +96,16 @@ route: $(DESIGN_DIR)/route/$(TOPMODULE)_route.dcp
 
 $(DESIGN_DIR)/route/$(TOPMODULE)_route.dcp: $(DESIGN_DIR)/place/$(TOPMODULE)_place.dcp
 	$(VIVADOTCL) -source tcl/route.tcl -log $(LOG_DIR)/$(TOPMODULE)_route.log -tclargs $(TOPMODULE) $<
+
+# Generate Bitstream file
+# ---------------------------------------------------------------------------
+PHONY += write_mcs
+write_mcs: $(BIT_DIR)/$(TOPMODULE).bit $(BIT_DIR)/$(TOPMODULE).mcs
+
+$(BIT_DIR)/$(TOPMODULE).bit $(BIT_DIR)/$(TOPMODULE).mcs: $(DESIGN_DIR)/route/$(TOPMODULE)_route.dcp
+	$(MKDIR) $(BIT_DIR)
+	echo '*' > $(BIT_DIR)/.gitignore
+	$(VIVADOTCL) -source tcl/gen_bitstream.tcl -log $(LOG_DIR)/$(TOPMODULE)_wbitstream.log -tclargs $(TOPMODULE) $<
 
 # clean target
 # ---------------------------------------------------------------------------
