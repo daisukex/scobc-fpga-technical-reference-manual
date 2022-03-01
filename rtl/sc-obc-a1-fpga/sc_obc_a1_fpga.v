@@ -12,7 +12,7 @@ module sc_obc_a1_fpga # (
   parameter SYSCTRL_USER_CLK2_MODE = 0,
   parameter CM3SS_UDL_ISR_NUM = 16,
   parameter CM3SS_ITCM_SIZE_KB = 128,
-  parameter CM3SS_ITCM_ADDR_BW = 14,
+  parameter CM3SS_ITCM_ADDR_BW = 17,
   parameter MAINAXI_UDL_M_AXI_ID_WIDTH = 2,
   parameter MAINAXI_S_AXI_ID_WIDTH = 3
 ) (
