@@ -7,7 +7,7 @@
 
 module ahb_memory # (
   parameter MEM_SIZE_KB = 8,
-  parameter MEM_ADDR_BW = 14
+  parameter MEM_ADDR_BW = 13
 ) (
   // System Interface
   input HCLK,
