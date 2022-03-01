@@ -32,12 +32,14 @@ RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(wildcard $(list)/*.v)
 
 LOG_DIR              := log
 DESIGN_DIR           := output
-CF                   := $(CIP_DIR) $(DESIGN_DIR) $(LOG_DIR)
+CONSTRAINTS_DIR      := constraints
+
+CF                   := $(CIP_DIR) $(DESIGN_DIR) $(LOG_DIR) rtl.list
 CF                   += vivado* .Xil .hbs
 
 
 PHONY := all
-all: synthesis_top
+all: place_top
 
 # Synthesis Cortex-M3
 # ---------------------------------------------------------------------------
@@ -79,6 +81,14 @@ $(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp: $(RTL_LIST) $(CM3_SYNTH_DIR)
 	@echo $(filter-out %sc_cm3_wrapper.v,${RTL_LIST}) > rtl.list
 	$(VIVADOTCL) -source tcl/synthesis.tcl -log $(LOG_DIR)/$(TOPMODULE)_synthesis.log\
 		-tclargs $(TOPMODULE) rtl.list $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp  $(AXI_CROSSBAR_DCP)
+
+# Place and Route TOP Module
+# ---------------------------------------------------------------------------
+PHONY += place
+place: $(DESIGN_DIR)/place/$(TOPMODULE)_place.dcp
+
+$(DESIGN_DIR)/place/$(TOPMODULE)_place.dcp: $(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp $(CONSTRAINTS_DIR)/$(TOPMODULE)_io.xdc
+	$(VIVADOTCL) -source tcl/place.tcl -log $(LOG_DIR)/$(TOPMODULE)_place.log -tclargs $(TOPMODULE) $<
 
 # clean target
 # ---------------------------------------------------------------------------

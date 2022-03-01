@@ -13,5 +13,5 @@ set rootd   ./output
 set xcid    ./ip
 set axiipd  ${xcid}/axi_crossbar
 set rtllist ./tcl/dut_rtl.list
-set xdcd    ./constraint
+set xdcd    ./constraints
 set bitd    ./bitstream
