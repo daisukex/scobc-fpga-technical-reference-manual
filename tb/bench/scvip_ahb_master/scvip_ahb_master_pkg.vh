@@ -1,3 +1,11 @@
+//-----------------------------------------------
+// Space Cubics AHB IP
+//  AHB Master Verification Package File
+//  Module: scvip_ahb_master
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 parameter SCVIP_AHBM_NUM_OF_MASTER = 3;
 parameter SCVIP_AHBM_MAX_TRANS_CYCLE = 128;
 reg [SCVIP_AHBM_MAX_TRANS_CYCLE*32-1:0] WriteData;
@@ -96,6 +104,13 @@ task automatic read_transaction (
     set_sens = {SENS_STOP, reg_sens[15:0]};
   else
     set_sens = {SENS_INFO, reg_sens[15:0]};
+
+  case (master)
+    0: ahbm[0].ahb_master.CHANGE_SENSITIVITY(set_sens);
+    1: ahbm[1].ahb_master.CHANGE_SENSITIVITY(set_sens);
+    2: ahbm[2].ahb_master.CHANGE_SENSITIVITY(set_sens);
+  endcase
+
 
   case (master)
     0: ahbm[0].ahb_master.CHANGE_SENSITIVITY(set_sens);

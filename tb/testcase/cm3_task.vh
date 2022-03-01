@@ -1,3 +1,10 @@
+//-----------------------------------------------
+// Space Cubics OBC A1 FPGA
+//  Cortex-M3 Verification Task
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 wire [239:0] CM3_ISR = tb_top.dut.obc_core.cm3_ss.cpu_wrapper.CORTEXM3INTEGRATION.INTISR;
 wire [239:0] CM3_CLK = tb_top.dut.obc_core.cm3_ss.cpu_wrapper.CORTEXM3INTEGRATION.HCLK;
 

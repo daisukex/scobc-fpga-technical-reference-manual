@@ -1,3 +1,11 @@
+//-----------------------------------------------
+// Space Cubics AHB IP
+//  AHB Master Verification IP (Version b0.1)
+//  Module: scvip_ahb_master
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 `timescale 1ps/1ps
 
 module scvip_ahb_master # (

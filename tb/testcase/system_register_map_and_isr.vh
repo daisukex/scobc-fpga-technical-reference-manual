@@ -1,3 +1,10 @@
+//-----------------------------------------------
+// Space Cubics OBC A1 FPGA
+//  Register Map and ISR Configuration file
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 `define CFG_QSPI_BASE 32'h4000_0000
 `define DAT_QSPI_BASE 32'h4010_0000
 `define FRM_QSPI_BASE 32'h4020_0000

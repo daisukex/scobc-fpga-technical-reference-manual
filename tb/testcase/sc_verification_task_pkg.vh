@@ -1,3 +1,10 @@
+//-----------------------------------------------
+// Space Cubics Verification Task Package
+//  Version 0.1
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 parameter TESTCASE_NAME_MAX_WORD_COUNT = 128;
 parameter SIM_LABEL_MAX_WORD_COUNT = 128;
 parameter DISPLAY_TEST_MAX_WORD_COUNT = 128;

@@ -1,3 +1,11 @@
+//-----------------------------------------------
+// Space Cubics OBC A1 FPGA
+//  I2C Slave Model
+//  Module: i2c_model
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 `timescale 1ps/1ps
 
 module i2c_model # (

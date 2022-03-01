@@ -1,3 +1,11 @@
+//-----------------------------------------------
+// Space Cubics OBC A1 FPGA
+//  UART Model
+//  Module: uart_model
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 `timescale 1ps/1ps
 
 module uart_model (

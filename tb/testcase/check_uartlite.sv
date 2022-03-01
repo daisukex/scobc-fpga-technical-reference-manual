@@ -1,3 +1,10 @@
+//-----------------------------------------------
+// Space Cubics SC-OBC-A1 FPGA
+//  Testcase: Check UART-Lite
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 `timescale 1ps/1ps
 
 module tb_top;

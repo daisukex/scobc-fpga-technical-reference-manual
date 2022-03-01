@@ -1,3 +1,10 @@
+//-----------------------------------------------
+// Space Cubics SC-OBC-A1 FPGA
+//  Testcase: Check Internal I2C Master Controller
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 `timescale 1ps/1ps
 
 module tb_top;

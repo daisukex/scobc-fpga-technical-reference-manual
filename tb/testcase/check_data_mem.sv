@@ -1,3 +1,11 @@
+//-----------------------------------------------
+// Space Cubics SC-OBC-A1 FPGA
+//  Testcase: Check NOR Flash Memory Controller 
+//                                for Data Memory
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
 `timescale 1ps/1ps
 
 module tb_top;

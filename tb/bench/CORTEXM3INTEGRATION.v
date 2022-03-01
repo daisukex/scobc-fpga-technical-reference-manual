@@ -1,3 +1,17 @@
+//-----------------------------------------------
+// Space Cubics OBC A1 FPGA
+//  CORTEXM3INTEGRATION rtl simulation module
+//  Module: CORTEXM3INTEGRATION
+//-----------------------------------------------
+// Copyright © 2022 Space Cubics, LLC.
+//-----------------------------------------------
+
+/*
+ * This module is used for Simulation. It should not be used for logic
+ * synthesis. The user execute verification by binding the AHB Master
+ * model to the terminals of this module.
+ */
+
 module CORTEXM3INTEGRATION (
   input ISOLATEn,
   input RETAINn,
