@@ -37,10 +37,10 @@ module lpahb_ss # (
   output WREADY,
 
   // AXI Write Responce Channel
-  input [LPAHB_AXI_ID_WIDTH-1:0] BID,
-  input [1:0] BRESP,
-  input BVALID,
-  output BREADY,
+  output [LPAHB_AXI_ID_WIDTH-1:0] BID,
+  output [1:0] BRESP,
+  output BVALID,
+  input BREADY,
 
   // AXI Read Address Channel
   input [LPAHB_AXI_ID_WIDTH-1:0] ARID,
