@@ -67,7 +67,6 @@ if {$sdc} then {
 }
 
 # Report Timing
-reset_timing
 report_clocks
 report_clock_interaction
 report_clock_networks
