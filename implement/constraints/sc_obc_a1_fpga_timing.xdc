@@ -18,5 +18,9 @@ set_case_analysis 0 [get_pins {sysctrl/clk_gen/scobca1_outsel/reg_clkmode[0]}]
 
 set_clock_groups \
     -asynchronous \
-    -group [get_clocks {sys_clk1 sys_clk2}] \
-    -group [get_clocks tclk]
+    -group [get_clocks refclk1] \
+    -group [get_clocks refclk2] \
+    -group [get_clocks pllclk96m] \
+    -group [get_clocks tclk] \
+    -group [get_clocks w_user_clk1] \
+    -group [get_clocks w_user_clk2]
