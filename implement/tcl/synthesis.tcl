@@ -51,19 +51,17 @@ read_verilog_from_rtllist ${rtllist}
 read_dcp_from_vallist ${rootd} ${arglist}
 
 # SDC Setting
-if { [ file exists ${xdcd}/${topmodule}.sdc ] == 1 } then {
-    create_fileset -constrset ${topmodule}_xdc
-    add_files -fileset ${topmodule}_xdc ${xdcd}/${topmodule}.sdc
+if { [ file exists ${xdcd}/${topmodule}_timing.xdc ] == 1 } then {
+    create_fileset -constrset ${topmodule}_timing_xdc
+    add_files -fileset ${topmodule}_timing_xdc ${xdcd}/${topmodule}_timing.xdc
     set sdc 1
 } else {
     set sdc 0
 }
 
-# IP SDC Setting
-
 # Synthesis TOP Module
 if {$sdc} then {
-    synth_design -constrset ${topmodule}_xdc -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule}
+    synth_design -constrset ${topmodule}_timing_xdc -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule}
 } else {
     synth_design -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule}
 }
