@@ -29,8 +29,6 @@ if {${argc} <= 2} {
     exit 1
 }
 set arglist ${argv}
-set outdir ${rootd}/synthesis
-file mkdir ${outdir}
 
 # set top module
 set topmodule [lindex ${arglist} 0]
