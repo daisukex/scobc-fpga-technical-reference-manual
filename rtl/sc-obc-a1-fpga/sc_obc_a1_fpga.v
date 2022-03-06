@@ -108,83 +108,83 @@ wire sys_rstb_sync_userclk1;
 wire sys_rstb_sync_userclk2;
 wire bus_rstb;
 
-wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_m_axi_awid;
-wire [31:0] udl_m_axi_awaddr;
-wire [7:0] udl_m_axi_awlen;
-wire [2:0] udl_m_axi_awsize;
-wire [1:0] udl_m_axi_awburst;
-wire udl_m_axi_awlock;
-wire [3:0] udl_m_axi_awcache;
-wire [2:0] udl_m_axi_awprot;
-wire [3:0] udl_m_axi_awqos;
-wire udl_m_axi_awvalid;
-wire udl_m_axi_awready;
-wire [31:0] udl_m_axi_wdata;
-wire [3:0] udl_m_axi_wstrb;
-wire udl_m_axi_wlast;
-wire udl_m_axi_wvalid;
-wire udl_m_axi_wready;
-wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_m_axi_bid;
-wire [1:0] udl_m_axi_bresp;
-wire udl_m_axi_bvalid;
-wire udl_m_axi_bready;
-wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_m_axi_arid;
-wire [31:0] udl_m_axi_araddr;
-wire [7:0] udl_m_axi_arlen;
-wire [2:0] udl_m_axi_arsize;
-wire [1:0] udl_m_axi_arburst;
-wire udl_m_axi_arlock;
-wire [3:0] udl_m_axi_arcache;
-wire [2:0] udl_m_axi_arprot;
-wire [3:0] udl_m_axi_arqos;
-wire udl_m_axi_arvalid;
-wire udl_m_axi_arready;
-wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_m_axi_rid;
-wire [31:0] udl_m_axi_rdata;
-wire [1:0] udl_m_axi_rresp;
-wire udl_m_axi_rlast;
-wire udl_m_axi_rvalid;
-wire udl_m_axi_rready;
+wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_axim_awid;
+wire [31:0] udl_axim_awaddr;
+wire [7:0] udl_axim_awlen;
+wire [2:0] udl_axim_awsize;
+wire [1:0] udl_axim_awburst;
+wire udl_axim_awlock;
+wire [3:0] udl_axim_awcache;
+wire [2:0] udl_axim_awprot;
+wire [3:0] udl_axim_awqos;
+wire udl_axim_awvalid;
+wire udl_axim_awready;
+wire [31:0] udl_axim_wdata;
+wire [3:0] udl_axim_wstrb;
+wire udl_axim_wlast;
+wire udl_axim_wvalid;
+wire udl_axim_wready;
+wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_axim_bid;
+wire [1:0] udl_axim_bresp;
+wire udl_axim_bvalid;
+wire udl_axim_bready;
+wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_axim_arid;
+wire [31:0] udl_axim_araddr;
+wire [7:0] udl_axim_arlen;
+wire [2:0] udl_axim_arsize;
+wire [1:0] udl_axim_arburst;
+wire udl_axim_arlock;
+wire [3:0] udl_axim_arcache;
+wire [2:0] udl_axim_arprot;
+wire [3:0] udl_axim_arqos;
+wire udl_axim_arvalid;
+wire udl_axim_arready;
+wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_axim_rid;
+wire [31:0] udl_axim_rdata;
+wire [1:0] udl_axim_rresp;
+wire udl_axim_rlast;
+wire udl_axim_rvalid;
+wire udl_axim_rready;
 
-wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_s_axi_awid;
-wire [31:0] udl_s_axi_awaddr;
-wire [7:0] udl_s_axi_awlen;
-wire [2:0] udl_s_axi_awsize;
-wire [1:0] udl_s_axi_awburst;
-wire udl_s_axi_awlock;
-wire [3:0] udl_s_axi_awcache;
-wire [2:0] udl_s_axi_awprot;
-wire [3:0] udl_s_axi_awregion;
-wire [3:0] udl_s_axi_awqos;
-wire udl_s_axi_awvalid;
-wire udl_s_axi_awready;
-wire [31:0] udl_s_axi_wdata;
-wire [3:0] udl_s_axi_wstrb;
-wire udl_s_axi_wlast;
-wire udl_s_axi_wvalid;
-wire udl_s_axi_wready;
-wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_s_axi_bid;
-wire [1:0] udl_s_axi_bresp;
-wire udl_s_axi_bvalid;
-wire udl_s_axi_bready;
-wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_s_axi_arid;
-wire [31:0] udl_s_axi_araddr;
-wire [7:0] udl_s_axi_arlen;
-wire [2:0] udl_s_axi_arsize;
-wire [1:0] udl_s_axi_arburst;
-wire udl_s_axi_arlock;
-wire [3:0] udl_s_axi_arcache;
-wire [2:0] udl_s_axi_arprot;
-wire [3:0] udl_s_axi_arregion;
-wire [3:0] udl_s_axi_arqos;
-wire udl_s_axi_arvalid;
-wire udl_s_axi_arready;
-wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_s_axi_rid;
-wire [31:0] udl_s_axi_rdata;
-wire [1:0] udl_s_axi_rresp;
-wire udl_s_axi_rlast;
-wire udl_s_axi_rvalid;
-wire udl_s_axi_rready;
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_axis_awid;
+wire [31:0] udl_axis_awaddr;
+wire [7:0] udl_axis_awlen;
+wire [2:0] udl_axis_awsize;
+wire [1:0] udl_axis_awburst;
+wire udl_axis_awlock;
+wire [3:0] udl_axis_awcache;
+wire [2:0] udl_axis_awprot;
+wire [3:0] udl_axis_awregion;
+wire [3:0] udl_axis_awqos;
+wire udl_axis_awvalid;
+wire udl_axis_awready;
+wire [31:0] udl_axis_wdata;
+wire [3:0] udl_axis_wstrb;
+wire udl_axis_wlast;
+wire udl_axis_wvalid;
+wire udl_axis_wready;
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_axis_bid;
+wire [1:0] udl_axis_bresp;
+wire udl_axis_bvalid;
+wire udl_axis_bready;
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_axis_arid;
+wire [31:0] udl_axis_araddr;
+wire [7:0] udl_axis_arlen;
+wire [2:0] udl_axis_arsize;
+wire [1:0] udl_axis_arburst;
+wire udl_axis_arlock;
+wire [3:0] udl_axis_arcache;
+wire [2:0] udl_axis_arprot;
+wire [3:0] udl_axis_arregion;
+wire [3:0] udl_axis_arqos;
+wire udl_axis_arvalid;
+wire udl_axis_arready;
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] udl_axis_rid;
+wire [31:0] udl_axis_rdata;
+wire [1:0] udl_axis_rresp;
+wire udl_axis_rlast;
+wire udl_axis_rvalid;
+wire udl_axis_rready;
 
 wire [CM3SS_UDL_ISR_NUM-1:0] udl_intisr;
 
@@ -281,94 +281,94 @@ sc_obc_core # (
   // UDL Master Interface
   // ------------------------------
   // Write Address Channel
-  .UDL_AXIM_AWID(udl_m_axi_awid),
-  .UDL_AXIM_AWADDR(udl_m_axi_awaddr),
-  .UDL_AXIM_AWLEN(udl_m_axi_awlen),
-  .UDL_AXIM_AWSIZE(udl_m_axi_awsize),
-  .UDL_AXIM_AWBURST(udl_m_axi_awburst),
-  .UDL_AXIM_AWLOCK(udl_m_axi_awlock),
-  .UDL_AXIM_AWCACHE(udl_m_axi_awcache),
-  .UDL_AXIM_AWPROT(udl_m_axi_awprot),
-  .UDL_AXIM_AWQOS(udl_m_axi_awqos),
-  .UDL_AXIM_AWVALID(udl_m_axi_awvalid),
-  .UDL_AXIM_AWREADY(udl_m_axi_awready),
+  .UDL_AXIM_AWID(udl_axim_awid),
+  .UDL_AXIM_AWADDR(udl_axim_awaddr),
+  .UDL_AXIM_AWLEN(udl_axim_awlen),
+  .UDL_AXIM_AWSIZE(udl_axim_awsize),
+  .UDL_AXIM_AWBURST(udl_axim_awburst),
+  .UDL_AXIM_AWLOCK(udl_axim_awlock),
+  .UDL_AXIM_AWCACHE(udl_axim_awcache),
+  .UDL_AXIM_AWPROT(udl_axim_awprot),
+  .UDL_AXIM_AWQOS(udl_axim_awqos),
+  .UDL_AXIM_AWVALID(udl_axim_awvalid),
+  .UDL_AXIM_AWREADY(udl_axim_awready),
   // Write Data Channel
-  .UDL_AXIM_WDATA(udl_m_axi_wdata),
-  .UDL_AXIM_WSTRB(udl_m_axi_wstrb),
-  .UDL_AXIM_WLAST(udl_m_axi_wlast),
-  .UDL_AXIM_WVALID(udl_m_axi_wvalid),
-  .UDL_AXIM_WREADY(udl_m_axi_wready),
-  .UDL_AXIM_BID(udl_m_axi_bid),
+  .UDL_AXIM_WDATA(udl_axim_wdata),
+  .UDL_AXIM_WSTRB(udl_axim_wstrb),
+  .UDL_AXIM_WLAST(udl_axim_wlast),
+  .UDL_AXIM_WVALID(udl_axim_wvalid),
+  .UDL_AXIM_WREADY(udl_axim_wready),
+  .UDL_AXIM_BID(udl_axim_bid),
   // Write Responce Channel
-  .UDL_AXIM_BRESP(udl_m_axi_bresp),
-  .UDL_AXIM_BVALID(udl_m_axi_bvalid),
-  .UDL_AXIM_BREADY(udl_m_axi_bready),
+  .UDL_AXIM_BRESP(udl_axim_bresp),
+  .UDL_AXIM_BVALID(udl_axim_bvalid),
+  .UDL_AXIM_BREADY(udl_axim_bready),
   // Read Address Channel
-  .UDL_AXIM_ARID(udl_m_axi_arid),
-  .UDL_AXIM_ARADDR(udl_m_axi_araddr),
-  .UDL_AXIM_ARLEN(udl_m_axi_arlen),
-  .UDL_AXIM_ARSIZE(udl_m_axi_arsize),
-  .UDL_AXIM_ARBURST(udl_m_axi_arburst),
-  .UDL_AXIM_ARLOCK(udl_m_axi_arlock),
-  .UDL_AXIM_ARCACHE(udl_m_axi_arcache),
-  .UDL_AXIM_ARPROT(udl_m_axi_arprot),
-  .UDL_AXIM_ARQOS(udl_m_axi_arqos),
-  .UDL_AXIM_ARVALID(udl_m_axi_arvalid),
-  .UDL_AXIM_ARREADY(udl_m_axi_arready),
+  .UDL_AXIM_ARID(udl_axim_arid),
+  .UDL_AXIM_ARADDR(udl_axim_araddr),
+  .UDL_AXIM_ARLEN(udl_axim_arlen),
+  .UDL_AXIM_ARSIZE(udl_axim_arsize),
+  .UDL_AXIM_ARBURST(udl_axim_arburst),
+  .UDL_AXIM_ARLOCK(udl_axim_arlock),
+  .UDL_AXIM_ARCACHE(udl_axim_arcache),
+  .UDL_AXIM_ARPROT(udl_axim_arprot),
+  .UDL_AXIM_ARQOS(udl_axim_arqos),
+  .UDL_AXIM_ARVALID(udl_axim_arvalid),
+  .UDL_AXIM_ARREADY(udl_axim_arready),
   // Read Data Channel
-  .UDL_AXIM_RID(udl_m_axi_rid),
-  .UDL_AXIM_RDATA(udl_m_axi_rdata),
-  .UDL_AXIM_RRESP(udl_m_axi_rresp),
-  .UDL_AXIM_RLAST(udl_m_axi_rlast),
-  .UDL_AXIM_RVALID(udl_m_axi_rvalid),
-  .UDL_AXIM_RREADY(udl_m_axi_rready),
+  .UDL_AXIM_RID(udl_axim_rid),
+  .UDL_AXIM_RDATA(udl_axim_rdata),
+  .UDL_AXIM_RRESP(udl_axim_rresp),
+  .UDL_AXIM_RLAST(udl_axim_rlast),
+  .UDL_AXIM_RVALID(udl_axim_rvalid),
+  .UDL_AXIM_RREADY(udl_axim_rready),
 
   // UDL Slave Interface
   // ------------------------------
   // Write Address Channel
-  .UDL_AXIS_AWID(udl_s_axi_awid),
-  .UDL_AXIS_AWADDR(udl_s_axi_awaddr),
-  .UDL_AXIS_AWLEN(udl_s_axi_awlen),
-  .UDL_AXIS_AWSIZE(udl_s_axi_awsize),
-  .UDL_AXIS_AWBURST(udl_s_axi_awburst),
-  .UDL_AXIS_AWLOCK(udl_s_axi_awlock),
-  .UDL_AXIS_AWCACHE(udl_s_axi_awcache),
-  .UDL_AXIS_AWPROT(udl_s_axi_awprot),
-  .UDL_AXIS_AWREGION(udl_s_axi_awregion),
-  .UDL_AXIS_AWQOS(udl_s_axi_awqos),
-  .UDL_AXIS_AWVALID(udl_s_axi_awvalid),
-  .UDL_AXIS_AWREADY(udl_s_axi_awready),
+  .UDL_AXIS_AWID(udl_axis_awid),
+  .UDL_AXIS_AWADDR(udl_axis_awaddr),
+  .UDL_AXIS_AWLEN(udl_axis_awlen),
+  .UDL_AXIS_AWSIZE(udl_axis_awsize),
+  .UDL_AXIS_AWBURST(udl_axis_awburst),
+  .UDL_AXIS_AWLOCK(udl_axis_awlock),
+  .UDL_AXIS_AWCACHE(udl_axis_awcache),
+  .UDL_AXIS_AWPROT(udl_axis_awprot),
+  .UDL_AXIS_AWREGION(udl_axis_awregion),
+  .UDL_AXIS_AWQOS(udl_axis_awqos),
+  .UDL_AXIS_AWVALID(udl_axis_awvalid),
+  .UDL_AXIS_AWREADY(udl_axis_awready),
   // Write Data Channel
-  .UDL_AXIS_WDATA(udl_s_axi_wdata),
-  .UDL_AXIS_WSTRB(udl_s_axi_wstrb),
-  .UDL_AXIS_WLAST(udl_s_axi_wlast),
-  .UDL_AXIS_WVALID(udl_s_axi_wvalid),
-  .UDL_AXIS_WREADY(udl_s_axi_wready),
+  .UDL_AXIS_WDATA(udl_axis_wdata),
+  .UDL_AXIS_WSTRB(udl_axis_wstrb),
+  .UDL_AXIS_WLAST(udl_axis_wlast),
+  .UDL_AXIS_WVALID(udl_axis_wvalid),
+  .UDL_AXIS_WREADY(udl_axis_wready),
   // Write Responce Channel
-  .UDL_AXIS_BID(udl_s_axi_bid),
-  .UDL_AXIS_BRESP(udl_s_axi_bresp),
-  .UDL_AXIS_BVALID(udl_s_axi_bvalid),
-  .UDL_AXIS_BREADY(udl_s_axi_bready),
+  .UDL_AXIS_BID(udl_axis_bid),
+  .UDL_AXIS_BRESP(udl_axis_bresp),
+  .UDL_AXIS_BVALID(udl_axis_bvalid),
+  .UDL_AXIS_BREADY(udl_axis_bready),
   // Read Address Channel
-  .UDL_AXIS_ARID(udl_s_axi_arid),
-  .UDL_AXIS_ARADDR(udl_s_axi_araddr),
-  .UDL_AXIS_ARLEN(udl_s_axi_arlen),
-  .UDL_AXIS_ARSIZE(udl_s_axi_arsize),
-  .UDL_AXIS_ARBURST(udl_s_axi_arburst),
-  .UDL_AXIS_ARLOCK(udl_s_axi_arlock),
-  .UDL_AXIS_ARCACHE(udl_s_axi_arcache),
-  .UDL_AXIS_ARPROT(udl_s_axi_arprot),
-  .UDL_AXIS_ARREGION(udl_s_axi_arregion),
-  .UDL_AXIS_ARQOS(udl_s_axi_arqos),
-  .UDL_AXIS_ARVALID(udl_s_axi_arvalid),
-  .UDL_AXIS_ARREADY(udl_s_axi_arready),
+  .UDL_AXIS_ARID(udl_axis_arid),
+  .UDL_AXIS_ARADDR(udl_axis_araddr),
+  .UDL_AXIS_ARLEN(udl_axis_arlen),
+  .UDL_AXIS_ARSIZE(udl_axis_arsize),
+  .UDL_AXIS_ARBURST(udl_axis_arburst),
+  .UDL_AXIS_ARLOCK(udl_axis_arlock),
+  .UDL_AXIS_ARCACHE(udl_axis_arcache),
+  .UDL_AXIS_ARPROT(udl_axis_arprot),
+  .UDL_AXIS_ARREGION(udl_axis_arregion),
+  .UDL_AXIS_ARQOS(udl_axis_arqos),
+  .UDL_AXIS_ARVALID(udl_axis_arvalid),
+  .UDL_AXIS_ARREADY(udl_axis_arready),
   // Read Data Channel
-  .UDL_AXIS_RID(udl_s_axi_rid),
-  .UDL_AXIS_RDATA(udl_s_axi_rdata),
-  .UDL_AXIS_RRESP(udl_s_axi_rresp),
-  .UDL_AXIS_RLAST(udl_s_axi_rlast),
-  .UDL_AXIS_RVALID(udl_s_axi_rvalid),
-  .UDL_AXIS_RREADY(udl_s_axi_rready),
+  .UDL_AXIS_RID(udl_axis_rid),
+  .UDL_AXIS_RDATA(udl_axis_rdata),
+  .UDL_AXIS_RRESP(udl_axis_rresp),
+  .UDL_AXIS_RLAST(udl_axis_rlast),
+  .UDL_AXIS_RVALID(udl_axis_rvalid),
+  .UDL_AXIS_RREADY(udl_axis_rready),
   .UDL_INTISR(udl_intisr),
 
   // NOR Flash Configuration Memory Interface
@@ -473,84 +473,84 @@ udl_axi # (
   .UDL_INTISR(udl_intisr),
 
   // UDL AXI4 Master Interface
-  .UDL_M_AXI_AWID(udl_m_axi_awid),
-  .UDL_M_AXI_AWADDR(udl_m_axi_awaddr),
-  .UDL_M_AXI_AWLEN(udl_m_axi_awlen),
-  .UDL_M_AXI_AWSIZE(udl_m_axi_awsize),
-  .UDL_M_AXI_AWBURST(udl_m_axi_awburst),
-  .UDL_M_AXI_AWLOCK(udl_m_axi_awlock),
-  .UDL_M_AXI_AWCACHE(udl_m_axi_awcache),
-  .UDL_M_AXI_AWPROT(udl_m_axi_awprot),
-  .UDL_M_AXI_AWQOS(udl_m_axi_awqos),
-  .UDL_M_AXI_AWVALID(udl_m_axi_awvalid),
-  .UDL_M_AXI_AWREADY(udl_m_axi_awready),
-  .UDL_M_AXI_WDATA(udl_m_axi_wdata),
-  .UDL_M_AXI_WSTRB(udl_m_axi_wstrb),
-  .UDL_M_AXI_WLAST(udl_m_axi_wlast),
-  .UDL_M_AXI_WVALID(udl_m_axi_wvalid),
-  .UDL_M_AXI_WREADY(udl_m_axi_wready),
-  .UDL_M_AXI_BID(udl_m_axi_bid),
-  .UDL_M_AXI_BRESP(udl_m_axi_bresp),
-  .UDL_M_AXI_BVALID(udl_m_axi_bvalid),
-  .UDL_M_AXI_BREADY(udl_m_axi_bready),
-  .UDL_M_AXI_ARID(udl_m_axi_arid),
-  .UDL_M_AXI_ARADDR(udl_m_axi_araddr),
-  .UDL_M_AXI_ARLEN(udl_m_axi_arlen),
-  .UDL_M_AXI_ARSIZE(udl_m_axi_arsize),
-  .UDL_M_AXI_ARBURST(udl_m_axi_arburst),
-  .UDL_M_AXI_ARLOCK(udl_m_axi_arlock),
-  .UDL_M_AXI_ARCACHE(udl_m_axi_arcache),
-  .UDL_M_AXI_ARPROT(udl_m_axi_arprot),
-  .UDL_M_AXI_ARQOS(udl_m_axi_arqos),
-  .UDL_M_AXI_ARVALID(udl_m_axi_arvalid),
-  .UDL_M_AXI_ARREADY(udl_m_axi_arready),
-  .UDL_M_AXI_RID(udl_m_axi_rid),
-  .UDL_M_AXI_RDATA(udl_m_axi_rdata),
-  .UDL_M_AXI_RRESP(udl_m_axi_rresp),
-  .UDL_M_AXI_RLAST(udl_m_axi_rlast),
-  .UDL_M_AXI_RVALID(udl_m_axi_rvalid),
-  .UDL_M_AXI_RREADY(udl_m_axi_rready),
+  .UDL_AXIM_AWID(udl_axim_awid),
+  .UDL_AXIM_AWADDR(udl_axim_awaddr),
+  .UDL_AXIM_AWLEN(udl_axim_awlen),
+  .UDL_AXIM_AWSIZE(udl_axim_awsize),
+  .UDL_AXIM_AWBURST(udl_axim_awburst),
+  .UDL_AXIM_AWLOCK(udl_axim_awlock),
+  .UDL_AXIM_AWCACHE(udl_axim_awcache),
+  .UDL_AXIM_AWPROT(udl_axim_awprot),
+  .UDL_AXIM_AWQOS(udl_axim_awqos),
+  .UDL_AXIM_AWVALID(udl_axim_awvalid),
+  .UDL_AXIM_AWREADY(udl_axim_awready),
+  .UDL_AXIM_WDATA(udl_axim_wdata),
+  .UDL_AXIM_WSTRB(udl_axim_wstrb),
+  .UDL_AXIM_WLAST(udl_axim_wlast),
+  .UDL_AXIM_WVALID(udl_axim_wvalid),
+  .UDL_AXIM_WREADY(udl_axim_wready),
+  .UDL_AXIM_BID(udl_axim_bid),
+  .UDL_AXIM_BRESP(udl_axim_bresp),
+  .UDL_AXIM_BVALID(udl_axim_bvalid),
+  .UDL_AXIM_BREADY(udl_axim_bready),
+  .UDL_AXIM_ARID(udl_axim_arid),
+  .UDL_AXIM_ARADDR(udl_axim_araddr),
+  .UDL_AXIM_ARLEN(udl_axim_arlen),
+  .UDL_AXIM_ARSIZE(udl_axim_arsize),
+  .UDL_AXIM_ARBURST(udl_axim_arburst),
+  .UDL_AXIM_ARLOCK(udl_axim_arlock),
+  .UDL_AXIM_ARCACHE(udl_axim_arcache),
+  .UDL_AXIM_ARPROT(udl_axim_arprot),
+  .UDL_AXIM_ARQOS(udl_axim_arqos),
+  .UDL_AXIM_ARVALID(udl_axim_arvalid),
+  .UDL_AXIM_ARREADY(udl_axim_arready),
+  .UDL_AXIM_RID(udl_axim_rid),
+  .UDL_AXIM_RDATA(udl_axim_rdata),
+  .UDL_AXIM_RRESP(udl_axim_rresp),
+  .UDL_AXIM_RLAST(udl_axim_rlast),
+  .UDL_AXIM_RVALID(udl_axim_rvalid),
+  .UDL_AXIM_RREADY(udl_axim_rready),
 
   // UDL AXI4 Slave Interface
-  .UDL_S_AXI_AWID(udl_s_axi_awid),
-  .UDL_S_AXI_AWADDR(udl_s_axi_awaddr),
-  .UDL_S_AXI_AWLEN(udl_s_axi_awlen),
-  .UDL_S_AXI_AWSIZE(udl_s_axi_awsize),
-  .UDL_S_AXI_AWBURST(udl_s_axi_awburst),
-  .UDL_S_AXI_AWLOCK(udl_s_axi_awlock),
-  .UDL_S_AXI_AWCACHE(udl_s_axi_awcache),
-  .UDL_S_AXI_AWPROT(udl_s_axi_awprot),
-  .UDL_S_AXI_AWREGION(udl_s_axi_awregion),
-  .UDL_S_AXI_AWQOS(udl_s_axi_awqos),
-  .UDL_S_AXI_AWVALID(udl_s_axi_awvalid),
-  .UDL_S_AXI_AWREADY(udl_s_axi_awready),
-  .UDL_S_AXI_WDATA(udl_s_axi_wdata),
-  .UDL_S_AXI_WSTRB(udl_s_axi_wstrb),
-  .UDL_S_AXI_WLAST(udl_s_axi_wlast),
-  .UDL_S_AXI_WVALID(udl_s_axi_wvalid),
-  .UDL_S_AXI_WREADY(udl_s_axi_wready),
-  .UDL_S_AXI_BID(udl_s_axi_bid),
-  .UDL_S_AXI_BRESP(udl_s_axi_bresp),
-  .UDL_S_AXI_BVALID(udl_s_axi_bvalid),
-  .UDL_S_AXI_BREADY(udl_s_axi_bready),
-  .UDL_S_AXI_ARID(udl_s_axi_arid),
-  .UDL_S_AXI_ARADDR(udl_s_axi_araddr),
-  .UDL_S_AXI_ARLEN(udl_s_axi_arlen),
-  .UDL_S_AXI_ARSIZE(udl_s_axi_arsize),
-  .UDL_S_AXI_ARBURST(udl_s_axi_arburst),
-  .UDL_S_AXI_ARLOCK(udl_s_axi_arlock),
-  .UDL_S_AXI_ARCACHE(udl_s_axi_arcache),
-  .UDL_S_AXI_ARPROT(udl_s_axi_arprot),
-  .UDL_S_AXI_ARREGION(udl_s_axi_arregion),
-  .UDL_S_AXI_ARQOS(udl_s_axi_arqos),
-  .UDL_S_AXI_ARVALID(udl_s_axi_arvalid),
-  .UDL_S_AXI_ARREADY(udl_s_axi_arready),
-  .UDL_S_AXI_RID(udl_s_axi_rid),
-  .UDL_S_AXI_RDATA(udl_s_axi_rdata),
-  .UDL_S_AXI_RRESP(udl_s_axi_rresp),
-  .UDL_S_AXI_RLAST(udl_s_axi_rlast),
-  .UDL_S_AXI_RVALID(udl_s_axi_rvalid),
-  .UDL_S_AXI_RREADY(udl_s_axi_rready)
+  .UDL_AXIS_AWID(udl_axis_awid),
+  .UDL_AXIS_AWADDR(udl_axis_awaddr),
+  .UDL_AXIS_AWLEN(udl_axis_awlen),
+  .UDL_AXIS_AWSIZE(udl_axis_awsize),
+  .UDL_AXIS_AWBURST(udl_axis_awburst),
+  .UDL_AXIS_AWLOCK(udl_axis_awlock),
+  .UDL_AXIS_AWCACHE(udl_axis_awcache),
+  .UDL_AXIS_AWPROT(udl_axis_awprot),
+  .UDL_AXIS_AWREGION(udl_axis_awregion),
+  .UDL_AXIS_AWQOS(udl_axis_awqos),
+  .UDL_AXIS_AWVALID(udl_axis_awvalid),
+  .UDL_AXIS_AWREADY(udl_axis_awready),
+  .UDL_AXIS_WDATA(udl_axis_wdata),
+  .UDL_AXIS_WSTRB(udl_axis_wstrb),
+  .UDL_AXIS_WLAST(udl_axis_wlast),
+  .UDL_AXIS_WVALID(udl_axis_wvalid),
+  .UDL_AXIS_WREADY(udl_axis_wready),
+  .UDL_AXIS_BID(udl_axis_bid),
+  .UDL_AXIS_BRESP(udl_axis_bresp),
+  .UDL_AXIS_BVALID(udl_axis_bvalid),
+  .UDL_AXIS_BREADY(udl_axis_bready),
+  .UDL_AXIS_ARID(udl_axis_arid),
+  .UDL_AXIS_ARADDR(udl_axis_araddr),
+  .UDL_AXIS_ARLEN(udl_axis_arlen),
+  .UDL_AXIS_ARSIZE(udl_axis_arsize),
+  .UDL_AXIS_ARBURST(udl_axis_arburst),
+  .UDL_AXIS_ARLOCK(udl_axis_arlock),
+  .UDL_AXIS_ARCACHE(udl_axis_arcache),
+  .UDL_AXIS_ARPROT(udl_axis_arprot),
+  .UDL_AXIS_ARREGION(udl_axis_arregion),
+  .UDL_AXIS_ARQOS(udl_axis_arqos),
+  .UDL_AXIS_ARVALID(udl_axis_arvalid),
+  .UDL_AXIS_ARREADY(udl_axis_arready),
+  .UDL_AXIS_RID(udl_axis_rid),
+  .UDL_AXIS_RDATA(udl_axis_rdata),
+  .UDL_AXIS_RRESP(udl_axis_rresp),
+  .UDL_AXIS_RLAST(udl_axis_rlast),
+  .UDL_AXIS_RVALID(udl_axis_rvalid),
+  .UDL_AXIS_RREADY(udl_axis_rready)
 
   // User IO Interface
 //  .UIO1(UIO1),
