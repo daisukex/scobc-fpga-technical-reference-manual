@@ -37,11 +37,11 @@ initial begin
   end
 end
 
-wire SYS_CLK  = dut.w_sys_clk;
-wire SYS_RSTB = dut.w_sys_rstb;
-wire PLLLOCK  = dut.w_plllock;
-wire CMC_REQ  = dut.w_cmc_req;
-wire CMC_ACK  = dut.w_cmc_ack;
+wire SYS_CLK  = dut.sys_clk;
+wire SYS_RSTB = dut.sys_rstb;
+wire PLLLOCK  = dut.plllock;
+wire CMC_REQ  = dut.cmc_req;
+wire CMC_ACK  = dut.cmc_ack;
 
 wire (pull1, pull0) cm3_tms_swdio = 1'b0;
 wire console_tx;
