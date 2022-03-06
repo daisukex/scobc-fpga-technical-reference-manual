@@ -47,6 +47,14 @@ module sc_obc_core # (
   output CPU_LOCKUP,
   output CPU_LOCKUP_RSTEN,
 
+  // TRCH/Board System Interface
+  // ------------------------------
+  input CDRST_B,
+  output CFG_DONE,
+  input [1:0] FPGA_BOOT,
+  output FPGA_WATCHDOG,
+  inout FPGA_RESERVE,
+
   // UDL Master Interface
   // ------------------------------
   // Write Address Channel
@@ -140,8 +148,28 @@ module sc_obc_core # (
   output UDL_AXIS_RREADY,
   input [CM3SS_UDL_ISR_NUM-1:0] UDL_INTISR,
 
+  // SRAM Interface
+  // ------------------------------
+  output [19:0] SRAM_A,
+  output SRAM1_CE_B,
+  output SRAM1_OE_B,
+  output SRAM1_WE_B,
+  output SRAM1_BHE_B,
+  output SRAM1_BLE_B,
+  input SRAM1_ERR,
+  inout [15:0] SRAM1_IO,
+  output SRAM2_CE_B,
+  output SRAM2_OE_B,
+  output SRAM2_WE_B,
+  output SRAM2_BHE_B,
+  output SRAM2_BLE_B,
+  input SRAM2_ERR,
+  inout [15:0] SRAM2_IO,
+
   // NOR Flash Configuration Memory Interface
   // ------------------------------
+  output CFG_MEM_SEL,
+  input CFG_MEM_MON,
   output CFG_MEM_SCK,
   output CFG_MEM_CS_B,
   inout  [3:0] CFG_MEM_IO,
@@ -179,11 +207,24 @@ module sc_obc_core # (
   // ------------------------------
   inout INTERNAL_I2CM_SDA,
   inout INTERNAL_I2CM_SCL,
+  input CVM_CRITICAL_B,
+  input CVM_WARNING_B,
+  input TEMP_ALERT_B,
 
   // External I2C Interface
   // ------------------------------
   inout EXTERNAL_I2CM_SDA,
   inout EXTERNAL_I2CM_SCL,
+
+  // ULPI Interface
+  // ------------------------------
+  output ULPI_CS,
+  input ULPI_CLOCK,
+  output ULPI_RESET_B,
+  input ULPI_DIR,
+  input ULPI_NXT,
+  output ULPI_STP,
+  inout [7:0] ULPI_DATA,
 
   // Coetex-M3 SWJ-DP Interface
   // ------------------------------
@@ -674,5 +715,29 @@ lpahb_ss # (
   .EXTERNAL_I2CM_SDA(EXTERNAL_I2CM_SDA),
   .EXTERNAL_I2CM_SCL(EXTERNAL_I2CM_SCL)
 );
+
+assign CFG_DONE = 1'b1;
+assign FPGA_WATCHDOG = 1'b0;
+
+assign CFG_MEM_SEL = 1'b0;
+
+assign SRAM_A = 20'h0;
+assign SRAM1_CE_B = 1'b1;
+assign SRAM1_OE_B = 1'b1;
+assign SRAM1_WE_B = 1'b1;
+assign SRAM1_BHE_B = 1'b1;
+assign SRAM1_BLE_B = 1'b1;
+assign SRAM1_IO = 16'h0;
+assign SRAM2_CE_B = 1'b1;
+assign SRAM2_OE_B = 1'b1;
+assign SRAM2_WE_B = 1'b1;
+assign SRAM2_BHE_B = 1'b1;
+assign SRAM2_BLE_B = 1'b1;
+assign SRAM2_IO = 16'h0;
+
+assign ULPI_CS = 1'b0;
+assign ULPI_RESET_B = 1'b1;
+assign ULPI_STP = 1'b0;
+assign ULPI_DATA = 8'h0;
 
 endmodule

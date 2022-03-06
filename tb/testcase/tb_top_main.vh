@@ -49,6 +49,31 @@ wire console_rx;
 wire can_tx;
 wire can_rx = can_tx;
 
+wire [19:0] sram_a;
+wire sram1_ce_b;
+wire sram1_oe_b;
+wire sram1_we_b;
+wire sram1_bhe_b;
+wire sram1_ble_b;
+wire sram1_err;
+wire [15:0] sram1_io;
+wire sram2_ce_b;
+wire sram2_oe_b;
+wire sram2_we_b;
+wire sram2_bhe_b;
+wire sram2_ble_b;
+wire sram2_err;
+wire [15:0] sram2_io;
+
+wire ulpi_cs;
+wire ulpi_clock;
+wire ulpi_reset_b;
+wire ulpi_dir;
+wire ulpi_nxt;
+wire ulpi_stp;
+wire [7:0] ulpi_data;
+wire ulpi_refclk;
+
 wire (pull1, pull0) internal_i2cm_sda = 1'b1;
 wire (pull1, pull0) internal_i2cm_scl = 1'b1;
 wire (pull1, pull0) external_i2cm_sda = 1'b1;
@@ -95,6 +120,23 @@ sc_obc_a1_fpga # (
   .CM3_TMS_SWDIO(cm3_tms_swdio),
   .CM3_TDO_SWO(/*open*/),
 
+  // SRAM Interface
+  .SRAM_A(sram_a),
+  .SRAM1_CE_B(sram1_ce_b),
+  .SRAM1_OE_B(sram1_oe_b),
+  .SRAM1_WE_B(sram1_we_b),
+  .SRAM1_BHE_B(sram1_bhe_b),
+  .SRAM1_BLE_B(sram1_ble_b),
+  .SRAM1_ERR(sram1_err),
+  .SRAM1_IO(sram1_io),
+  .SRAM2_CE_B(sram2_ce_b),
+  .SRAM2_OE_B(sram2_oe_b),
+  .SRAM2_WE_B(sram2_we_b),
+  .SRAM2_BHE_B(sram2_bhe_b),
+  .SRAM2_BLE_B(sram2_ble_b),
+  .SRAM2_ERR(sram2_err),
+  .SRAM2_IO(sram2_io),
+
   // CFG QSPI Flash Interface
   .CFG_MEM_SEL(/*open*/),
   .CFG_MEM_MON(1'b0),
@@ -137,6 +179,16 @@ sc_obc_a1_fpga # (
   .FPGA_BOOT1(1'b1),
   .FPGA_WATCHDOG(/*open*/),
   .FPGA_RESERVE(/*open*/),
+
+  // ULPI Interface
+  .ULPI_CS(ulpi_cs),
+  .ULPI_CLOCK(ulpi_clock),
+  .ULPI_RESET_B(ulpi_reset_b),
+  .ULPI_DIR(ulpi_dir),
+  .ULPI_NXT(ulpi_nxt),
+  .ULPI_STP(ulpi_stp),
+  .ULPI_DATA(ulpi_data),
+  .ULPI_REFCLK(ulpi_refclk),
 
   // User IO Interface
 //  inout  [15:0] UIO1,

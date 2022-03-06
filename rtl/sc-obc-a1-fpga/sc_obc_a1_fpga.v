@@ -31,6 +31,23 @@ module sc_obc_a1_fpga # (
   inout  CM3_TMS_SWDIO,
   output CM3_TDO_SWO,
 
+  // SRAM Interface
+  output [19:0] SRAM_A,
+  output SRAM1_CE_B,
+  output SRAM1_OE_B,
+  output SRAM1_WE_B,
+  output SRAM1_BHE_B,
+  output SRAM1_BLE_B,
+  input  SRAM1_ERR,
+  inout  [15:0] SRAM1_IO,
+  output SRAM2_CE_B,
+  output SRAM2_OE_B,
+  output SRAM2_WE_B,
+  output SRAM2_BHE_B,
+  output SRAM2_BLE_B,
+  input  SRAM2_ERR,
+  inout  [15:0] SRAM2_IO,
+
   // CFG QSPI Flash Interface
   output CFG_MEM_SEL,
   input  CFG_MEM_MON,
@@ -73,6 +90,16 @@ module sc_obc_a1_fpga # (
   input  FPGA_BOOT1,
   output FPGA_WATCHDOG,
   inout  FPGA_RESERVE,
+
+  // ULPI Interface
+  output ULPI_CS,
+  input ULPI_CLOCK,
+  output ULPI_RESET_B,
+  input ULPI_DIR,
+  input ULPI_NXT,
+  output ULPI_STP,
+  inout [7:0] ULPI_DATA,
+  output ULPI_REFCLK,
 
   // User IO Interface
 //  inout  [15:0] UIO1,
@@ -226,7 +253,7 @@ scobca1_sysctrl # (
   .REF_CLK(ref_clk),
   .SYS_CLK(sys_clk),
   .MAXI_CLK(maxi_clk),
-  .ULPI_REFCLK(/*open*/),
+  .ULPI_REFCLK(ULPI_REFCLK),
   .USER_CLK1(user_clk1),
   .USER_CLK2(user_clk2),
   .POR_RSTB(por_rstb),
@@ -277,6 +304,14 @@ sc_obc_core # (
   // Lockup monitor and control
   .CPU_LOCKUP(cpu_lockup),
   .CPU_LOCKUP_RSTEN(cpu_lockup_rsten),
+
+  // TRCH/Board System Interface
+  // ------------------------------
+  .CDRST_B(CDRST_B),
+  .CFG_DONE(CFG_DONE),
+  .FPGA_BOOT({FPGA_BOOT1,FPGA_BOO0}),
+  .FPGA_WATCHDOG(FPGA_WATCHDOG),
+  .FPGA_RESERVE(FPGA_RESERVE),
 
   // UDL Master Interface
   // ------------------------------
@@ -371,8 +406,28 @@ sc_obc_core # (
   .UDL_AXIS_RREADY(udl_axis_rready),
   .UDL_INTISR(udl_intisr),
 
+  // SRAM Interface
+  // ------------------------------
+  .SRAM_A(SRAM_A),
+  .SRAM1_CE_B(SRAM1_CE_B),
+  .SRAM1_OE_B(SRAM1_OE_B),
+  .SRAM1_WE_B(SRAM1_WE_B),
+  .SRAM1_BHE_B(SRAM1_BHE_B),
+  .SRAM1_BLE_B(SRAM1_BLE_B),
+  .SRAM1_ERR(SRAM1_ERR),
+  .SRAM1_IO(SRAM1_IO),
+  .SRAM2_CE_B(SRAM2_CE_B),
+  .SRAM2_OE_B(SRAM2_OE_B),
+  .SRAM2_WE_B(SRAM2_WE_B),
+  .SRAM2_BHE_B(SRAM2_BHE_B),
+  .SRAM2_BLE_B(SRAM2_BLE_B),
+  .SRAM2_ERR(SRAM2_ERR),
+  .SRAM2_IO(SRAM2_IO),
+
   // NOR Flash Configuration Memory Interface
   // ------------------------------
+  .CFG_MEM_SEL(CFG_MEM_SEL),
+  .CFG_MEM_MON(CFG_MEM_MON),
   .CFG_MEM_SCK(CFG_MEM_SCK),
   .CFG_MEM_CS_B(CFG_MEM_CS_B),
   .CFG_MEM_IO(CFG_MEM_IO),
@@ -410,11 +465,24 @@ sc_obc_core # (
   // ------------------------------
   .INTERNAL_I2CM_SDA(FPGA_INT_SDA),
   .INTERNAL_I2CM_SCL(FPGA_INT_SCL),
+  .CVM_CRITICAL_B(CVM_CRITICAL_B),
+  .CVM_WARNING_B(CVM_WARNING_B),
+  .TEMP_ALERT_B(TEMP_ALERT_B),
 
   // External I2C Interface
   // ------------------------------
   .EXTERNAL_I2CM_SDA(FPGA_EXT_SDA),
   .EXTERNAL_I2CM_SCL(FPGA_EXT_SCL),
+
+  // ULPI Interface
+  // ------------------------------
+  .ULPI_CS(ULPI_CS),
+  .ULPI_CLOCK(ULPI_CLOCK),
+  .ULPI_RESET_B(ULPI_RESET_B),
+  .ULPI_DIR(ULPI_DIR),
+  .ULPI_NXT(ULPI_NXT),
+  .ULPI_STP(ULPI_STP),
+  .ULPI_DATA(ULPI_DATA),
 
   // Coetex-M3 SWJ-DP Interface
   // ------------------------------
@@ -557,11 +625,5 @@ udl_axi # (
 //  .UIO2(UIO2),
 //  .UIO4(UIO4)
 );
-
-// Not Used Signal
-assign CFG_DONE = 1'b0;
-assign CFG_MEM_SEL = 1'b0;
-assign FPGA_WATCHDOG = 1'b0;
-assign FPGA_RESERVE = 1'b0;
 
 endmodule
