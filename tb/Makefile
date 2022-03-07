@@ -54,7 +54,7 @@ LOG_DIR              := simlog
 WAV_DIR              := wave
 
 CF                   := $(LOG_DIR) $(WAV_DIR) sim_wave.tcl
-CF                   += xsim* webtalk* xelab* xvlog* hs_err_* vivado_pid*
+CF                   += xsim* webtalk* xelab* xvlog* hs_err_* vivado_pid* $(TB_DIR)/glbl.sdb
 
 vpath %.vh  $(RTL_DIR_LIST)
 vpath %.v   $(RTL_DIR_LIST)
