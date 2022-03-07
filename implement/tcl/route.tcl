@@ -41,6 +41,9 @@ route_design -timing_summary
 # Optimize after Place
 phys_opt_design -routing_opt
 
+# Export design report
+report_utilization -file ${outdir}/report_utilization_route.log
+
 # Export design
 write_verilog -force -mode funcsim -cell ${topmodule} ${rootd}/route/${topmodule}_route_funcsim_netlist.v
 write_verilog -force -mode design  -cell ${topmodule} ${rootd}/route/${topmodule}_route_design_netlist.v
