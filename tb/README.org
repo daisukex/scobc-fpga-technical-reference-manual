@@ -11,6 +11,11 @@ cp {Verilog model path} ./bench/flash_model
 This verification environment requires the cy15b104 and s25fl256l Verilog models.
 It can be downloaded from the infineon website.
 
+Copy the AhbToAxi.v file from the implement directory.
+#+BEGIN_SRC
+cp ../implement/cm3/AhbSToAxi_design.v ./bench/AhbSToAxi.v
+#+END_SRC
+
 * Execute Simulation
 #+BEGIN_SRC
 make TESTCASE={testcase name}

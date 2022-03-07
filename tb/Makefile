@@ -34,7 +34,6 @@ DUT_ROOT_DIR         := ../rtl
 DUT_DIR_LIST         := $(shell find $(DUT_ROOT_DIR) -type d)
 MAIN_AXI_CROSSBAR_DIR:= $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/sim $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/hdl
 UDL_AXI_CROSSBAR_DIR := $(AXI_CROSSBAR_IP_DIR)/$(UDL_AXI_CROSSBAR_IP)/sim
-CORTEX_M3_DIR        := $(CORTEX_M3_IP_DIR)/$(CORTEX_M3_IP)/rtl
 
 RTL_DIR_LIST         := $(DUT_DIR_LIST) $(MAIN_AXI_CROSSBAR_DIR) $(UDL_AXI_CROSSBAR_DIR) $(CORTEX_M3_DIR)
 RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
