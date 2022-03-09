@@ -7,7 +7,9 @@
 
 module ahb_memory # (
   parameter MEM_SIZE_KB = 8,
-  parameter MEM_ADDR_BW = 13
+  parameter MEM_ADDR_BW = 13,
+  parameter MEM_INIT = "off",
+  parameter MEM_INIT_FILE = "code.hex"
 ) (
   // System Interface
   input HCLK,
@@ -57,6 +59,14 @@ assign byte_en[3] = acc_byte & (HADDR[1:0] == 2'b11)
 
 assign HRESP = 2'b00;
 assign HREADY = 1'b1;
+
+// Memory Initialize
+// --------------------------------------------------
+if (MEM_INIT) begin
+  initial begin
+    $readmemh(MEM_INIT_FILE, mem, 0, 256*MEM_SIZE_KB-1);
+  end
+end
 
 // Memory Write
 // --------------------------------------------------
