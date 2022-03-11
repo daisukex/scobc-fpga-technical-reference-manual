@@ -40,6 +40,15 @@ set rtllist [lindex ${arglist} 0]
 puts "RTL list file: ${rtllist}"
 set arglist [lreplace ${arglist} 0 0];
 
+# set ITCM initialize
+set itcm_init_mode [lindex ${arglist} 0]
+set itcm_init_file "code.hex"
+if {$itcm_init_mode == "on" } then {
+    set arglist [lreplace ${arglist} 0 0];
+    set itcm_init_file [lindex ${arglist} 0]
+}
+set arglist [lreplace ${arglist} 0 0];
+
 # Create design export directory
 set outdir ${rootd}/synthesis
 file mkdir ${outdir}
@@ -61,9 +70,11 @@ if { [ file exists ${xdcd}/${topmodule}_timing.xdc ] == 1 } then {
 
 # Synthesis TOP Module
 if {$sdc} then {
-    synth_design -constrset ${topmodule}_timing_xdc -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule}
+    synth_design -constrset ${topmodule}_timing_xdc -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule} \
+        -generic CM3SS_ITCM_INIT=${itcm_init_mode} -generic CM3SS_ITCM_INIT_FILE=${itcm_init_file}
 } else {
-    synth_design -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule}
+    synth_design -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule} \
+        -generic CM3SS_ITCM_INIT=${itcm_init_mode} -generic CM3SS_ITCM_INIT_FILE=${itcm_init_file}
 }
 
 # Report Timing

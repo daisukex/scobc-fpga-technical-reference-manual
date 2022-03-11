@@ -8,12 +8,19 @@
 # ---------------------------------------------------------------------------
 
 TOPMODULE            := sc_obc_a1_fpga
+ITCM_INIT_FILE       :=
+ifdef ITCM_INIT_FILE
+	ITCM_INIT = on
+else
+	ITCM_INIT = off
+endif
 
 # Command variables
 VIVADOTCL            := vivado -mode batch
 CP                   := cp -rf
 RM                   := rm -rf
 MKDIR                := mkdir -p
+ELF2MHEX             := ../vivado/tools/elf2mhex.bash
 
 # File Path variables
 IP_ROOT_DIR          := ../vivado/ip
@@ -78,10 +85,13 @@ $(DESIGN_DIR)/$(UDL_AXI_CROSSBAR)/$(UDL_AXI_CROSSBAR).dcp: $(AXI_CROSSBAR_DIR)/$
 PHONY += synthesis_top
 synthesis_top: $(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp
 
-$(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp: $(RTL_LIST) $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp $(AXI_CROSSBAR_DCP)
+$(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp: $(RTL_LIST) $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp $(AXI_CROSSBAR_DCP) $(ITCM_INIT_FILE)
 	@echo $(filter-out %sc_cm3_wrapper.v,${RTL_LIST}) > rtl.list
+    ifdef ITCM_INIT_FILE
+		$(ELF2MHEX) $(ITCM_INIT_FILE)
+    endif
 	$(VIVADOTCL) -source tcl/synthesis.tcl -log $(LOG_DIR)/$(TOPMODULE)_synthesis.log\
-		-tclargs $(TOPMODULE) rtl.list $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp  $(AXI_CROSSBAR_DCP)
+		-tclargs $(TOPMODULE) rtl.list $(ITCM_INIT) $(notdir $(ITCM_INIT_FILE:.elf=.hex)) $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp  $(AXI_CROSSBAR_DCP)
 
 # Place and Route TOP Module
 # ---------------------------------------------------------------------------
