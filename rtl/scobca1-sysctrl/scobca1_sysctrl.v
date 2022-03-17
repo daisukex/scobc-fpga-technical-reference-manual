@@ -35,6 +35,7 @@ module scobca1_sysctrl # (
   output ULPI_REFCLK,
   output USER_CLK1,
   output USER_CLK2,
+  output BOOT_RSTB,
   output POR_RSTB,
   output POR_RSTB_SYNC_REFCLK,
   output SYS_RSTB,
@@ -44,7 +45,6 @@ module scobca1_sysctrl # (
   output BUS_RSTB
 );
 
-wire ref_rstb;
 wire clk_ok;
 
 scobca1_clk_gen # (
@@ -65,7 +65,7 @@ scobca1_clk_gen # (
   .SLEEPHOLDREQN(SLEEPHOLDREQN),
   .SLEEPHOLDACKN(SLEEPHOLDACKN),
   .REF_CLK(REF_CLK),
-  .REF_RSTB(ref_rstb),
+  .REF_RSTB(BOOT_RSTB),
   .SYS_CLK(SYS_CLK),
   .MAXI_CLK(MAXI_CLK),
   .ULPI_REFCLK(ULPI_REFCLK),
@@ -79,7 +79,7 @@ scobca1_rst_gen rst_gen (
   .SYS_CLK(SYS_CLK),
   .USER_CLK1(USER_CLK1),
   .USER_CLK2(USER_CLK2),
-  .REF_RSTB(ref_rstb),
+  .REF_RSTB(BOOT_RSTB),
   .INIT_REQ(INIT_REQ),
   .INIT_DONE(INIT_DONE),
   .SYS_RST_REQ(SYS_RST_REQ),

@@ -258,6 +258,7 @@ scobca1_sysctrl # (
   .ULPI_REFCLK(ULPI_REFCLK),
   .USER_CLK1(user_clk1),
   .USER_CLK2(user_clk2),
+  .BOOT_RSTB(/*open*/),
   .POR_RSTB(por_rstb),
   .POR_RSTB_SYNC_REFCLK(por_rstb_sync_refclk),
   .SYS_RSTB(sys_rstb),
