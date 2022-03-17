@@ -287,6 +287,7 @@ sc_obc_core # (
   // Reset
   .SYS_RST_REQ(sys_rst_req),
   .REG_RST_REQ(reg_rst_req),
+  .BOOT_RSTB(1'b0),
   .POR_RSTB(por_rstb),
   .POR_RSTB_SYNC_REFCLK(por_rstb_sync_refclk),
   .SYS_RSTB(sys_rstb),

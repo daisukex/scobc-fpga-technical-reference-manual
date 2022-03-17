@@ -24,6 +24,7 @@ module sc_obc_core # (
   // Reset
   output SYS_RST_REQ,
   output REG_RST_REQ,
+  input BOOT_RSTB,
   input POR_RSTB,
   input POR_RSTB_SYNC_REFCLK,
   input SYS_RSTB,
