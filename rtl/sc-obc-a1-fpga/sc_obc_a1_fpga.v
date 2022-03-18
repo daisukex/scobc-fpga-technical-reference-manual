@@ -316,7 +316,7 @@ sc_obc_core # (
   // ------------------------------
   .CDRST_B(CDRST_B),
   .CFG_DONE(CFG_DONE),
-  .FPGA_BOOT({FPGA_BOOT1,FPGA_BOO0}),
+  .FPGA_BOOT({FPGA_BOOT1,FPGA_BOOT0}),
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
   .FPGA_RESERVE(FPGA_RESERVE),
 
