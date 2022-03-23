@@ -25,7 +25,7 @@ parameter AHB_READ  = 0,
 parameter AHB_LEN_SINGLE = 5'b00001,
           AHB_LEN_4BEAT  = 5'b00100,
           AHB_LEN_8BEAT  = 5'b01000,
-          AHB_LEN_16BEAT = 5'b01000;
+          AHB_LEN_16BEAT = 5'b10000;
 
 parameter SENS_NONE = 2'b00, // Does nothing for the event.
           SENS_INFO = 2'b01, // Notify you when an event occurs.
