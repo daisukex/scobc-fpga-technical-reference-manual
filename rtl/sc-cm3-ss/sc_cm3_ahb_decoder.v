@@ -31,8 +31,8 @@ localparam CODE_HIGH_ADDR_MAX = 32'h1FFF_FFFF;
 
 wire cfgitcm_ff;
 
-tmr_ff #  (.DW(1), .SRVAL(1'b1))
-l_cfgitcm (.D(CFGITCMEN), .CLK(HRESETN), .SRB(HRESETN), .Q(cfgitcm_ff));
+sclib_tmr_ff_winit # (.DW(1), .IVAL(1'b1), .SRVAL(1'b1))
+l_cfgitcm (.D(CFGITCMEN), .CLK(HRESETN), .SRB(1'b1), .Q(cfgitcm_ff));
 
 always @ (*) begin
   HSEL_ITCM = 1'b0;
