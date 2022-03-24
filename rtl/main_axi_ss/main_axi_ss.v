@@ -191,99 +191,99 @@ module main_axi_ss # (
   output CAN_SLEEP_EN
 );
 
-localparam MAINAXI_CRSBAR_S_PORTS = 2;
-localparam MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS = 0;
-localparam MAINAXI_CRSBAR_S_PORT_NUM_UDL = 1;
+localparam CROSSBAR_S_PORTS = 2;
+localparam CROSSBAR_S_PORT_NUM_CPU_SYS = 0;
+localparam CROSSBAR_S_PORT_NUM_UDL = 1;
 
-localparam MAINAXI_CRSBAR_M_PORTS = 10;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM = 0;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG = 1;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA = 2;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM = 3;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM = 4;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_CAN = 5;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG = 6;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG = 7;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_LPAHB = 8;
-localparam MAINAXI_CRSBAR_M_PORT_NUM_UDL = 9;
+localparam CROSSBAR_M_PORTS = 10;
+localparam CROSSBAR_M_PORT_NUM_HRMEM_SRAM = 0;
+localparam CROSSBAR_M_PORT_NUM_QSPI_CFG = 1;
+localparam CROSSBAR_M_PORT_NUM_QSPI_DATA = 2;
+localparam CROSSBAR_M_PORT_NUM_QSPI_FRAM = 3;
+localparam CROSSBAR_M_PORT_NUM_HRMEM_BRAM = 4;
+localparam CROSSBAR_M_PORT_NUM_CAN = 5;
+localparam CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG = 6;
+localparam CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG = 7;
+localparam CROSSBAR_M_PORT_NUM_LPAHB = 8;
+localparam CROSSBAR_M_PORT_NUM_UDL = 9;
 
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awid;
-wire [32*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awaddr;
-wire [8*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awlen;
-wire [3*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awsize;
-wire [2*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awburst;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awlock;
-wire [4*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awcache;
-wire [3*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awprot;
-wire [4*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awqos;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awvalid;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_awready;
-wire [32*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_wdata;
-wire [4*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_wstrb;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_wlast;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_wvalid;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_wready;
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_bid;
-wire [2*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_bresp;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_bvalid;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_bready;
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arid;
-wire [32*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_araddr;
-wire [8*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arlen;
-wire [3*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arsize;
-wire [2*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arburst;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arlock;
-wire [4*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arcache;
-wire [3*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arprot;
-wire [4*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arqos;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arvalid;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_arready;
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_rid;
-wire [32*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_rdata;
-wire [2*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_rresp;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_rlast;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_rvalid;
-wire [1*MAINAXI_CRSBAR_S_PORTS-1:0] w_crsbar_s_axi_rready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awid;
+wire [32*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awaddr;
+wire [8*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awlen;
+wire [3*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awsize;
+wire [2*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awburst;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awlock;
+wire [4*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awcache;
+wire [3*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awprot;
+wire [4*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awqos;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awvalid;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_awready;
+wire [32*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_wdata;
+wire [4*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_wstrb;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_wlast;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_wvalid;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_wready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_bid;
+wire [2*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_bresp;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_bvalid;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_bready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arid;
+wire [32*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_araddr;
+wire [8*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arlen;
+wire [3*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arsize;
+wire [2*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arburst;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arlock;
+wire [4*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arcache;
+wire [3*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arprot;
+wire [4*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arqos;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arvalid;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_arready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_rid;
+wire [32*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_rdata;
+wire [2*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_rresp;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_rlast;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_rvalid;
+wire [1*CROSSBAR_S_PORTS-1:0] w_crsbar_s_axi_rready;
 
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awid;
-wire [32*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awaddr;
-wire [8*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awlen;
-wire [3*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awsize;
-wire [2*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awburst;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awlock;
-wire [4*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awcache;
-wire [3*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awprot;
-wire [4*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awregion;
-wire [4*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awqos;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awvalid;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_awready;
-wire [32*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_wdata;
-wire [4*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_wstrb;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_wlast;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_wvalid;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_wready;
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_bid;
-wire [2*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_bresp;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_bvalid;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_bready;
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arid;
-wire [32*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_araddr;
-wire [8*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arlen;
-wire [3*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arsize;
-wire [2*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arburst;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arlock;
-wire [4*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arcache;
-wire [3*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arprot;
-wire [4*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arregion;
-wire [4*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arqos;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arvalid;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_arready;
-wire [MAINAXI_S_AXI_ID_WIDTH*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_rid;
-wire [32*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_rdata;
-wire [2*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_rresp;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_rlast;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_rvalid;
-wire [1*MAINAXI_CRSBAR_M_PORTS-1:0] w_crsbar_m_axi_rready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awid;
+wire [32*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awaddr;
+wire [8*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awlen;
+wire [3*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awsize;
+wire [2*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awburst;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awlock;
+wire [4*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awcache;
+wire [3*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awprot;
+wire [4*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awregion;
+wire [4*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awqos;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awvalid;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_awready;
+wire [32*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_wdata;
+wire [4*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_wstrb;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_wlast;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_wvalid;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_wready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_bid;
+wire [2*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_bresp;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_bvalid;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_bready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arid;
+wire [32*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_araddr;
+wire [8*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arlen;
+wire [3*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arsize;
+wire [2*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arburst;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arlock;
+wire [4*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arcache;
+wire [3*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arprot;
+wire [4*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arregion;
+wire [4*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arqos;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arvalid;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_arready;
+wire [MAINAXI_S_AXI_ID_WIDTH*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_rid;
+wire [32*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_rdata;
+wire [2*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_rresp;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_rlast;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_rvalid;
+wire [1*CROSSBAR_M_PORTS-1:0] w_crsbar_m_axi_rready;
 
 wire [3:0] w_cfg_mem_oe;
 wire [3:0] w_cfg_mem_dout;
@@ -310,82 +310,82 @@ wire [3:0] w_fram1_din;
 wire [3:0] w_fram2_din;
 
 // CPU AXI3 SYS Slave Interface to main_axi_crossbar
-assign w_crsbar_s_axi_awid[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = 0;
-assign w_crsbar_s_axi_awaddr[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*32 +: 32] = CPU_SYS_S_AXI_AWADDR;
-assign w_crsbar_s_axi_awlen[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*8 +: 8] = {4'h0, CPU_SYS_S_AXI_AWLEN};
-assign w_crsbar_s_axi_awsize[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_AWSIZE;
-assign w_crsbar_s_axi_awburst[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*2 +: 2] = CPU_SYS_S_AXI_AWBURST;
-assign w_crsbar_s_axi_awlock[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_AWLOCK[0];
-assign w_crsbar_s_axi_awcache[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = CPU_SYS_S_AXI_AWCACHE;
-assign w_crsbar_s_axi_awprot[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_AWPROT;
-assign w_crsbar_s_axi_awqos[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = 0;
-assign w_crsbar_s_axi_awvalid[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_AWVALID;
-assign w_crsbar_s_axi_wdata[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*32 +:32] = CPU_SYS_S_AXI_WDATA;
-assign w_crsbar_s_axi_wstrb[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = CPU_SYS_S_AXI_WSTRB;
-assign w_crsbar_s_axi_wlast[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_WLAST;
-assign w_crsbar_s_axi_wvalid[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_WVALID;
-assign w_crsbar_s_axi_bready[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_BREADY;
-assign w_crsbar_s_axi_arid[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = 0;
-assign w_crsbar_s_axi_araddr[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*32 +:32] = CPU_SYS_S_AXI_ARADDR;
-assign w_crsbar_s_axi_arlen[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*8 +: 8] = {4'h0, CPU_SYS_S_AXI_ARLEN};
-assign w_crsbar_s_axi_arsize[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_ARSIZE;
-assign w_crsbar_s_axi_arburst[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*2 +: 2] = CPU_SYS_S_AXI_ARBURST;
-assign w_crsbar_s_axi_arlock[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_ARLOCK[0];
-assign w_crsbar_s_axi_arcache[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = CPU_SYS_S_AXI_ARCACHE;
-assign w_crsbar_s_axi_arprot[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_ARPROT;
-assign w_crsbar_s_axi_arqos[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = 0;
-assign w_crsbar_s_axi_arvalid[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_ARVALID;
-assign w_crsbar_s_axi_rready[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_RREADY;
-assign CPU_SYS_S_AXI_AWREADY = w_crsbar_s_axi_awready[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
-assign CPU_SYS_S_AXI_WREADY = w_crsbar_s_axi_wready[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
-assign CPU_SYS_S_AXI_BRESP = w_crsbar_s_axi_bresp[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*2 +: 2];
-assign CPU_SYS_S_AXI_BVALID = w_crsbar_s_axi_bvalid[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
-assign CPU_SYS_S_AXI_ARREADY = w_crsbar_s_axi_arready[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
-assign CPU_SYS_S_AXI_RDATA = w_crsbar_s_axi_rdata[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*32 +: 32];
-assign CPU_SYS_S_AXI_RRESP = w_crsbar_s_axi_rresp[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*2 +: 2];
-assign CPU_SYS_S_AXI_RLAST = w_crsbar_s_axi_rlast[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
-assign CPU_SYS_S_AXI_RVALID = w_crsbar_s_axi_rvalid[MAINAXI_CRSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
+assign w_crsbar_s_axi_awid[CROSSBAR_S_PORT_NUM_CPU_SYS*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = 0;
+assign w_crsbar_s_axi_awaddr[CROSSBAR_S_PORT_NUM_CPU_SYS*32 +: 32] = CPU_SYS_S_AXI_AWADDR;
+assign w_crsbar_s_axi_awlen[CROSSBAR_S_PORT_NUM_CPU_SYS*8 +: 8] = {4'h0, CPU_SYS_S_AXI_AWLEN};
+assign w_crsbar_s_axi_awsize[CROSSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_AWSIZE;
+assign w_crsbar_s_axi_awburst[CROSSBAR_S_PORT_NUM_CPU_SYS*2 +: 2] = CPU_SYS_S_AXI_AWBURST;
+assign w_crsbar_s_axi_awlock[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_AWLOCK[0];
+assign w_crsbar_s_axi_awcache[CROSSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = CPU_SYS_S_AXI_AWCACHE;
+assign w_crsbar_s_axi_awprot[CROSSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_AWPROT;
+assign w_crsbar_s_axi_awqos[CROSSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = 0;
+assign w_crsbar_s_axi_awvalid[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_AWVALID;
+assign w_crsbar_s_axi_wdata[CROSSBAR_S_PORT_NUM_CPU_SYS*32 +:32] = CPU_SYS_S_AXI_WDATA;
+assign w_crsbar_s_axi_wstrb[CROSSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = CPU_SYS_S_AXI_WSTRB;
+assign w_crsbar_s_axi_wlast[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_WLAST;
+assign w_crsbar_s_axi_wvalid[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_WVALID;
+assign w_crsbar_s_axi_bready[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_BREADY;
+assign w_crsbar_s_axi_arid[CROSSBAR_S_PORT_NUM_CPU_SYS*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = 0;
+assign w_crsbar_s_axi_araddr[CROSSBAR_S_PORT_NUM_CPU_SYS*32 +:32] = CPU_SYS_S_AXI_ARADDR;
+assign w_crsbar_s_axi_arlen[CROSSBAR_S_PORT_NUM_CPU_SYS*8 +: 8] = {4'h0, CPU_SYS_S_AXI_ARLEN};
+assign w_crsbar_s_axi_arsize[CROSSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_ARSIZE;
+assign w_crsbar_s_axi_arburst[CROSSBAR_S_PORT_NUM_CPU_SYS*2 +: 2] = CPU_SYS_S_AXI_ARBURST;
+assign w_crsbar_s_axi_arlock[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_ARLOCK[0];
+assign w_crsbar_s_axi_arcache[CROSSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = CPU_SYS_S_AXI_ARCACHE;
+assign w_crsbar_s_axi_arprot[CROSSBAR_S_PORT_NUM_CPU_SYS*3 +: 3] = CPU_SYS_S_AXI_ARPROT;
+assign w_crsbar_s_axi_arqos[CROSSBAR_S_PORT_NUM_CPU_SYS*4 +: 4] = 0;
+assign w_crsbar_s_axi_arvalid[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_ARVALID;
+assign w_crsbar_s_axi_rready[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1] = CPU_SYS_S_AXI_RREADY;
+assign CPU_SYS_S_AXI_AWREADY = w_crsbar_s_axi_awready[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
+assign CPU_SYS_S_AXI_WREADY = w_crsbar_s_axi_wready[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
+assign CPU_SYS_S_AXI_BRESP = w_crsbar_s_axi_bresp[CROSSBAR_S_PORT_NUM_CPU_SYS*2 +: 2];
+assign CPU_SYS_S_AXI_BVALID = w_crsbar_s_axi_bvalid[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
+assign CPU_SYS_S_AXI_ARREADY = w_crsbar_s_axi_arready[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
+assign CPU_SYS_S_AXI_RDATA = w_crsbar_s_axi_rdata[CROSSBAR_S_PORT_NUM_CPU_SYS*32 +: 32];
+assign CPU_SYS_S_AXI_RRESP = w_crsbar_s_axi_rresp[CROSSBAR_S_PORT_NUM_CPU_SYS*2 +: 2];
+assign CPU_SYS_S_AXI_RLAST = w_crsbar_s_axi_rlast[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
+assign CPU_SYS_S_AXI_RVALID = w_crsbar_s_axi_rvalid[CROSSBAR_S_PORT_NUM_CPU_SYS*1 +: 1];
 
 // UDL AXI4 Slave Interface to main_axi_crossbar
-assign w_crsbar_s_axi_awid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] =
+assign w_crsbar_s_axi_awid[CROSSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] =
        {{MAINAXI_S_AXI_ID_WIDTH-MAINAXI_UDL_M_AXI_ID_WIDTH{1'b0}}, UDL_S_AXI_AWID};
-assign w_crsbar_s_axi_awaddr[MAINAXI_CRSBAR_S_PORT_NUM_UDL*32 +: 32] = UDL_S_AXI_AWADDR;
-assign w_crsbar_s_axi_awlen[MAINAXI_CRSBAR_S_PORT_NUM_UDL*8 +: 8] = UDL_S_AXI_AWLEN;
-assign w_crsbar_s_axi_awsize[MAINAXI_CRSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_AWSIZE;
-assign w_crsbar_s_axi_awburst[MAINAXI_CRSBAR_S_PORT_NUM_UDL*2 +: 2] = UDL_S_AXI_AWBURST;
-assign w_crsbar_s_axi_awlock[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_AWLOCK;
-assign w_crsbar_s_axi_awcache[MAINAXI_CRSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_AWCACHE;
-assign w_crsbar_s_axi_awprot[MAINAXI_CRSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_AWPROT;
-assign w_crsbar_s_axi_awqos[MAINAXI_CRSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_AWQOS;
-assign w_crsbar_s_axi_awvalid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_AWVALID;
-assign w_crsbar_s_axi_wdata[MAINAXI_CRSBAR_S_PORT_NUM_UDL*32 +:32] = UDL_S_AXI_WDATA;
-assign w_crsbar_s_axi_wstrb[MAINAXI_CRSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_WSTRB;
-assign w_crsbar_s_axi_wlast[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_WLAST;
-assign w_crsbar_s_axi_wvalid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_WVALID;
-assign w_crsbar_s_axi_bready[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_BREADY;
-assign w_crsbar_s_axi_arid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] =
+assign w_crsbar_s_axi_awaddr[CROSSBAR_S_PORT_NUM_UDL*32 +: 32] = UDL_S_AXI_AWADDR;
+assign w_crsbar_s_axi_awlen[CROSSBAR_S_PORT_NUM_UDL*8 +: 8] = UDL_S_AXI_AWLEN;
+assign w_crsbar_s_axi_awsize[CROSSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_AWSIZE;
+assign w_crsbar_s_axi_awburst[CROSSBAR_S_PORT_NUM_UDL*2 +: 2] = UDL_S_AXI_AWBURST;
+assign w_crsbar_s_axi_awlock[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_AWLOCK;
+assign w_crsbar_s_axi_awcache[CROSSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_AWCACHE;
+assign w_crsbar_s_axi_awprot[CROSSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_AWPROT;
+assign w_crsbar_s_axi_awqos[CROSSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_AWQOS;
+assign w_crsbar_s_axi_awvalid[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_AWVALID;
+assign w_crsbar_s_axi_wdata[CROSSBAR_S_PORT_NUM_UDL*32 +:32] = UDL_S_AXI_WDATA;
+assign w_crsbar_s_axi_wstrb[CROSSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_WSTRB;
+assign w_crsbar_s_axi_wlast[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_WLAST;
+assign w_crsbar_s_axi_wvalid[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_WVALID;
+assign w_crsbar_s_axi_bready[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_BREADY;
+assign w_crsbar_s_axi_arid[CROSSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] =
        {{MAINAXI_S_AXI_ID_WIDTH-MAINAXI_UDL_M_AXI_ID_WIDTH{1'b0}}, UDL_S_AXI_ARID};
-assign w_crsbar_s_axi_araddr[MAINAXI_CRSBAR_S_PORT_NUM_UDL*32 +:32] = UDL_S_AXI_ARADDR;
-assign w_crsbar_s_axi_arlen[MAINAXI_CRSBAR_S_PORT_NUM_UDL*8 +: 8] = UDL_S_AXI_ARLEN;
-assign w_crsbar_s_axi_arsize[MAINAXI_CRSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_ARSIZE;
-assign w_crsbar_s_axi_arburst[MAINAXI_CRSBAR_S_PORT_NUM_UDL*2 +: 2] = UDL_S_AXI_ARBURST;
-assign w_crsbar_s_axi_arlock[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_ARLOCK;
-assign w_crsbar_s_axi_arcache[MAINAXI_CRSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_ARCACHE;
-assign w_crsbar_s_axi_arprot[MAINAXI_CRSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_ARPROT;
-assign w_crsbar_s_axi_arqos[MAINAXI_CRSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_ARQOS;
-assign w_crsbar_s_axi_arvalid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_ARVALID;
-assign w_crsbar_s_axi_rready[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_RREADY;
-assign UDL_S_AXI_AWREADY = w_crsbar_s_axi_awready[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1];
-assign UDL_S_AXI_WREADY = w_crsbar_s_axi_wready[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1];
-assign UDL_S_AXI_BID = w_crsbar_s_axi_bid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_UDL_M_AXI_ID_WIDTH];
-assign UDL_S_AXI_BRESP = w_crsbar_s_axi_bresp[MAINAXI_CRSBAR_S_PORT_NUM_UDL*2 +: 2];
-assign UDL_S_AXI_BVALID = w_crsbar_s_axi_bvalid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1];
-assign UDL_S_AXI_ARREADY = w_crsbar_s_axi_arready[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1];
-assign UDL_S_AXI_RID = w_crsbar_s_axi_rid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_UDL_M_AXI_ID_WIDTH];
-assign UDL_S_AXI_RDATA = w_crsbar_s_axi_rdata[MAINAXI_CRSBAR_S_PORT_NUM_UDL*32 +: 32];
-assign UDL_S_AXI_RRESP = w_crsbar_s_axi_rresp[MAINAXI_CRSBAR_S_PORT_NUM_UDL*2 +: 2];
-assign UDL_S_AXI_RLAST = w_crsbar_s_axi_rlast[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1];
-assign UDL_S_AXI_RVALID = w_crsbar_s_axi_rvalid[MAINAXI_CRSBAR_S_PORT_NUM_UDL*1 +: 1];
+assign w_crsbar_s_axi_araddr[CROSSBAR_S_PORT_NUM_UDL*32 +:32] = UDL_S_AXI_ARADDR;
+assign w_crsbar_s_axi_arlen[CROSSBAR_S_PORT_NUM_UDL*8 +: 8] = UDL_S_AXI_ARLEN;
+assign w_crsbar_s_axi_arsize[CROSSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_ARSIZE;
+assign w_crsbar_s_axi_arburst[CROSSBAR_S_PORT_NUM_UDL*2 +: 2] = UDL_S_AXI_ARBURST;
+assign w_crsbar_s_axi_arlock[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_ARLOCK;
+assign w_crsbar_s_axi_arcache[CROSSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_ARCACHE;
+assign w_crsbar_s_axi_arprot[CROSSBAR_S_PORT_NUM_UDL*3 +: 3] = UDL_S_AXI_ARPROT;
+assign w_crsbar_s_axi_arqos[CROSSBAR_S_PORT_NUM_UDL*4 +: 4] = UDL_S_AXI_ARQOS;
+assign w_crsbar_s_axi_arvalid[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_ARVALID;
+assign w_crsbar_s_axi_rready[CROSSBAR_S_PORT_NUM_UDL*1 +: 1] = UDL_S_AXI_RREADY;
+assign UDL_S_AXI_AWREADY = w_crsbar_s_axi_awready[CROSSBAR_S_PORT_NUM_UDL*1 +: 1];
+assign UDL_S_AXI_WREADY = w_crsbar_s_axi_wready[CROSSBAR_S_PORT_NUM_UDL*1 +: 1];
+assign UDL_S_AXI_BID = w_crsbar_s_axi_bid[CROSSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_UDL_M_AXI_ID_WIDTH];
+assign UDL_S_AXI_BRESP = w_crsbar_s_axi_bresp[CROSSBAR_S_PORT_NUM_UDL*2 +: 2];
+assign UDL_S_AXI_BVALID = w_crsbar_s_axi_bvalid[CROSSBAR_S_PORT_NUM_UDL*1 +: 1];
+assign UDL_S_AXI_ARREADY = w_crsbar_s_axi_arready[CROSSBAR_S_PORT_NUM_UDL*1 +: 1];
+assign UDL_S_AXI_RID = w_crsbar_s_axi_rid[CROSSBAR_S_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_UDL_M_AXI_ID_WIDTH];
+assign UDL_S_AXI_RDATA = w_crsbar_s_axi_rdata[CROSSBAR_S_PORT_NUM_UDL*32 +: 32];
+assign UDL_S_AXI_RRESP = w_crsbar_s_axi_rresp[CROSSBAR_S_PORT_NUM_UDL*2 +: 2];
+assign UDL_S_AXI_RLAST = w_crsbar_s_axi_rlast[CROSSBAR_S_PORT_NUM_UDL*1 +: 1];
+assign UDL_S_AXI_RVALID = w_crsbar_s_axi_rvalid[CROSSBAR_S_PORT_NUM_UDL*1 +: 1];
 
 // Main AXI Bus Crossvar
 main_axi_crossbar main_axi_crossbar (
@@ -478,41 +478,41 @@ sc_axi_slave # (
   // AXI Interface
   .S_AXI_ACLK(SYS_CLK),
   .S_AXI_ARESETN(SYS_RSTB),
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
   // Register Interface
   .REG_WEN(/*open*/),
   .REG_WADDR(/*open*/),
@@ -540,41 +540,41 @@ sc_qspim # (
   .MODULE_RSTN(1'b1),
 
   // AXI Interface
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_QSPI_CFG*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_QSPI_CFG*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_QSPI_CFG*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_QSPI_CFG*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_QSPI_CFG*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_QSPI_CFG*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_QSPI_CFG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_QSPI_CFG*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_QSPI_CFG*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_QSPI_CFG*1 +: 1]),
 
   // QSPI Interface
   .QSPI_SCK(CFG_MEM_SCK),
@@ -610,41 +610,41 @@ sc_qspim # (
   .MODULE_RSTN(1'b1),
 
   // AXI Interface
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_QSPI_DATA*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_QSPI_DATA*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_QSPI_DATA*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_QSPI_DATA*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_QSPI_DATA*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_QSPI_DATA*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_QSPI_DATA*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_QSPI_DATA*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_QSPI_DATA*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_QSPI_DATA*1 +: 1]),
 
   // QSPI Interface
   .QSPI_SCK(w_data_mem_sck),
@@ -697,41 +697,41 @@ sc_qspim # (
   .MODULE_RSTN(1'b1),
 
   // AXI Interface
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_QSPI_FRAM*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_QSPI_FRAM*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_QSPI_FRAM*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_QSPI_FRAM*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_QSPI_FRAM*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_QSPI_FRAM*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_QSPI_FRAM*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_QSPI_FRAM*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_QSPI_FRAM*1 +: 1]),
 
   // QSPI Interface
   .QSPI_SCK(w_fram_sck),
@@ -779,41 +779,41 @@ sc_axi_slave # (
   // AXI Interface
   .S_AXI_ACLK(SYS_CLK),
   .S_AXI_ARESETN(SYS_RSTB),
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM*1 +: 1]),
   // Register Interface
   .REG_WEN(/*open*/),
   .REG_WADDR(/*open*/),
@@ -841,41 +841,41 @@ sc_can # (
   .MODULE_RSTN(1'b1),
 
   // AXI Slave Interface
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_CAN*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_CAN*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_CAN*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_CAN*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_CAN*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_CAN*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_CAN*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_CAN*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_CAN*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_CAN*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_CAN*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_CAN*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_CAN*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_CAN*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_CAN*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_CAN*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_CAN*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_CAN*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_CAN*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_CAN*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_CAN*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_CAN*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_CAN*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_CAN*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_CAN*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_CAN*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_CAN*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_CAN*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_CAN*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_CAN*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_CAN*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_CAN*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_CAN*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_CAN*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_CAN*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_CAN*1 +: 1]),
 
   // CAN Bus Signal
   .CAN_TX(CAN_TX),
@@ -897,41 +897,41 @@ sc_axi_slave # (
   // AXI Interface
   .S_AXI_ACLK(SYS_CLK),
   .S_AXI_ARESETN(SYS_RSTB),
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
   // Register Interface
   .REG_WEN(/*open*/),
   .REG_WADDR(/*open*/),
@@ -954,41 +954,41 @@ sc_axi_slave # (
   // AXI Interface
   .S_AXI_ACLK(SYS_CLK),
   .S_AXI_ARESETN(SYS_RSTB),
-  .S_AXI_AWID(w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
-  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*8 +: 8]),
-  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
-  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
-  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*4 +: 4]),
-  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
-  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_AWREADY(w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_WDATA(w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
-  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*4 +: 4]),
-  .S_AXI_WLAST(w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_WREADY(w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_BID(w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
-  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_BREADY(w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_ARID(w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
-  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*8 +: 8]),
-  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
-  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
-  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*4 +: 4]),
-  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
-  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_ARREADY(w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_RID(w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
-  .S_AXI_RRESP(w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
-  .S_AXI_RLAST(w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
-  .S_AXI_RREADY(w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_AWID(w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_AWADDR(w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
+  .S_AXI_AWLEN(w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*8 +: 8]),
+  .S_AXI_AWSIZE(w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
+  .S_AXI_AWBURST(w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
+  .S_AXI_AWLOCK(w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_AWCACHE(w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*4 +: 4]),
+  .S_AXI_AWPROT(w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
+  .S_AXI_AWVALID(w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_AWREADY(w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_WDATA(w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
+  .S_AXI_WSTRB(w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*4 +: 4]),
+  .S_AXI_WLAST(w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_WVALID(w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_WREADY(w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_BID(w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_BRESP(w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
+  .S_AXI_BVALID(w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_BREADY(w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_ARID(w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_ARADDR(w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
+  .S_AXI_ARLEN(w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*8 +: 8]),
+  .S_AXI_ARSIZE(w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
+  .S_AXI_ARBURST(w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
+  .S_AXI_ARLOCK(w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_ARCACHE(w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*4 +: 4]),
+  .S_AXI_ARPROT(w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*3 +: 3]),
+  .S_AXI_ARVALID(w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_ARREADY(w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_RID(w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
+  .S_AXI_RDATA(w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*32 +: 32]),
+  .S_AXI_RRESP(w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*2 +: 2]),
+  .S_AXI_RLAST(w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_RVALID(w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
+  .S_AXI_RREADY(w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_HRMEM_BRAM_REG*1 +: 1]),
   // Register Interface
   .REG_WEN(/*open*/),
   .REG_WADDR(/*open*/),
@@ -1003,75 +1003,75 @@ sc_axi_slave # (
 );
 
 // main_axi_crossbar to Low Performance AHB AXI4 Master Interface
-assign LPAHB_M_AXI_AWID = w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
-assign LPAHB_M_AXI_AWADDR = w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*32 +: 32];
-assign LPAHB_M_AXI_AWLEN = w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*8 +: 8];
-assign LPAHB_M_AXI_AWSIZE = w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*3 +: 3];
-assign LPAHB_M_AXI_AWBURST = w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*2 +: 2];
-assign LPAHB_M_AXI_AWVALID = w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1];
-assign w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_AWREADY;
-assign LPAHB_M_AXI_WDATA = w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*32 +: 32];
-assign LPAHB_M_AXI_WSTRB = w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*4 +: 4];
-assign LPAHB_M_AXI_WLAST = w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1];
-assign LPAHB_M_AXI_WVALID = w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1];
-assign w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_WREADY;
-assign w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = LPAHB_M_AXI_BID;
-assign w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*2 +: 2] = LPAHB_M_AXI_BRESP;
-assign w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_BVALID;
-assign LPAHB_M_AXI_BREADY = w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1];
-assign LPAHB_M_AXI_ARID = w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
-assign LPAHB_M_AXI_ARADDR = w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*32 +: 32];
-assign LPAHB_M_AXI_ARLEN = w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*8 +: 8];
-assign LPAHB_M_AXI_ARSIZE = w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*3 +: 3];
-assign LPAHB_M_AXI_ARBURST = w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*2 +: 2];
-assign LPAHB_M_AXI_ARVALID = w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1];
-assign w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_ARREADY;
-assign w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = LPAHB_M_AXI_RID;
-assign w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*32 +: 32] = LPAHB_M_AXI_RDATA;
-assign w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*2 +: 2] = LPAHB_M_AXI_RRESP;
-assign w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_RLAST;
-assign w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_RVALID;
-assign LPAHB_M_AXI_RREADY = w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_LPAHB*1 +: 1];
+assign LPAHB_M_AXI_AWID = w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign LPAHB_M_AXI_AWADDR = w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_LPAHB*32 +: 32];
+assign LPAHB_M_AXI_AWLEN = w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_LPAHB*8 +: 8];
+assign LPAHB_M_AXI_AWSIZE = w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_LPAHB*3 +: 3];
+assign LPAHB_M_AXI_AWBURST = w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_LPAHB*2 +: 2];
+assign LPAHB_M_AXI_AWVALID = w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1];
+assign w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_AWREADY;
+assign LPAHB_M_AXI_WDATA = w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_LPAHB*32 +: 32];
+assign LPAHB_M_AXI_WSTRB = w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_LPAHB*4 +: 4];
+assign LPAHB_M_AXI_WLAST = w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1];
+assign LPAHB_M_AXI_WVALID = w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1];
+assign w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_WREADY;
+assign w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = LPAHB_M_AXI_BID;
+assign w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_LPAHB*2 +: 2] = LPAHB_M_AXI_BRESP;
+assign w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_BVALID;
+assign LPAHB_M_AXI_BREADY = w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1];
+assign LPAHB_M_AXI_ARID = w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign LPAHB_M_AXI_ARADDR = w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_LPAHB*32 +: 32];
+assign LPAHB_M_AXI_ARLEN = w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_LPAHB*8 +: 8];
+assign LPAHB_M_AXI_ARSIZE = w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_LPAHB*3 +: 3];
+assign LPAHB_M_AXI_ARBURST = w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_LPAHB*2 +: 2];
+assign LPAHB_M_AXI_ARVALID = w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1];
+assign w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_ARREADY;
+assign w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_LPAHB*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = LPAHB_M_AXI_RID;
+assign w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_LPAHB*32 +: 32] = LPAHB_M_AXI_RDATA;
+assign w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_LPAHB*2 +: 2] = LPAHB_M_AXI_RRESP;
+assign w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_RLAST;
+assign w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1] = LPAHB_M_AXI_RVALID;
+assign LPAHB_M_AXI_RREADY = w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_LPAHB*1 +: 1];
 
 // main_axi_crossbar to UDL AXI4 Master Interface
-assign UDL_M_AXI_AWID = w_crsbar_m_axi_awid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
-assign UDL_M_AXI_AWADDR = w_crsbar_m_axi_awaddr[MAINAXI_CRSBAR_M_PORT_NUM_UDL*32 +: 32];
-assign UDL_M_AXI_AWLEN = w_crsbar_m_axi_awlen[MAINAXI_CRSBAR_M_PORT_NUM_UDL*8 +: 8];
-assign UDL_M_AXI_AWSIZE = w_crsbar_m_axi_awsize[MAINAXI_CRSBAR_M_PORT_NUM_UDL*3 +: 3];
-assign UDL_M_AXI_AWBURST = w_crsbar_m_axi_awburst[MAINAXI_CRSBAR_M_PORT_NUM_UDL*2 +: 2];
-assign UDL_M_AXI_AWLOCK = w_crsbar_m_axi_awlock[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
-assign UDL_M_AXI_AWCACHE = w_crsbar_m_axi_awcache[MAINAXI_CRSBAR_M_PORT_NUM_UDL*4 +: 4];
-assign UDL_M_AXI_AWPROT = w_crsbar_m_axi_awprot[MAINAXI_CRSBAR_M_PORT_NUM_UDL*3 +: 3];
-assign UDL_M_AXI_AWREGION = w_crsbar_m_axi_awregion[MAINAXI_CRSBAR_M_PORT_NUM_UDL*4 +: 4];
-assign UDL_M_AXI_AWQOS = w_crsbar_m_axi_awqos[MAINAXI_CRSBAR_M_PORT_NUM_UDL*4 +: 4];
-assign UDL_M_AXI_AWVALID = w_crsbar_m_axi_awvalid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
-assign w_crsbar_m_axi_awready[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_AWREADY;
-assign UDL_M_AXI_WDATA = w_crsbar_m_axi_wdata[MAINAXI_CRSBAR_M_PORT_NUM_UDL*32 +: 32];
-assign UDL_M_AXI_WSTRB = w_crsbar_m_axi_wstrb[MAINAXI_CRSBAR_M_PORT_NUM_UDL*4 +: 4];
-assign UDL_M_AXI_WLAST = w_crsbar_m_axi_wlast[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
-assign UDL_M_AXI_WVALID = w_crsbar_m_axi_wvalid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
-assign w_crsbar_m_axi_wready[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_WREADY;
-assign w_crsbar_m_axi_bid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = UDL_M_AXI_BID;
-assign w_crsbar_m_axi_bresp[MAINAXI_CRSBAR_M_PORT_NUM_UDL*2 +: 2] = UDL_M_AXI_BRESP;
-assign w_crsbar_m_axi_bvalid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_BVALID;
-assign UDL_M_AXI_BREADY = w_crsbar_m_axi_bready[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
-assign UDL_M_AXI_ARID = w_crsbar_m_axi_arid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
-assign UDL_M_AXI_ARADDR = w_crsbar_m_axi_araddr[MAINAXI_CRSBAR_M_PORT_NUM_UDL*32 +: 32];
-assign UDL_M_AXI_ARLEN = w_crsbar_m_axi_arlen[MAINAXI_CRSBAR_M_PORT_NUM_UDL*8 +: 8];
-assign UDL_M_AXI_ARSIZE = w_crsbar_m_axi_arsize[MAINAXI_CRSBAR_M_PORT_NUM_UDL*3 +: 3];
-assign UDL_M_AXI_ARBURST = w_crsbar_m_axi_arburst[MAINAXI_CRSBAR_M_PORT_NUM_UDL*2 +: 2];
-assign UDL_M_AXI_ARLOCK = w_crsbar_m_axi_arlock[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
-assign UDL_M_AXI_ARCACHE = w_crsbar_m_axi_arcache[MAINAXI_CRSBAR_M_PORT_NUM_UDL*4 +: 4];
-assign UDL_M_AXI_ARPROT = w_crsbar_m_axi_arprot[MAINAXI_CRSBAR_M_PORT_NUM_UDL*3 +: 3];
-assign UDL_M_AXI_ARREGION = w_crsbar_m_axi_arregion[MAINAXI_CRSBAR_M_PORT_NUM_UDL*4 +: 4];
-assign UDL_M_AXI_ARQOS = w_crsbar_m_axi_arqos[MAINAXI_CRSBAR_M_PORT_NUM_UDL*4 +: 4];
-assign UDL_M_AXI_ARVALID = w_crsbar_m_axi_arvalid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
-assign w_crsbar_m_axi_arready[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_ARREADY;
-assign w_crsbar_m_axi_rid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = UDL_M_AXI_RID;
-assign w_crsbar_m_axi_rdata[MAINAXI_CRSBAR_M_PORT_NUM_UDL*32 +: 32] = UDL_M_AXI_RDATA;
-assign w_crsbar_m_axi_rresp[MAINAXI_CRSBAR_M_PORT_NUM_UDL*2 +: 2] = UDL_M_AXI_RRESP;
-assign w_crsbar_m_axi_rlast[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_RLAST;
-assign w_crsbar_m_axi_rvalid[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_RVALID;
-assign UDL_M_AXI_RREADY = w_crsbar_m_axi_rready[MAINAXI_CRSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign UDL_M_AXI_AWID = w_crsbar_m_axi_awid[CROSSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign UDL_M_AXI_AWADDR = w_crsbar_m_axi_awaddr[CROSSBAR_M_PORT_NUM_UDL*32 +: 32];
+assign UDL_M_AXI_AWLEN = w_crsbar_m_axi_awlen[CROSSBAR_M_PORT_NUM_UDL*8 +: 8];
+assign UDL_M_AXI_AWSIZE = w_crsbar_m_axi_awsize[CROSSBAR_M_PORT_NUM_UDL*3 +: 3];
+assign UDL_M_AXI_AWBURST = w_crsbar_m_axi_awburst[CROSSBAR_M_PORT_NUM_UDL*2 +: 2];
+assign UDL_M_AXI_AWLOCK = w_crsbar_m_axi_awlock[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign UDL_M_AXI_AWCACHE = w_crsbar_m_axi_awcache[CROSSBAR_M_PORT_NUM_UDL*4 +: 4];
+assign UDL_M_AXI_AWPROT = w_crsbar_m_axi_awprot[CROSSBAR_M_PORT_NUM_UDL*3 +: 3];
+assign UDL_M_AXI_AWREGION = w_crsbar_m_axi_awregion[CROSSBAR_M_PORT_NUM_UDL*4 +: 4];
+assign UDL_M_AXI_AWQOS = w_crsbar_m_axi_awqos[CROSSBAR_M_PORT_NUM_UDL*4 +: 4];
+assign UDL_M_AXI_AWVALID = w_crsbar_m_axi_awvalid[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign w_crsbar_m_axi_awready[CROSSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_AWREADY;
+assign UDL_M_AXI_WDATA = w_crsbar_m_axi_wdata[CROSSBAR_M_PORT_NUM_UDL*32 +: 32];
+assign UDL_M_AXI_WSTRB = w_crsbar_m_axi_wstrb[CROSSBAR_M_PORT_NUM_UDL*4 +: 4];
+assign UDL_M_AXI_WLAST = w_crsbar_m_axi_wlast[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign UDL_M_AXI_WVALID = w_crsbar_m_axi_wvalid[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign w_crsbar_m_axi_wready[CROSSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_WREADY;
+assign w_crsbar_m_axi_bid[CROSSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = UDL_M_AXI_BID;
+assign w_crsbar_m_axi_bresp[CROSSBAR_M_PORT_NUM_UDL*2 +: 2] = UDL_M_AXI_BRESP;
+assign w_crsbar_m_axi_bvalid[CROSSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_BVALID;
+assign UDL_M_AXI_BREADY = w_crsbar_m_axi_bready[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign UDL_M_AXI_ARID = w_crsbar_m_axi_arid[CROSSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign UDL_M_AXI_ARADDR = w_crsbar_m_axi_araddr[CROSSBAR_M_PORT_NUM_UDL*32 +: 32];
+assign UDL_M_AXI_ARLEN = w_crsbar_m_axi_arlen[CROSSBAR_M_PORT_NUM_UDL*8 +: 8];
+assign UDL_M_AXI_ARSIZE = w_crsbar_m_axi_arsize[CROSSBAR_M_PORT_NUM_UDL*3 +: 3];
+assign UDL_M_AXI_ARBURST = w_crsbar_m_axi_arburst[CROSSBAR_M_PORT_NUM_UDL*2 +: 2];
+assign UDL_M_AXI_ARLOCK = w_crsbar_m_axi_arlock[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign UDL_M_AXI_ARCACHE = w_crsbar_m_axi_arcache[CROSSBAR_M_PORT_NUM_UDL*4 +: 4];
+assign UDL_M_AXI_ARPROT = w_crsbar_m_axi_arprot[CROSSBAR_M_PORT_NUM_UDL*3 +: 3];
+assign UDL_M_AXI_ARREGION = w_crsbar_m_axi_arregion[CROSSBAR_M_PORT_NUM_UDL*4 +: 4];
+assign UDL_M_AXI_ARQOS = w_crsbar_m_axi_arqos[CROSSBAR_M_PORT_NUM_UDL*4 +: 4];
+assign UDL_M_AXI_ARVALID = w_crsbar_m_axi_arvalid[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
+assign w_crsbar_m_axi_arready[CROSSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_ARREADY;
+assign w_crsbar_m_axi_rid[CROSSBAR_M_PORT_NUM_UDL*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = UDL_M_AXI_RID;
+assign w_crsbar_m_axi_rdata[CROSSBAR_M_PORT_NUM_UDL*32 +: 32] = UDL_M_AXI_RDATA;
+assign w_crsbar_m_axi_rresp[CROSSBAR_M_PORT_NUM_UDL*2 +: 2] = UDL_M_AXI_RRESP;
+assign w_crsbar_m_axi_rlast[CROSSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_RLAST;
+assign w_crsbar_m_axi_rvalid[CROSSBAR_M_PORT_NUM_UDL*1 +: 1] = UDL_M_AXI_RVALID;
+assign UDL_M_AXI_RREADY = w_crsbar_m_axi_rready[CROSSBAR_M_PORT_NUM_UDL*1 +: 1];
 
 endmodule
