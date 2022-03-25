@@ -3,12 +3,14 @@
 make generate_ip
 #+END_SRC
 
-Copy the Verilog model released by the memory vendor to the bench directory.
+Copy the Verilog/VHDL model released by the memory vendor to the bench directory.
 #+BEGIN_SRC
-cp {Verilog model path} ./bench/flash_model
+cp {flash model path} ./bench/flash_model
+cp {sram model path} ./bench/sram_model
 #+END_SRC
 
-This verification environment requires the cy15b104 and s25fl256l Verilog models.
+Store the simulation model in the ./bench directory. There are no restrictions on the name of the directory.
+This verification environment requires the cy15b104, s25fl256l and cy7c1061ge simulation models.
 It can be downloaded from the infineon website.
 
 Copy the AhbToAxi.v file from the implement directory.
