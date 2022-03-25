@@ -12,6 +12,7 @@ parameter TB_FRAM2_ENABLE = 0;
 `include "tb_top_main.vh"
 `include "sc_verification_task_pkg.vh"
 `include "cm3_task.vh"
+`include "sc_obc_a1_fpga_task.vh"
 `include "scvip_ahb_master_pkg.vh"
 `include "dut_register_map.vh"
 
