@@ -92,6 +92,74 @@ module main_axi_ss # (
   output UDL_S_AXI_RVALID,
   input  UDL_S_AXI_RREADY,
 
+  // HRMEM for SRAM AXI4 Master Interface
+  output [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_M_AXI_AWID,
+  output [31:0] HRMEM_SRAM_M_AXI_AWADDR,
+  output [7:0] HRMEM_SRAM_M_AXI_AWLEN,
+  output [2:0] HRMEM_SRAM_M_AXI_AWSIZE,
+  output [1:0] HRMEM_SRAM_M_AXI_AWBURST,
+  output HRMEM_SRAM_M_AXI_AWLOCK,
+  output [3:0] HRMEM_SRAM_M_AXI_AWCACHE,
+  output [2:0] HRMEM_SRAM_M_AXI_AWPROT,
+  output HRMEM_SRAM_M_AXI_AWVALID,
+  input  HRMEM_SRAM_M_AXI_AWREADY,
+  output [31:0] HRMEM_SRAM_M_AXI_WDATA,
+  output [3:0] HRMEM_SRAM_M_AXI_WSTRB,
+  output HRMEM_SRAM_M_AXI_WLAST,
+  output HRMEM_SRAM_M_AXI_WVALID,
+  input  HRMEM_SRAM_M_AXI_WREADY,
+  input  [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_M_AXI_BID,
+  input  [1:0] HRMEM_SRAM_M_AXI_BRESP,
+  input  HRMEM_SRAM_M_AXI_BVALID,
+  output HRMEM_SRAM_M_AXI_BREADY,
+  output [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_M_AXI_ARID,
+  output [31:0] HRMEM_SRAM_M_AXI_ARADDR,
+  output [7:0] HRMEM_SRAM_M_AXI_ARLEN,
+  output [2:0] HRMEM_SRAM_M_AXI_ARSIZE,
+  output [1:0] HRMEM_SRAM_M_AXI_ARBURST,
+  output HRMEM_SRAM_M_AXI_ARLOCK,
+  output [3:0] HRMEM_SRAM_M_AXI_ARCACHE,
+  output [2:0] HRMEM_SRAM_M_AXI_ARPROT,
+  output HRMEM_SRAM_M_AXI_ARVALID,
+  input  HRMEM_SRAM_M_AXI_ARREADY,
+  input  [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_M_AXI_RID,
+  input  [31:0] HRMEM_SRAM_M_AXI_RDATA,
+  input  [1:0] HRMEM_SRAM_M_AXI_RRESP,
+  input  HRMEM_SRAM_M_AXI_RLAST,
+  input  HRMEM_SRAM_M_AXI_RVALID,
+  output HRMEM_SRAM_M_AXI_RREADY,
+
+  // HRMEM Register for SRAM AXI4 Master Interface
+  output [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_REG_M_AXI_AWID,
+  output [31:0] HRMEM_SRAM_REG_M_AXI_AWADDR,
+  output [7:0] HRMEM_SRAM_REG_M_AXI_AWLEN,
+  output [2:0] HRMEM_SRAM_REG_M_AXI_AWSIZE,
+  output [1:0] HRMEM_SRAM_REG_M_AXI_AWBURST,
+  output HRMEM_SRAM_REG_M_AXI_AWVALID,
+  input  HRMEM_SRAM_REG_M_AXI_AWREADY,
+  output [31:0] HRMEM_SRAM_REG_M_AXI_WDATA,
+  output [3:0] HRMEM_SRAM_REG_M_AXI_WSTRB,
+  output HRMEM_SRAM_REG_M_AXI_WLAST,
+  output HRMEM_SRAM_REG_M_AXI_WVALID,
+  input  HRMEM_SRAM_REG_M_AXI_WREADY,
+  input  [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_REG_M_AXI_BID,
+  input  [1:0] HRMEM_SRAM_REG_M_AXI_BRESP,
+  input  HRMEM_SRAM_REG_M_AXI_BVALID,
+  output HRMEM_SRAM_REG_M_AXI_BREADY,
+  output [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_REG_M_AXI_ARID,
+  output [31:0] HRMEM_SRAM_REG_M_AXI_ARADDR,
+  output [7:0] HRMEM_SRAM_REG_M_AXI_ARLEN,
+  output [2:0] HRMEM_SRAM_REG_M_AXI_ARSIZE,
+  output [1:0] HRMEM_SRAM_REG_M_AXI_ARBURST,
+  output HRMEM_SRAM_REG_M_AXI_ARVALID,
+  input  HRMEM_SRAM_REG_M_AXI_ARREADY,
+  input  [MAINAXI_S_AXI_ID_WIDTH-1:0] HRMEM_SRAM_REG_M_AXI_RID,
+  input  [31:0] HRMEM_SRAM_REG_M_AXI_RDATA,
+  input  [1:0] HRMEM_SRAM_REG_M_AXI_RRESP,
+  input  HRMEM_SRAM_REG_M_AXI_RLAST,
+  input  HRMEM_SRAM_REG_M_AXI_RVALID,
+  output HRMEM_SRAM_REG_M_AXI_RREADY,
+
   // Low Performance AHB AXI4 Master Interface
   output [MAINAXI_S_AXI_ID_WIDTH-1:0] LPAHB_M_AXI_AWID,
   output [31:0] LPAHB_M_AXI_AWADDR,
@@ -469,62 +537,42 @@ main_axi_crossbar main_axi_crossbar (
   .m_axi_rready(axim_rready)
 );
 
-// High Reliability Memory Controller for SRAM (Dummy)
-sc_axi_slave # (
-  .P_AD_W(32),
-  .P_DT_W(32),
-  .P_ID_W(MAINAXI_S_AXI_ID_WIDTH)
-) axi_slave_hrmem_sram_dummy (
-  // AXI Interface
-  .S_AXI_ACLK(SYS_CLK),
-  .S_AXI_ARESETN(SYS_RSTB),
-  .S_AXI_AWID(axim_awid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(axim_awaddr[M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_AWLEN(axim_awlen[M_PORT_NUM_HRMEM_SRAM*8 +: 8]),
-  .S_AXI_AWSIZE(axim_awsize[M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_AWBURST(axim_awburst[M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_AWLOCK(axim_awlock[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_AWCACHE(axim_awcache[M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
-  .S_AXI_AWPROT(axim_awprot[M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_AWVALID(axim_awvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_AWREADY(axim_awready[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_WDATA(axim_wdata[M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_WSTRB(axim_wstrb[M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
-  .S_AXI_WLAST(axim_wlast[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_WVALID(axim_wvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_WREADY(axim_wready[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_BID(axim_bid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(axim_bresp[M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_BVALID(axim_bvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_BREADY(axim_bready[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_ARID(axim_arid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(axim_araddr[M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_ARLEN(axim_arlen[M_PORT_NUM_HRMEM_SRAM*8 +: 8]),
-  .S_AXI_ARSIZE(axim_arsize[M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_ARBURST(axim_arburst[M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_ARLOCK(axim_arlock[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_ARCACHE(axim_arcache[M_PORT_NUM_HRMEM_SRAM*4 +: 4]),
-  .S_AXI_ARPROT(axim_arprot[M_PORT_NUM_HRMEM_SRAM*3 +: 3]),
-  .S_AXI_ARVALID(axim_arvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_ARREADY(axim_arready[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_RID(axim_rid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(axim_rdata[M_PORT_NUM_HRMEM_SRAM*32 +: 32]),
-  .S_AXI_RRESP(axim_rresp[M_PORT_NUM_HRMEM_SRAM*2 +: 2]),
-  .S_AXI_RLAST(axim_rlast[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_RVALID(axim_rvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  .S_AXI_RREADY(axim_rready[M_PORT_NUM_HRMEM_SRAM*1 +: 1]),
-  // Register Interface
-  .REG_WEN(/*open*/),
-  .REG_WADDR(/*open*/),
-  .REG_WBTEN(/*open*/),
-  .REG_WDATA(/*open*/),
-  .REG_REN(/*open*/),
-  .REG_RADDR(/*open*/),
-  .REG_RDATA(32'h0),
-  .REG_WACCERR(1'b0),
-  .REG_RACCERR(1'b0),
-  .REG_RWAIT(1'b0)
-);
+// main_axi_crossbar to HRMEM for SRAM AXI4 Master Interface
+assign HRMEM_SRAM_M_AXI_AWID = axim_awid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign HRMEM_SRAM_M_AXI_AWADDR = axim_awaddr[M_PORT_NUM_HRMEM_SRAM*32 +: 32];
+assign HRMEM_SRAM_M_AXI_AWLEN = axim_awlen[M_PORT_NUM_HRMEM_SRAM*8 +: 8];
+assign HRMEM_SRAM_M_AXI_AWSIZE = axim_awsize[M_PORT_NUM_HRMEM_SRAM*3 +: 3];
+assign HRMEM_SRAM_M_AXI_AWBURST = axim_awburst[M_PORT_NUM_HRMEM_SRAM*2 +: 2];
+assign HRMEM_SRAM_M_AXI_AWLOCK = axim_awlock[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
+assign HRMEM_SRAM_M_AXI_AWCACHE = axim_awcache[M_PORT_NUM_HRMEM_SRAM*4 +: 4];
+assign HRMEM_SRAM_M_AXI_AWPROT = axim_awprot[M_PORT_NUM_HRMEM_SRAM*3 +: 3];
+assign HRMEM_SRAM_M_AXI_AWVALID = axim_awvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
+assign axim_awready[M_PORT_NUM_HRMEM_SRAM*1 +: 1] = HRMEM_SRAM_M_AXI_AWREADY;
+assign HRMEM_SRAM_M_AXI_WDATA = axim_wdata[M_PORT_NUM_HRMEM_SRAM*32 +: 32];
+assign HRMEM_SRAM_M_AXI_WSTRB = axim_wstrb[M_PORT_NUM_HRMEM_SRAM*4 +: 4];
+assign HRMEM_SRAM_M_AXI_WLAST = axim_wlast[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
+assign HRMEM_SRAM_M_AXI_WVALID = axim_wvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
+assign axim_wready[M_PORT_NUM_HRMEM_SRAM*1 +: 1] = HRMEM_SRAM_M_AXI_WREADY;
+assign axim_bid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = HRMEM_SRAM_M_AXI_BID;
+assign axim_bresp[M_PORT_NUM_HRMEM_SRAM*2 +: 2] = HRMEM_SRAM_M_AXI_BRESP;
+assign axim_bvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1] = HRMEM_SRAM_M_AXI_BVALID;
+assign HRMEM_SRAM_M_AXI_BREADY = axim_bready[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
+assign HRMEM_SRAM_M_AXI_ARID = axim_arid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign HRMEM_SRAM_M_AXI_ARADDR = axim_araddr[M_PORT_NUM_HRMEM_SRAM*32 +: 32];
+assign HRMEM_SRAM_M_AXI_ARLEN = axim_arlen[M_PORT_NUM_HRMEM_SRAM*8 +: 8];
+assign HRMEM_SRAM_M_AXI_ARSIZE = axim_arsize[M_PORT_NUM_HRMEM_SRAM*3 +: 3];
+assign HRMEM_SRAM_M_AXI_ARBURST = axim_arburst[M_PORT_NUM_HRMEM_SRAM*2 +: 2];
+assign HRMEM_SRAM_M_AXI_ARLOCK = axim_arlock[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
+assign HRMEM_SRAM_M_AXI_ARCACHE = axim_arcache[M_PORT_NUM_HRMEM_SRAM*4 +: 4];
+assign HRMEM_SRAM_M_AXI_ARPROT = axim_arprot[M_PORT_NUM_HRMEM_SRAM*3 +: 3];
+assign HRMEM_SRAM_M_AXI_ARVALID = axim_arvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
+assign axim_arready[M_PORT_NUM_HRMEM_SRAM*1 +: 1] = HRMEM_SRAM_M_AXI_ARREADY;
+assign axim_rid[M_PORT_NUM_HRMEM_SRAM*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = HRMEM_SRAM_M_AXI_RID;
+assign axim_rdata[M_PORT_NUM_HRMEM_SRAM*32 +: 32] = HRMEM_SRAM_M_AXI_RDATA;
+assign axim_rresp[M_PORT_NUM_HRMEM_SRAM*2 +: 2] = HRMEM_SRAM_M_AXI_RRESP;
+assign axim_rlast[M_PORT_NUM_HRMEM_SRAM*1 +: 1] = HRMEM_SRAM_M_AXI_RLAST;
+assign axim_rvalid[M_PORT_NUM_HRMEM_SRAM*1 +: 1] = HRMEM_SRAM_M_AXI_RVALID;
+assign HRMEM_SRAM_M_AXI_RREADY = axim_rready[M_PORT_NUM_HRMEM_SRAM*1 +: 1];
 
 // QSPI Master (NOR Flash Configuration Memory)
 sc_qspim # (
@@ -888,62 +936,36 @@ sc_can # (
   .CAN_INT(CAN_INT)
 );
 
-// High Reliability Memory Controller Register for SRAM (Dummy)
-sc_axi_slave # (
-  .P_AD_W(32),
-  .P_DT_W(32),
-  .P_ID_W(MAINAXI_S_AXI_ID_WIDTH)
-) axi_slave_hrmem_sram_reg_dummy (
-  // AXI Interface
-  .S_AXI_ACLK(SYS_CLK),
-  .S_AXI_ARESETN(SYS_RSTB),
-  .S_AXI_AWID(axim_awid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_AWADDR(axim_awaddr[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_AWLEN(axim_awlen[M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8]),
-  .S_AXI_AWSIZE(axim_awsize[M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_AWBURST(axim_awburst[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_AWLOCK(axim_awlock[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_AWCACHE(axim_awcache[M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
-  .S_AXI_AWPROT(axim_awprot[M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_AWVALID(axim_awvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_AWREADY(axim_awready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_WDATA(axim_wdata[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_WSTRB(axim_wstrb[M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
-  .S_AXI_WLAST(axim_wlast[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_WVALID(axim_wvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_WREADY(axim_wready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_BID(axim_bid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_BRESP(axim_bresp[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_BVALID(axim_bvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_BREADY(axim_bready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_ARID(axim_arid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_ARADDR(axim_araddr[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_ARLEN(axim_arlen[M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8]),
-  .S_AXI_ARSIZE(axim_arsize[M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_ARBURST(axim_arburst[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_ARLOCK(axim_arlock[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_ARCACHE(axim_arcache[M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4]),
-  .S_AXI_ARPROT(axim_arprot[M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3]),
-  .S_AXI_ARVALID(axim_arvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_ARREADY(axim_arready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_RID(axim_rid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH]),
-  .S_AXI_RDATA(axim_rdata[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32]),
-  .S_AXI_RRESP(axim_rresp[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2]),
-  .S_AXI_RLAST(axim_rlast[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_RVALID(axim_rvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  .S_AXI_RREADY(axim_rready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1]),
-  // Register Interface
-  .REG_WEN(/*open*/),
-  .REG_WADDR(/*open*/),
-  .REG_WBTEN(/*open*/),
-  .REG_WDATA(/*open*/),
-  .REG_REN(/*open*/),
-  .REG_RADDR(/*open*/),
-  .REG_RDATA(32'h0),
-  .REG_WACCERR(1'b0),
-  .REG_RACCERR(1'b0),
-  .REG_RWAIT(1'b0)
-);
+// main_axi_crossbar to HRMEM Register for SRAM AXI4 Master Interface
+assign HRMEM_SRAM_REG_M_AXI_AWID = axim_awid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign HRMEM_SRAM_REG_M_AXI_AWADDR = axim_awaddr[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32];
+assign HRMEM_SRAM_REG_M_AXI_AWLEN = axim_awlen[M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8];
+assign HRMEM_SRAM_REG_M_AXI_AWSIZE = axim_awsize[M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3];
+assign HRMEM_SRAM_REG_M_AXI_AWBURST = axim_awburst[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2];
+assign HRMEM_SRAM_REG_M_AXI_AWVALID = axim_awvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1];
+assign axim_awready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1] = HRMEM_SRAM_REG_M_AXI_AWREADY;
+assign HRMEM_SRAM_REG_M_AXI_WDATA = axim_wdata[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32];
+assign HRMEM_SRAM_REG_M_AXI_WSTRB = axim_wstrb[M_PORT_NUM_HRMEM_SRAM_REG*4 +: 4];
+assign HRMEM_SRAM_REG_M_AXI_WLAST = axim_wlast[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1];
+assign HRMEM_SRAM_REG_M_AXI_WVALID = axim_wvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1];
+assign axim_wready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1] = HRMEM_SRAM_REG_M_AXI_WREADY;
+assign axim_bid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = HRMEM_SRAM_REG_M_AXI_BID;
+assign axim_bresp[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2] = HRMEM_SRAM_REG_M_AXI_BRESP;
+assign axim_bvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1] = HRMEM_SRAM_REG_M_AXI_BVALID;
+assign HRMEM_SRAM_REG_M_AXI_BREADY = axim_bready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1];
+assign HRMEM_SRAM_REG_M_AXI_ARID = axim_arid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH];
+assign HRMEM_SRAM_REG_M_AXI_ARADDR = axim_araddr[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32];
+assign HRMEM_SRAM_REG_M_AXI_ARLEN = axim_arlen[M_PORT_NUM_HRMEM_SRAM_REG*8 +: 8];
+assign HRMEM_SRAM_REG_M_AXI_ARSIZE = axim_arsize[M_PORT_NUM_HRMEM_SRAM_REG*3 +: 3];
+assign HRMEM_SRAM_REG_M_AXI_ARBURST = axim_arburst[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2];
+assign HRMEM_SRAM_REG_M_AXI_ARVALID = axim_arvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1];
+assign axim_arready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1] = HRMEM_SRAM_REG_M_AXI_ARREADY;
+assign axim_rid[M_PORT_NUM_HRMEM_SRAM_REG*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = HRMEM_SRAM_REG_M_AXI_RID;
+assign axim_rdata[M_PORT_NUM_HRMEM_SRAM_REG*32 +: 32] = HRMEM_SRAM_REG_M_AXI_RDATA;
+assign axim_rresp[M_PORT_NUM_HRMEM_SRAM_REG*2 +: 2] = HRMEM_SRAM_REG_M_AXI_RRESP;
+assign axim_rlast[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1] = HRMEM_SRAM_REG_M_AXI_RLAST;
+assign axim_rvalid[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1] = HRMEM_SRAM_REG_M_AXI_RVALID;
+assign HRMEM_SRAM_REG_M_AXI_RREADY = axim_rready[M_PORT_NUM_HRMEM_SRAM_REG*1 +: 1];
 
 // High Reliability Memory Register for BlockRAM (Dummy)
 sc_axi_slave # (

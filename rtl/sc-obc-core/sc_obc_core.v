@@ -243,7 +243,6 @@ module sc_obc_core # (
   output NTDOEN
 );
 
-assign INIT_DONE = INIT_REQ;
 assign CPU_LOCKUP_RSTEN = 0;
 
 localparam LPAHB_CONSOLE_UART_DIV = 16'h01A0;
@@ -251,6 +250,7 @@ localparam CM3SS_PRIMARY_ISR_NUM = 8;
 
 // SC-OBC-SS Interrupt Signal
 wire [CM3SS_PRIMARY_ISR_NUM-1:0] internal_isr;
+wire hrmem_sram_isr;
 wire cfgmem_qspi_isr;
 wire datamem_qspi_isr;
 wire fram_qspi_isr;
@@ -264,10 +264,23 @@ assign internal_isr[5] = canc_isr;
 assign internal_isr[4] = fram_qspi_isr;
 assign internal_isr[3] = datamem_qspi_isr;
 assign internal_isr[2] = cfgmem_qspi_isr;
-assign internal_isr[1] = 1'b0;
+assign internal_isr[1] = hrmem_sram_isr;
 assign internal_isr[0] = uartlite_isr;
 
 wire cfgitcmen;
+
+// CM3_COD_AHB Interface
+wire cm3_cod_hsel;
+wire [1:0] cm3_cod_htrans;
+wire [31:0] cm3_cod_haddr;
+wire [2:0] cm3_cod_hburst;
+wire cm3_cod_hwrite;
+wire [2:0] cm3_cod_hsize;
+wire [3:0] cm3_cod_hprot;
+wire [31:0] cm3_cod_hwdata;
+wire cm3_cod_hready;
+wire [31:0] cm3_cod_hrdata;
+wire [1:0] cm3_cod_hresp;
 
 // CM3_SYS_AXI Interface
 //  Write Address Channel
@@ -306,6 +319,95 @@ wire [1:0] cm3_sys_rresp;
 wire cm3_sys_rlast;
 wire cm3_sys_rvalid;
 wire cm3_sys_rready;
+
+// HRMEM for SRAM AXI Interface
+//  Write Address Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_axis_awid;
+wire [31:0] hrmem_sram_axis_awaddr;
+wire [7:0] hrmem_sram_axis_awlen;
+wire [2:0] hrmem_sram_axis_awsize;
+wire [1:0] hrmem_sram_axis_awburst;
+wire hrmem_sram_axis_awlock;
+wire [3:0] hrmem_sram_axis_awcache;
+wire [2:0] hrmem_sram_axis_awprot;
+wire hrmem_sram_axis_awvalid;
+wire hrmem_sram_axis_awready;
+//  Write Data Channel
+wire [31:0] hrmem_sram_axis_wdata;
+wire [3:0] hrmem_sram_axis_wstrb;
+wire hrmem_sram_axis_wlast;
+wire hrmem_sram_axis_wvalid;
+wire hrmem_sram_axis_wready;
+//  Write Responce Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_axis_bid;
+wire [1:0] hrmem_sram_axis_bresp;
+wire hrmem_sram_axis_bvalid;
+wire hrmem_sram_axis_bready;
+//  Read Address Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_axis_arid;
+wire [31:0] hrmem_sram_axis_araddr;
+wire [7:0] hrmem_sram_axis_arlen;
+wire [2:0] hrmem_sram_axis_arsize;
+wire [1:0] hrmem_sram_axis_arburst;
+wire hrmem_sram_axis_arlock;
+wire [3:0] hrmem_sram_axis_arcache;
+wire [2:0] hrmem_sram_axis_arprot;
+wire hrmem_sram_axis_arvalid;
+wire hrmem_sram_axis_arready;
+//  Read Data Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_axis_rid;
+wire [31:0] hrmem_sram_axis_rdata;
+wire [1:0] hrmem_sram_axis_rresp;
+wire hrmem_sram_axis_rlast;
+wire hrmem_sram_axis_rvalid;
+wire hrmem_sram_axis_rready;
+
+// HRMEM Register for SRAM AXI Interface
+//  Write Address Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_reg_axis_awid;
+wire [31:0] hrmem_sram_reg_axis_awaddr;
+wire [7:0] hrmem_sram_reg_axis_awlen;
+wire [2:0] hrmem_sram_reg_axis_awsize;
+wire [1:0] hrmem_sram_reg_axis_awburst;
+wire hrmem_sram_reg_axis_awvalid;
+wire hrmem_sram_reg_axis_awready;
+//  Write Data Channel
+wire [31:0] hrmem_sram_reg_axis_wdata;
+wire [3:0] hrmem_sram_reg_axis_wstrb;
+wire hrmem_sram_reg_axis_wlast;
+wire hrmem_sram_reg_axis_wvalid;
+wire hrmem_sram_reg_axis_wready;
+//  Write Responce Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_reg_axis_bid;
+wire [1:0] hrmem_sram_reg_axis_bresp;
+wire hrmem_sram_reg_axis_bvalid;
+wire hrmem_sram_reg_axis_bready;
+//  Read Address Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_reg_axis_arid;
+wire [31:0] hrmem_sram_reg_axis_araddr;
+wire [7:0] hrmem_sram_reg_axis_arlen;
+wire [2:0] hrmem_sram_reg_axis_arsize;
+wire [1:0] hrmem_sram_reg_axis_arburst;
+wire hrmem_sram_reg_axis_arvalid;
+wire hrmem_sram_reg_axis_arready;
+//  Read Data Channel
+wire [MAINAXI_S_AXI_ID_WIDTH-1:0] hrmem_sram_reg_axis_rid;
+wire [31:0] hrmem_sram_reg_axis_rdata;
+wire [1:0] hrmem_sram_reg_axis_rresp;
+wire hrmem_sram_reg_axis_rlast;
+wire hrmem_sram_reg_axis_rvalid;
+wire hrmem_sram_reg_axis_rready;
+
+// HRMEM Register for SRAM AHB Interface
+wire [31:0] hrmem_sram_reg_haddr;
+wire [1:0] hrmem_sram_reg_htrans;
+wire hrmem_sram_reg_hwrite;
+wire [2:0] hrmem_sram_reg_hsize;
+wire [2:0] hrmem_sram_reg_hburst;
+wire [31:0] hrmem_sram_reg_hwdata;
+wire [31:0] hrmem_sram_reg_hrdata;
+wire hrmem_sram_reg_hready;
+wire [1:0] hrmem_sram_reg_hresp;
 
 // Low Performance AXI Interface
 //  Write Address Channel
@@ -374,17 +476,17 @@ sc_cm3_ss # (
   .NMI(1'b0),
 
   // CM3_COD_AHB Interface
-  .CM3_COD_HSEL(/*open*/),
-  .CM3_COD_HTRANS(/*open*/),
-  .CM3_COD_HADDR(/*open*/),
-  .CM3_COD_HBURST(/*open*/),
-  .CM3_COD_HWRITE(/*open*/),
-  .CM3_COD_HSIZE(/*open*/),
-  .CM3_COD_HPROT(/*open*/),
-  .CM3_COD_HWDATA(/*open*/),
-  .CM3_COD_HREADY(1'b1),
-  .CM3_COD_HRDATA(32'h0000_0000),
-  .CM3_COD_HRESP(2'b00),
+  .CM3_COD_HSEL(cm3_cod_hsel),
+  .CM3_COD_HTRANS(cm3_cod_htrans),
+  .CM3_COD_HADDR(cm3_cod_haddr),
+  .CM3_COD_HBURST(cm3_cod_hburst),
+  .CM3_COD_HWRITE(cm3_cod_hwrite),
+  .CM3_COD_HSIZE(cm3_cod_hsize),
+  .CM3_COD_HPROT(cm3_cod_hprot),
+  .CM3_COD_HWDATA(cm3_cod_hwdata),
+  .CM3_COD_HREADY(cm3_cod_hready),
+  .CM3_COD_HRDATA(cm3_cod_hrdata),
+  .CM3_COD_HRESP(cm3_cod_hresp),
 
   // CM3_SYS_AXI3 Write Address Channel
   .CM3_SYS_AWADDR(cm3_sys_awaddr),
@@ -440,6 +542,165 @@ sc_cm3_ss # (
   .TDI(TDI),
   .TDO(TDO),
   .NTDOEN(NTDOEN)
+);
+
+sc_hrmem_sram # (
+  .SC_HRMEM_SRAM_SYS_AXI_ID_W(MAINAXI_S_AXI_ID_WIDTH),
+  .SC_HRMEM_SRAM_PFB_STG_NUM(8),
+  .SC_HRMEM_SRAM_PFB_LINE_NUM(8),
+  .SC_HRMEM_SRAM_SP_PFB_LINE_NUM(2)
+) hrmem_sram (
+  // System Interface
+  .SYSCLK(SYS_CLK),
+  .SYSRST_N(SYS_RSTB),
+  .MODULE_RSTN(1'b1),
+  .POR_RST_N(BOOT_RSTB),
+  .RAM_INIT_REQ(INIT_REQ),
+  .RAM_INIT_DONE(INIT_DONE),
+
+  // CM3 CODE Bus AHB Slave Interface
+  .CODE_SHSEL(cm3_cod_hsel),
+  .CODE_SHADDR(cm3_cod_haddr[21:0]),
+  .CODE_SHTRANS(cm3_cod_htrans),
+  .CODE_SHSIZE(cm3_cod_hsize),
+  .CODE_SHBURST(cm3_cod_hburst),
+  .CODE_SHWRITE(cm3_cod_hwrite),
+  .CODE_SHPROT(cm3_cod_hprot),
+  .CODE_SHWDATA(cm3_cod_hwdata),
+  .CODE_SHRDATA(cm3_cod_hrdata),
+  .CODE_SHRESP(cm3_cod_hresp),
+  .CODE_SHREADYIN(1'b1),
+  .CODE_SHREADYOUT(cm3_cod_hready),
+
+  // SYS Bus AXI Slave Interface
+  .SYS_S_AXI_AWID(hrmem_sram_axis_awid),
+  .SYS_S_AXI_AWADDR(hrmem_sram_axis_awaddr[21:0]),
+  .SYS_S_AXI_AWLEN(hrmem_sram_axis_awlen),
+  .SYS_S_AXI_AWSIZE(hrmem_sram_axis_awsize),
+  .SYS_S_AXI_AWBURST(hrmem_sram_axis_awburst),
+  .SYS_S_AXI_AWLOCK(hrmem_sram_axis_awlock),
+  .SYS_S_AXI_AWCACHE(hrmem_sram_axis_awcache),
+  .SYS_S_AXI_AWPROT(hrmem_sram_axis_awprot),
+  .SYS_S_AXI_AWVALID(hrmem_sram_axis_awvalid),
+  .SYS_S_AXI_AWREADY(hrmem_sram_axis_awready),
+  .SYS_S_AXI_WDATA(hrmem_sram_axis_wdata),
+  .SYS_S_AXI_WSTRB(hrmem_sram_axis_wstrb),
+  .SYS_S_AXI_WLAST(hrmem_sram_axis_wlast),
+  .SYS_S_AXI_WVALID(hrmem_sram_axis_wvalid),
+  .SYS_S_AXI_WREADY(hrmem_sram_axis_wready),
+  .SYS_S_AXI_BID(hrmem_sram_axis_bid),
+  .SYS_S_AXI_BRESP(hrmem_sram_axis_bresp),
+  .SYS_S_AXI_BVALID(hrmem_sram_axis_bvalid),
+  .SYS_S_AXI_BREADY(hrmem_sram_axis_bready),
+  .SYS_S_AXI_ARID(hrmem_sram_axis_arid),
+  .SYS_S_AXI_ARADDR(hrmem_sram_axis_araddr[21:0]),
+  .SYS_S_AXI_ARLEN(hrmem_sram_axis_arlen),
+  .SYS_S_AXI_ARSIZE(hrmem_sram_axis_arsize),
+  .SYS_S_AXI_ARBURST(hrmem_sram_axis_arburst),
+  .SYS_S_AXI_ARLOCK(hrmem_sram_axis_arlock),
+  .SYS_S_AXI_ARCACHE(hrmem_sram_axis_arcache),
+  .SYS_S_AXI_ARPROT(hrmem_sram_axis_arprot),
+  .SYS_S_AXI_ARVALID(hrmem_sram_axis_arvalid),
+  .SYS_S_AXI_ARREADY(hrmem_sram_axis_arready),
+  .SYS_S_AXI_RID(hrmem_sram_axis_rid),
+  .SYS_S_AXI_RDATA(hrmem_sram_axis_rdata),
+  .SYS_S_AXI_RRESP(hrmem_sram_axis_rresp),
+  .SYS_S_AXI_RLAST(hrmem_sram_axis_rlast),
+  .SYS_S_AXI_RVALID(hrmem_sram_axis_rvalid),
+  .SYS_S_AXI_RREADY(hrmem_sram_axis_rready),
+
+  // AHB Interface
+  .SHSEL(hrmem_sram_reg_htrans[1]),
+  .SHADDR(hrmem_sram_reg_haddr),
+  .SHTRANS(hrmem_sram_reg_htrans),
+  .SHSIZE(hrmem_sram_reg_hsize),
+  .SHBURST(hrmem_sram_reg_hburst),
+  .SHWRITE(hrmem_sram_reg_hwrite),
+  .SHREADYIN(1'b1),
+  .SHREADYOUT(hrmem_sram_reg_hready),
+  .SHWDATA(hrmem_sram_reg_hwdata),
+  .SHRDATA(hrmem_sram_reg_hrdata),
+  .SHRESP(hrmem_sram_reg_hresp),
+
+  // SRAM Interface
+  .SR_A(SRAM_A),
+  .SR1_CEB(SRAM1_CE_B),
+  .SR1_OEB(SRAM1_OE_B),
+  .SR1_WEB(SRAM1_WE_B),
+  .SR1_BHEB(SRAM1_BHE_B),
+  .SR1_BLEB(SRAM1_BLE_B),
+  .SR1_IO(SRAM1_IO),
+  .SR1_ERR(SRAM1_ERR),
+  .SR2_CEB(SRAM2_CE_B),
+  .SR2_OEB(SRAM2_OE_B),
+  .SR2_WEB(SRAM2_WE_B),
+  .SR2_BHEB(SRAM2_BHE_B),
+  .SR2_BLEB(SRAM2_BLE_B),
+  .SR2_IO(SRAM2_IO),
+  .SR2_ERR(SRAM2_ERR),
+
+  // Interrupt Interface
+  .HRMEM_INT(hrmem_sram_isr)
+);
+
+sc_axim2ahbs_nb # (
+  .AXIM2AHBSNB_ID_WIDTH(MAINAXI_S_AXI_ID_WIDTH),
+  .AXIM2AHBSNB_HCLK_IDLE_BIT(5)
+) axim2ahbs_hrmem_sram_reg (
+  // Global Signal
+  .ACLK(SYS_CLK),
+  .ARESETN(SYS_RSTB),
+
+  // Write Address Channel Signal
+  .AWID(hrmem_sram_reg_axis_awid),
+  .AWADDR(hrmem_sram_reg_axis_awaddr),
+  .AWLEN(hrmem_sram_reg_axis_awlen),
+  .AWSIZE(hrmem_sram_reg_axis_awsize),
+  .AWBURST(hrmem_sram_reg_axis_awburst),
+  .AWVALID(hrmem_sram_reg_axis_awvalid),
+  .AWREADY(hrmem_sram_reg_axis_awready),
+
+  // Write Data Channel Signal
+  .WDATA(hrmem_sram_reg_axis_wdata),
+  .WSTRB(hrmem_sram_reg_axis_wstrb),
+  .WLAST(hrmem_sram_reg_axis_wlast),
+  .WVALID(hrmem_sram_reg_axis_wvalid),
+  .WREADY(hrmem_sram_reg_axis_wready),
+
+  // Write Responce Channel Signal
+  .BRESP(hrmem_sram_reg_axis_bresp),
+  .BVALID(hrmem_sram_reg_axis_bvalid),
+  .BREADY(hrmem_sram_reg_axis_bready),
+  .BID(hrmem_sram_reg_axis_bid),
+
+  // Read Address Channel Signal
+  .ARID(hrmem_sram_reg_axis_arid),
+  .ARADDR(hrmem_sram_reg_axis_araddr),
+  .ARLEN(hrmem_sram_reg_axis_arlen),
+  .ARSIZE(hrmem_sram_reg_axis_arsize),
+  .ARBURST(hrmem_sram_reg_axis_arburst),
+  .ARVALID(hrmem_sram_reg_axis_arvalid),
+  .ARREADY(hrmem_sram_reg_axis_arready),
+
+  // Read Data Channel Signal
+  .RID(hrmem_sram_reg_axis_rid),
+  .RDATA(hrmem_sram_reg_axis_rdata),
+  .RRESP(hrmem_sram_reg_axis_rresp),
+  .RLAST(hrmem_sram_reg_axis_rlast),
+  .RVALID(hrmem_sram_reg_axis_rvalid),
+  .RREADY(hrmem_sram_reg_axis_rready),
+
+  // AHB Slave Interface
+  .HADDR(hrmem_sram_reg_haddr),
+  .HTRANS(hrmem_sram_reg_htrans),
+  .HWRITE(hrmem_sram_reg_hwrite),
+  .HSIZE(hrmem_sram_reg_hsize),
+  .HBURST(hrmem_sram_reg_hburst),
+  .HWDATA(hrmem_sram_reg_hwdata),
+  .HRDATA(hrmem_sram_reg_hrdata),
+  .HREADY(hrmem_sram_reg_hready),
+  .HRESP(hrmem_sram_reg_hresp),
+  .HCLKEN(/*open*/)
 );
 
 main_axi_ss # (
@@ -539,6 +800,84 @@ main_axi_ss # (
   .UDL_S_AXI_RLAST(UDL_AXIM_RLAST),
   .UDL_S_AXI_RVALID(UDL_AXIM_RVALID),
   .UDL_S_AXI_RREADY(UDL_AXIM_RREADY),
+
+  // HRMEM for SRAM AXI4 Master Interface
+  //  Write Address Channel
+  .HRMEM_SRAM_M_AXI_AWID(hrmem_sram_axis_awid),
+  .HRMEM_SRAM_M_AXI_AWADDR(hrmem_sram_axis_awaddr),
+  .HRMEM_SRAM_M_AXI_AWLEN(hrmem_sram_axis_awlen),
+  .HRMEM_SRAM_M_AXI_AWSIZE(hrmem_sram_axis_awsize),
+  .HRMEM_SRAM_M_AXI_AWBURST(hrmem_sram_axis_awburst),
+  .HRMEM_SRAM_M_AXI_AWLOCK(hrmem_sram_axis_awlock),
+  .HRMEM_SRAM_M_AXI_AWCACHE(hrmem_sram_axis_awcache),
+  .HRMEM_SRAM_M_AXI_AWPROT(hrmem_sram_axis_awprot),
+  .HRMEM_SRAM_M_AXI_AWVALID(hrmem_sram_axis_awvalid),
+  .HRMEM_SRAM_M_AXI_AWREADY(hrmem_sram_axis_awready),
+  //  Write Data Channel
+  .HRMEM_SRAM_M_AXI_WDATA(hrmem_sram_axis_wdata),
+  .HRMEM_SRAM_M_AXI_WSTRB(hrmem_sram_axis_wstrb),
+  .HRMEM_SRAM_M_AXI_WLAST(hrmem_sram_axis_wlast),
+  .HRMEM_SRAM_M_AXI_WVALID(hrmem_sram_axis_wvalid),
+  .HRMEM_SRAM_M_AXI_WREADY(hrmem_sram_axis_wready),
+  //  Write Responce Channel
+  .HRMEM_SRAM_M_AXI_BID(hrmem_sram_axis_bid),
+  .HRMEM_SRAM_M_AXI_BRESP(hrmem_sram_axis_bresp),
+  .HRMEM_SRAM_M_AXI_BVALID(hrmem_sram_axis_bvalid),
+  .HRMEM_SRAM_M_AXI_BREADY(hrmem_sram_axis_bready),
+  //  Read Address Channel
+  .HRMEM_SRAM_M_AXI_ARID(hrmem_sram_axis_arid),
+  .HRMEM_SRAM_M_AXI_ARADDR(hrmem_sram_axis_araddr),
+  .HRMEM_SRAM_M_AXI_ARLEN(hrmem_sram_axis_arlen),
+  .HRMEM_SRAM_M_AXI_ARSIZE(hrmem_sram_axis_arsize),
+  .HRMEM_SRAM_M_AXI_ARBURST(hrmem_sram_axis_arburst),
+  .HRMEM_SRAM_M_AXI_ARLOCK(hrmem_sram_axis_arlock),
+  .HRMEM_SRAM_M_AXI_ARCACHE(hrmem_sram_axis_arcache),
+  .HRMEM_SRAM_M_AXI_ARPROT(hrmem_sram_axis_arprot),
+  .HRMEM_SRAM_M_AXI_ARVALID(hrmem_sram_axis_arvalid),
+  .HRMEM_SRAM_M_AXI_ARREADY(hrmem_sram_axis_arready),
+  //  Read Data Channel
+  .HRMEM_SRAM_M_AXI_RID(hrmem_sram_axis_rid),
+  .HRMEM_SRAM_M_AXI_RDATA(hrmem_sram_axis_rdata),
+  .HRMEM_SRAM_M_AXI_RRESP(hrmem_sram_axis_rresp),
+  .HRMEM_SRAM_M_AXI_RLAST(hrmem_sram_axis_rlast),
+  .HRMEM_SRAM_M_AXI_RVALID(hrmem_sram_axis_rvalid),
+  .HRMEM_SRAM_M_AXI_RREADY(hrmem_sram_axis_rready),
+
+  // HRMEM Register for SRAM AXI4 Master Interface
+  //  Write Address Channel
+  .HRMEM_SRAM_REG_M_AXI_AWID(hrmem_sram_reg_axis_awid),
+  .HRMEM_SRAM_REG_M_AXI_AWADDR(hrmem_sram_reg_axis_awaddr),
+  .HRMEM_SRAM_REG_M_AXI_AWLEN(hrmem_sram_reg_axis_awlen),
+  .HRMEM_SRAM_REG_M_AXI_AWSIZE(hrmem_sram_reg_axis_awsize),
+  .HRMEM_SRAM_REG_M_AXI_AWBURST(hrmem_sram_reg_axis_awburst),
+  .HRMEM_SRAM_REG_M_AXI_AWVALID(hrmem_sram_reg_axis_awvalid),
+  .HRMEM_SRAM_REG_M_AXI_AWREADY(hrmem_sram_reg_axis_awready),
+  //  Write Data Channel
+  .HRMEM_SRAM_REG_M_AXI_WDATA(hrmem_sram_reg_axis_wdata),
+  .HRMEM_SRAM_REG_M_AXI_WSTRB(hrmem_sram_reg_axis_wstrb),
+  .HRMEM_SRAM_REG_M_AXI_WLAST(hrmem_sram_reg_axis_wlast),
+  .HRMEM_SRAM_REG_M_AXI_WVALID(hrmem_sram_reg_axis_wvalid),
+  .HRMEM_SRAM_REG_M_AXI_WREADY(hrmem_sram_reg_axis_wready),
+  //  Write Responce Channel
+  .HRMEM_SRAM_REG_M_AXI_BID(hrmem_sram_reg_axis_bid),
+  .HRMEM_SRAM_REG_M_AXI_BRESP(hrmem_sram_reg_axis_bresp),
+  .HRMEM_SRAM_REG_M_AXI_BVALID(hrmem_sram_reg_axis_bvalid),
+  .HRMEM_SRAM_REG_M_AXI_BREADY(hrmem_sram_reg_axis_bready),
+  //  Read Address Channel
+  .HRMEM_SRAM_REG_M_AXI_ARID(hrmem_sram_reg_axis_arid),
+  .HRMEM_SRAM_REG_M_AXI_ARADDR(hrmem_sram_reg_axis_araddr),
+  .HRMEM_SRAM_REG_M_AXI_ARLEN(hrmem_sram_reg_axis_arlen),
+  .HRMEM_SRAM_REG_M_AXI_ARSIZE(hrmem_sram_reg_axis_arsize),
+  .HRMEM_SRAM_REG_M_AXI_ARBURST(hrmem_sram_reg_axis_arburst),
+  .HRMEM_SRAM_REG_M_AXI_ARVALID(hrmem_sram_reg_axis_arvalid),
+  .HRMEM_SRAM_REG_M_AXI_ARREADY(hrmem_sram_reg_axis_arready),
+  //  Read Data Channel
+  .HRMEM_SRAM_REG_M_AXI_RID(hrmem_sram_reg_axis_rid),
+  .HRMEM_SRAM_REG_M_AXI_RDATA(hrmem_sram_reg_axis_rdata),
+  .HRMEM_SRAM_REG_M_AXI_RRESP(hrmem_sram_reg_axis_rresp),
+  .HRMEM_SRAM_REG_M_AXI_RLAST(hrmem_sram_reg_axis_rlast),
+  .HRMEM_SRAM_REG_M_AXI_RVALID(hrmem_sram_reg_axis_rvalid),
+  .HRMEM_SRAM_REG_M_AXI_RREADY(hrmem_sram_reg_axis_rready),
 
   // Low Performance AHB AXI4 Master Interface
   //  Write Address Channel
@@ -725,20 +1064,6 @@ assign CFG_DONE = 1'b1;
 assign FPGA_WATCHDOG = 1'b0;
 
 assign CFG_MEM_SEL = 1'b0;
-
-assign SRAM_A = 20'h0;
-assign SRAM1_CE_B = 1'b1;
-assign SRAM1_OE_B = 1'b1;
-assign SRAM1_WE_B = 1'b1;
-assign SRAM1_BHE_B = 1'b1;
-assign SRAM1_BLE_B = 1'b1;
-assign SRAM1_IO = 16'h0;
-assign SRAM2_CE_B = 1'b1;
-assign SRAM2_OE_B = 1'b1;
-assign SRAM2_WE_B = 1'b1;
-assign SRAM2_BHE_B = 1'b1;
-assign SRAM2_BLE_B = 1'b1;
-assign SRAM2_IO = 16'h0;
 
 assign ULPI_CS = 1'b0;
 assign ULPI_RESET_B = 1'b1;
