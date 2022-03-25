@@ -48,7 +48,7 @@ TC_DIR               := ./testcase
 TC_FILE              := $(TC_DIR)/$(TESTCASE).sv
 
 # Simulation Directory
-SDB_DIR              := xsim.dir/work
+XDB_DIR              := xsim.dir/work
 LOG_DIR              := simlog
 WAV_DIR              := wave
 
@@ -58,7 +58,7 @@ CF                   += xsim* webtalk* xelab* xvlog* hs_err_* vivado_pid* $(TB_D
 vpath %.vh  $(RTL_DIR_LIST)
 vpath %.v   $(RTL_DIR_LIST)
 vpath %.v   $(TB_DIR_LIST)
-vpath %.sdb $(SDB_DIR)
+vpath %.sdb $(XDB_DIR)
 
 # ===========================================================================
 # Simulation: sc_obc_core
@@ -70,8 +70,8 @@ PHONY += sim_preparation
 sim_preparation:
 	$(MKDIR) $(LOG_DIR)
 	echo '*' > $(LOG_DIR)/.gitignore
-	$(MKDIR) $(SDB_DIR)
-	echo '*' > $(SDB_DIR)/.gitignore
+	$(MKDIR) $(XDB_DIR)
+	echo '*' > $(XDB_DIR)/.gitignore
 
 generate_ip:
 	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(MAIN_AXI_CROSSBAR_IP)
