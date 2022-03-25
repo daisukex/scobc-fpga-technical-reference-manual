@@ -129,6 +129,7 @@ wire maxi_clk;
 wire user_clk1;
 wire user_clk2;
 
+wire boot_rstb;
 wire por_rstb;
 wire por_rstb_sync_refclk;
 wire sys_rstb;
