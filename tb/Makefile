@@ -42,7 +42,7 @@ RTL_HEADER_LIST      := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(l
 # Testbench Directory
 TB_DIR               := ./bench
 TB_DIR_LIST          := $(shell find $(TB_DIR) -type d)
-TB_LIST              := $(foreach list, $(TB_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
+TB_VERILOG_LIST      := $(foreach list, $(TB_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
 AHBVIP_DIR           := ./bench/scvip_ahb_master
 TC_DIR               := ./testcase
 TC_FILE              := $(TC_DIR)/$(TESTCASE).sv
@@ -84,7 +84,7 @@ dut_compile: sim_preparation glbl.sdb $(RTL_LIST:.v=.sdb)
 
 # Compile Testbench
 PHONY += tb_compile
-tb_compile: sim_preparation $(TB_LIST:.v=.sdb)
+tb_compile: sim_preparation $(TB_VERILOG_LIST:.v=.sdb)
 
 # Compile Testcase
 PHONY += testcase_compile
