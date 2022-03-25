@@ -23,7 +23,7 @@ parameter TB_FRAM2_ENABLE = 0;
 
 assign testcase_name = "Check System Register";
 initial begin
-  timeout_ms = 5;
+  timeout_ms = 100;
   @ (posedge SYS_RSTB);
 
   //--------------------------------------------------

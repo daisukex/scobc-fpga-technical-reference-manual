@@ -34,7 +34,7 @@ reg [63:0] DW;
 
 assign testcase_name = "Check UART-Lite";
 initial begin
-  timeout_ms = 5;
+  timeout_ms = 100;
   @ (posedge SYS_RSTB);
 
   //--------------------------------------------------

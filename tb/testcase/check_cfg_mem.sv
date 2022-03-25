@@ -96,7 +96,7 @@ endtask
 
 assign testcase_name = "Check NOR Flash Memory Controller for Configuration Memory";
 initial begin
-  timeout_ms = 5;
+  timeout_ms = 100;
   @ (posedge SYS_RSTB);
 
   //--------------------------------------------------
