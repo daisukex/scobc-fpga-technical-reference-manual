@@ -5,3 +5,14 @@
 //-----------------------------------------------
 // Copyright © 2022 Space Cubics, LLC.
 //-----------------------------------------------
+
+// Skip SRAM initialization
+task skip_sram_init;
+begin
+  if (dut.obc_core.hrmem_sram.ram_init_ctrl.RAM_INIT_REQ !== 1'b1)
+    @(posedge dut.obc_core.hrmem_sram.ram_init_ctrl.RAM_INIT_REQ);
+  repeat(20) @(posedge SYS_CLK);
+  dut.obc_core.hrmem_sram.ram_init_ctrl.RAM_INIT_ADDR = (2**20) - 8;
+  display_text("Skip SRAM initialization", 1, 1); @(posedge SYS_CLK);
+end
+endtask

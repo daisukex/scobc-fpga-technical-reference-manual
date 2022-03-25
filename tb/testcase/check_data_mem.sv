@@ -98,6 +98,7 @@ endtask
 assign testcase_name = "Check NOR Flash Memory Controller for Data Memory";
 initial begin
   timeout_ms = 100;
+  skip_sram_init();
   @ (posedge SYS_RSTB);
 
   //--------------------------------------------------

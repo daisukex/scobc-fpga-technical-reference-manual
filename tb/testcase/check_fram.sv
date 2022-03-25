@@ -177,6 +177,7 @@ endtask
 assign testcase_name = "Check FRAM Controller";
 initial begin
   timeout_ms = 100;
+  skip_sram_init();
   @ (posedge SYS_RSTB);
 
   //--------------------------------------------------

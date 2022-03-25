@@ -21,6 +21,7 @@ integer i;
 assign testcase_name = "Check ITCM Address Range";
 initial begin
   timeout_ms = 5;
+  skip_sram_init();
   @ (posedge SYS_RSTB);
 
   //--------------------------------------------------

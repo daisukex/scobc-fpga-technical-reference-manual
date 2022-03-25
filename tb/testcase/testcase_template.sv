@@ -25,7 +25,7 @@ parameter TB_FRAM2_ENABLE = 0;
 
 assign testcase_name = "Testcase Template";
 initial begin
-
+  skip_sram_init();
   repeat (100) @ (posedge SYS_CLK);
   simfinish(0);
 

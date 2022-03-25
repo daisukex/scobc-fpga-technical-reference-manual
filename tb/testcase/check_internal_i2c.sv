@@ -27,6 +27,7 @@ parameter TB_FRAM2_ENABLE = 0;
 assign testcase_name = "Check Internal I2C Master Controller";
 initial begin
   timeout_ms = 100;
+  skip_sram_init();
   @ (posedge SYS_RSTB);
 
   //--------------------------------------------------
