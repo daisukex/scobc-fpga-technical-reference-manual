@@ -1,5 +1,6 @@
 xsim*
 xvlog*
+xvhdl*
 xelab*
 bench/glbl.v
 sim_wave.tcl

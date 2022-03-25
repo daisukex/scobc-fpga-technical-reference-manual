@@ -11,6 +11,7 @@ WAVE_FORMAT  := wdb
 # Command variables
 VLOG         := xvlog
 SVLOG        := xvlog -sv
+XVHDL        := xvhdl
 ELAB         := xelab --timescale 1ps/1ps --debug all -L unisims_ver
 SIM          := xsim
 WVIEW        := xsim --gui --nolog
@@ -43,6 +44,10 @@ RTL_HEADER_LIST      := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(l
 TB_DIR               := ./bench
 TB_DIR_LIST          := $(shell find $(TB_DIR) -type d)
 TB_VERILOG_LIST      := $(foreach list, $(TB_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
+TB_VHDL_LIST         := $(foreach list, $(TB_DIR_LIST), $(wildcard $(list)/*.vhd))
+TB_VHDLP_LIST        := $(foreach list, $(TB_VHDL_LIST), $(notdir $(shell grep -iEl 'package .+ is' $(list))))
+TB_VHDLS_LIST        := $(foreach list, $(TB_VHDL_LIST), $(notdir $(shell grep -iEL 'package .+ is' $(list))))
+
 AHBVIP_DIR           := ./bench/scvip_ahb_master
 TC_DIR               := ./testcase
 TC_FILE              := $(TC_DIR)/$(TESTCASE).sv
@@ -53,12 +58,14 @@ LOG_DIR              := simlog
 WAV_DIR              := wave
 
 CF                   := $(LOG_DIR) $(WAV_DIR) sim_wave.tcl
-CF                   += xsim* webtalk* xelab* xvlog* hs_err_* vivado_pid* $(TB_DIR)/glbl.sdb
+CF                   += xsim* webtalk* xelab* xvlog* xvhdl* hs_err_* vivado_pid* $(TB_DIR)/glbl.sdb
 
 vpath %.vh  $(RTL_DIR_LIST)
 vpath %.v   $(RTL_DIR_LIST)
 vpath %.v   $(TB_DIR_LIST)
+vpath %.vhd $(TB_DIR_LIST)
 vpath %.sdb $(XDB_DIR)
+vpath %.vdb $(XDB_DIR)
 
 # ===========================================================================
 # Simulation: sc_obc_core
@@ -84,7 +91,9 @@ dut_compile: sim_preparation glbl.sdb $(RTL_LIST:.v=.sdb)
 
 # Compile Testbench
 PHONY += tb_compile
-tb_compile: sim_preparation $(TB_VERILOG_LIST:.v=.sdb)
+tb_compile: sim_preparation $(TB_VHDLS_LIST:.vhd=.vdb) $(TB_VERILOG_LIST:.v=.sdb)
+
+$(TB_VHDLS_LIST:.vhd=.vdb): $(TB_VHDLP_LIST:.vhd=.vdb) $(TB_VHDLS_LIST)
 
 # Compile Testcase
 PHONY += testcase_compile
@@ -121,6 +130,9 @@ glbl.v:
 
 %.sdb: %.v $(RTL_HEADER_LIST)
 	$(VLOG) --log $(LOG_DIR)/$(basename $(<F))_compile.log $<
+
+%.vdb: %.vhd
+	$(XVHDL) --log $(LOG_DIR)/$(basename $(<F))_compile.log $<
 
 # ===========================================================================
 # clean target
