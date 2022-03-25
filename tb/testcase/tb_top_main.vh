@@ -223,6 +223,29 @@ i2c_model # (
   .I2C_SDA(external_i2cm_sda)
 );
 
+if (TB_SRAM_ENABLE === 1) begin: sram
+CY7C1061GE_10 sram1 (
+  .CE_b(sram1_ce_b),
+  .WE_b(sram1_we_b),
+  .OE_b(sram1_oe_b),
+  .BHE_b(sram1_bhe_b),
+  .BLE_b(sram1_ble_b),
+  .A(sram_a),
+  .DQ(sram1_io),
+  .ERR(sram1_err)
+);
+CY7C1061GE_10 sram2 (
+  .CE_b(sram2_ce_b),
+  .WE_b(sram2_we_b),
+  .OE_b(sram2_oe_b),
+  .BHE_b(sram2_bhe_b),
+  .BLE_b(sram2_ble_b),
+  .A(sram_a),
+  .DQ(sram2_io),
+  .ERR(sram2_err)
+);
+end
+
 if (TB_CFG_MEM1_ENABLE === 1) begin: cfg_mem1
 s25fl256l # (
   .UserPreload(0),

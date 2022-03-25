@@ -10,6 +10,7 @@
 
 module tb_top;
 
+parameter TB_SRAM_ENABLE = 0;
 parameter TB_CFG_MEM1_ENABLE = 1;
 parameter TB_CFG_MEM2_ENABLE = 0;
 parameter TB_DATA_MEM1_ENABLE = 0;
