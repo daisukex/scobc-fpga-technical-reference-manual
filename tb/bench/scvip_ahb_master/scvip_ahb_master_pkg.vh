@@ -226,3 +226,58 @@ task automatic write_transaction (
   endcase
 
 endtask
+
+task static block_transaction (
+  input integer master = 0,
+  input integer blocknum = 1,
+  input [31:0] addr [0:SCVIP_AHBM_MAX_TRANS_CYCLE-1],
+  input [SCVIP_AHBM_MAX_TRANS_CYCLE-1:0] write = 0,
+  input [1:0] burst [0:SCVIP_AHBM_MAX_TRANS_CYCLE-1] = '{SCVIP_AHBM_MAX_TRANS_CYCLE+1{AHB_BURST_TYPE_INCR}},
+  input [2:0] size [0:SCVIP_AHBM_MAX_TRANS_CYCLE-1]    = '{SCVIP_AHBM_MAX_TRANS_CYCLE{AHB_SIZE_4BYTE}},
+  input [31:0] data [0:SCVIP_AHBM_MAX_TRANS_CYCLE-1],
+  input [4:0] len [0:SCVIP_AHBM_MAX_TRANS_CYCLE-1]     = '{SCVIP_AHBM_MAX_TRANS_CYCLE{AHB_LEN_SINGLE}},
+  input [31:0] chkbit [0:SCVIP_AHBM_MAX_TRANS_CYCLE-1] = '{SCVIP_AHBM_MAX_TRANS_CYCLE{32'hFFFF_FFFF}},
+  input check
+);
+
+  integer i;
+
+  reg [32*SCVIP_AHBM_MAX_TRANS_CYCLE-1:0] bdata;
+  reg [32*SCVIP_AHBM_MAX_TRANS_CYCLE-1:0] baddr;
+  reg [2*SCVIP_AHBM_MAX_TRANS_CYCLE-1:0]  bburst;
+  reg [3*SCVIP_AHBM_MAX_TRANS_CYCLE-1:0]  bsize;
+  reg [5**SCVIP_AHBM_MAX_TRANS_CYCLE-1:0] blen;
+  reg [32*SCVIP_AHBM_MAX_TRANS_CYCLE-1:0] bchkbit;
+  reg [17:0] reg_sens, set_sens;
+  reg_sens = SENSITIVITY[master];
+  if (check)
+    set_sens = {SENS_STOP, reg_sens[15:0]};
+  else
+    set_sens = {SENS_INFO, reg_sens[15:0]};
+
+  case (master)
+    0: ahbm[0].ahb_master.CHANGE_SENSITIVITY(set_sens);
+  endcase
+
+  for(i=0; i<SCVIP_AHBM_MAX_TRANS_CYCLE; i++) begin
+    baddr[i*32 +:32] = addr[i];
+    bdata[i*32 +:32] = data[i];
+    bburst[i*2 +:2] = burst[i];
+    bsize[i*3 +:3] = size[i];
+    blen[i*5 +:5] = len[i];
+    bchkbit[i*32 +:32] = chkbit[i];
+  end
+
+  case (master)
+    0: ahbm[0].ahb_master.AHB_TRANS(blocknum, baddr, write, bburst, bsize, blen, bdata, bchkbit);
+    1: ahbm[1].ahb_master.AHB_TRANS(blocknum, baddr, write, bburst, bsize, blen, bdata, bchkbit);
+    2: ahbm[2].ahb_master.AHB_TRANS(blocknum, baddr, write, bburst, bsize, blen, bdata, bchkbit);
+  endcase
+
+  case (master)
+    0: ahbm[0].ahb_master.CHANGE_SENSITIVITY(reg_sens);
+    1: ahbm[1].ahb_master.CHANGE_SENSITIVITY(reg_sens);
+    2: ahbm[2].ahb_master.CHANGE_SENSITIVITY(reg_sens);
+  endcase
+
+endtask
