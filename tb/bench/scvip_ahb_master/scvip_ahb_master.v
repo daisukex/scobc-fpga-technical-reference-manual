@@ -657,7 +657,7 @@ function ahb_trans_check_rd_data (
   input [31:0] mask
 );
 begin
-  ahb_trans_check_rd_data = ((rdata & mask) == (expdata & mask));
+  ahb_trans_check_rd_data = ((rdata & mask) === (expdata & mask));
 end
 endfunction
 
