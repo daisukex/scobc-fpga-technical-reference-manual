@@ -1,12 +1,12 @@
 //-----------------------------------------------
 // Space Cubics Standard IP Core
 //  Majority Vote
-//  Module: mvote
+//  Module: sclib_mvote
 //-----------------------------------------------
 // Copyright © 2021 Space Cubics, LLC.
 //-----------------------------------------------
 
-module mvote (
+module sclib_mvote (
   input [2:0] IN,
   output reg OUT
 );

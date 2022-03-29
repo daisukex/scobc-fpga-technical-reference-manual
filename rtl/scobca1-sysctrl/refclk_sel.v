@@ -115,8 +115,8 @@ always @ (posedge REFCLK) begin
   end
 end
 
-mvote clk_en_1 (.IN(clk_d_count_en1), .OUT(clk_d_count_en[1]));
-mvote clk_en_2 (.IN(clk_d_count_en2), .OUT(clk_d_count_en[2]));
+sclib_mvote clk_en_1 (.IN(clk_d_count_en1), .OUT(clk_d_count_en[1]));
+sclib_mvote clk_en_2 (.IN(clk_d_count_en2), .OUT(clk_d_count_en[2]));
 assign SYSCLK1_EN = clk_d_count_en[1];
 assign SYSCLK2_EN = clk_d_count_en[2];
 
@@ -128,8 +128,8 @@ always @ (posedge REFCLK) begin
     ref_sel <= {3{clksel}};
   end
 end
-mvote mvote_clk_valid (.IN(ref_valid), .OUT(clksel_latch));
-mvote mvote_clk_sel   (.IN(ref_sel),   .OUT(REFCLK_SEL));
+sclib_mvote mvote_clk_valid (.IN(ref_valid), .OUT(clksel_latch));
+sclib_mvote mvote_clk_sel   (.IN(ref_sel),   .OUT(REFCLK_SEL));
 
 sclib_rstb_sync sys_rstb (
   .CLK(REFCLK),
