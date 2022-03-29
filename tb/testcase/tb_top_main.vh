@@ -42,6 +42,7 @@ wire SYS_RSTB = dut.sys_rstb;
 wire PLLLOCK  = dut.plllock;
 wire CMC_REQ  = dut.cmc_req;
 wire CMC_ACK  = dut.cmc_ack;
+reg [1:0] FPGA_BOOT = 2'b01;
 
 wire (pull1, pull0) cm3_tms_swdio = 1'b0;
 wire console_tx;
@@ -175,8 +176,8 @@ sc_obc_a1_fpga # (
   .FPGA_EXT_SDA(external_i2cm_sda),
 
   // TRCH Interface
-  .FPGA_BOOT0(1'b0),
-  .FPGA_BOOT1(1'b1),
+  .FPGA_BOOT0(FPGA_BOOT[0]),
+  .FPGA_BOOT1(FPGA_BOOT[1]),
   .FPGA_WATCHDOG(/*open*/),
   .FPGA_RESERVE(/*open*/),
 

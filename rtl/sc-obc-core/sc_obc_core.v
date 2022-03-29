@@ -999,6 +999,7 @@ lpahb_ss # (
   .UARTLITE_ISR(uartlite_isr),
   .INTERNAL_I2CM_ISR(internal_i2c_isr),
   .EXTERNAL_I2CM_ISR(external_i2c_isr),
+  .TRCH_BOOT(FPGA_BOOT),
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
   .CMC_ACK(CMC_ACK),

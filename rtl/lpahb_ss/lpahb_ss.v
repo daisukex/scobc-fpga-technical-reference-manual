@@ -16,6 +16,7 @@ module lpahb_ss # (
   output UARTLITE_ISR,
   output INTERNAL_I2CM_ISR,
   output EXTERNAL_I2CM_ISR,
+  input [1:0] TRCH_BOOT,
   output [1:0] CLKMODE,
   output CMC_REQ,
   input CMC_ACK,
@@ -262,7 +263,7 @@ sysreg sysreg (
   // Output Signal
   .SYS_RESET_REQ(SYSREG_RST_REQ),
   .CFGITCMEN(CFGITCMEN),
-  .TRCH_BOOT(2'b01),
+  .TRCH_BOOT(TRCH_BOOT),
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
   .CMC_ACK(CMC_ACK)
