@@ -18,6 +18,7 @@ module sysreg_main (
   input [31:0] REG_WADR,
   input [3:0] REG_WENB,
   input [31:0] REG_WDAT,
+  output REG_WWAT,
   input [31:0] REG_RADR,
   input REG_RENB,
   output reg [31:0] REG_RDAT,
@@ -69,7 +70,7 @@ always @ (posedge HCLK) begin
     clk_change_req <= 3'b111;
   end
   else begin
-    if (WRAD == `SYSREG_SYSCLKCTL & REG_WENB[0]) begin
+    if (WRAD == `SYSREG_SYSCLKCTL & REG_WENB[0] & !REG_WWAT) begin
       clk_mode[0] <= {3{REG_WDAT[`SR_CLKMODE]}};
       clk_mode[1] <= {3{REG_WDAT[`SR_CLKMODE+1]}};
       clk_change_req <= 3'b111;
@@ -98,6 +99,7 @@ end
 always @ (posedge HCLK) begin
   sync_cmc_ack <= {sync_cmc_ack[1:0], CMC_ACK};
 end
+assign REG_WWAT = WRAD == `SYSREG_SYSCLKCTL & |REG_WENB & (CMC_REQ | sync_cmc_ack[2]);
 
 // Scratch Pad Register
 //----------------------------------------------

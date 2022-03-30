@@ -36,6 +36,7 @@ module sysreg (
 wire [31:0] REG_WADR;
 wire [3:0] REG_WENB;
 wire [31:0] REG_WDAT;
+wire REG_WWAT;
 wire [31:0] REG_RADR;
 wire REG_RENB;
 wire [31:0] REG_RDAT;
@@ -63,7 +64,7 @@ sc_ahbip_slave # (
   .REG_WTYP(/*open*/),
   .REG_WENB(REG_WENB),
   .REG_WDAT(REG_WDAT),
-  .REG_WWAT(1'b0),
+  .REG_WWAT(REG_WWAT),
   .REG_WERR(1'b0),
 
   .REG_RADR(REG_RADR),
@@ -84,6 +85,7 @@ sysreg_main sysreg_main (
   .REG_WADR(REG_WADR),
   .REG_WENB(REG_WENB),
   .REG_WDAT(REG_WDAT),
+  .REG_WWAT(REG_WWAT),
   .REG_RADR(REG_RADR),
   .REG_RENB(REG_RENB),
   .REG_RDAT(REG_RDAT),
