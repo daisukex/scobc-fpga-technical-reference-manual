@@ -262,6 +262,7 @@ sysreg sysreg (
   // Output Signal
   .SYS_RESET_REQ(SYSREG_RST_REQ),
   .CFGITCMEN(CFGITCMEN),
+  .TRCH_BOOT(2'b01),
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
   .CMC_ACK(CMC_ACK)
