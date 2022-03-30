@@ -55,6 +55,8 @@ reg [1:0] next_clkmode;
 always @ (*) begin
   if (cmc_req_p[2:1] == 2'b01)
     next_clkmode = CLKMODE;
+  else
+    next_clkmode = REG_CLKMODE;
 end
 
 tmr_ff # (.DW(2), .SRVAL(2'b00))
