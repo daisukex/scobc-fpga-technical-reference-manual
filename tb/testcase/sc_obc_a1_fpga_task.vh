@@ -16,3 +16,12 @@ begin
   display_text("Skip SRAM initialization", 1, 1); @(posedge SYS_CLK);
 end
 endtask
+
+// System Re-Configuration
+task system_reconfig;
+begin
+  force dut.sysctrl.clk_gen.refclk_sel.clksel_latch = 0;
+  #100;
+  release dut.sysctrl.clk_gen.refclk_sel.clksel_latch;
+end
+endtask
