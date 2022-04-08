@@ -59,7 +59,6 @@ always @ (posedge HCLK) begin
     latch_rvalid <= 1'b0;
     latch_size <= 3'b000;
     latch_burst <= 3'b000;
-    latch_wdata <= 32'h0000_0000;
   end
   else begin
     if ((REG_RENB & !REG_RWAT) | (|REG_WENB & !REG_WWAT)) begin
