@@ -77,13 +77,14 @@ wire                 w_hready;
 
 wire                 w_self_acc_start;
 
+reg [1:0]            r_htrans_p1;
 reg                  r_self_wr_acc_end_p1;
 reg                  r_self_wr_acc_end_p2;
 reg                  r_self_wr_acc_end_p3;
 reg                  r_other_wr_acc_end_p1;
 reg                  r_other_wr_acc_end_p2;
-reg                  r_self_rd_b_acc_end_p1;
-reg                  r_self_rd_b_acc_end_p2;
+reg [P_RD_LTCY-1:0]  r_self_rd_b_acc_end_p;
+reg [P_RD_LTCY-2:0]  r_self_rd_after_b_st_p;
 reg                  r_self_rd_burst_dt_msk;
 reg                  r_other_rd_burst_en_p1;
 reg [1:0]            r_other_rd_state_p1;
@@ -168,27 +169,30 @@ assign SELF_RD_ACC_END = ~HTRANS[0] & w_hready & ((SELF_STATE == P_RD_RESP) | PF
 
 always @ (posedge HCLK or negedge HRESETN) begin
   if (!HRESETN) begin
+    r_htrans_p1            <= 0;
     r_self_wr_acc_end_p1   <= 0;
     r_self_wr_acc_end_p2   <= 0;
     r_self_wr_acc_end_p3   <= 0;
     r_other_wr_acc_end_p1  <= 0;
     r_other_wr_acc_end_p2  <= 0;
-    r_self_rd_b_acc_end_p1 <= 0;
-    r_self_rd_b_acc_end_p2 <= 0;
+    r_self_rd_b_acc_end_p  <= 0;
+    r_self_rd_after_b_st_p <= 0;
     r_self_rd_burst_dt_msk <= 0;
     r_other_rd_burst_en_p1 <= 0;
     r_other_rd_state_p1    <= 0;
   end
   else begin
+    r_htrans_p1            <= HTRANS;
     r_self_wr_acc_end_p1   <= SELF_WR_ACC_END;
     r_self_wr_acc_end_p2   <= r_self_wr_acc_end_p1;
     r_self_wr_acc_end_p3   <= r_self_wr_acc_end_p2;
     r_other_wr_acc_end_p1  <= OTHER_WR_ACC_END;
     r_other_wr_acc_end_p2  <= r_other_wr_acc_end_p1;
-    r_self_rd_b_acc_end_p1 <= SELF_RD_ACC_END & SELF_BURST_EN;
-    r_self_rd_b_acc_end_p2 <= r_self_rd_b_acc_end_p1;
-    r_self_rd_burst_dt_msk <= (SELF_RD_ACC_END & SELF_BURST_EN) |
-                              r_self_rd_b_acc_end_p1 | r_self_rd_b_acc_end_p2;
+    r_self_rd_b_acc_end_p  <= {r_self_rd_b_acc_end_p[P_RD_LTCY-2:0], SELF_RD_ACC_END & SELF_BURST_EN};
+    r_self_rd_after_b_st_p <= {r_self_rd_after_b_st_p[P_RD_LTCY-3:0],
+                               SELF_RD_ACC_START & ~w_wait_flg & ~w_wr2rd_wait & ~PF_SRCH_VAL};
+    r_self_rd_burst_dt_msk <= ((SELF_RD_ACC_END & SELF_BURST_EN) | |r_self_rd_b_acc_end_p) &
+                              ~r_self_rd_after_b_st_p[P_RD_LTCY-2];
     r_other_rd_burst_en_p1 <= OTHER_RD_BURST_EN;
     r_other_rd_state_p1    <= OTHER_RD_STATE;
   end
@@ -812,7 +816,7 @@ end
 assign RAM_REN  = (SELF_RD_ACC_START & ~w_wait_flg & ~w_wr2rd_wait) |
                   ((((SELF_STATE == P_WAIT_CONF) & SELF_RD_ACC_BUSY & w_wait_end) |
                     (SELF_STATE == P_WAIT_WR2RD)) & ~w_wr2rd_wait) |
-                  r_ram_ren_burst;
+                  (r_ram_ren_burst & ~((HTRANS == 2'b10) & (r_htrans_p1 == 2'b11) & ~HREADYOUT));
 assign RAM_RADR = (SELF_RD_ACC_START & ~w_wait_flg & ~w_wr2rd_wait)                 ? HADDR:
                   ((((SELF_STATE == P_WAIT_CONF) & SELF_RD_ACC_BUSY & w_wait_end) |
                     (SELF_STATE == P_WAIT_WR2RD)) & ~w_wr2rd_wait)                  ? r_haddr_lat:
