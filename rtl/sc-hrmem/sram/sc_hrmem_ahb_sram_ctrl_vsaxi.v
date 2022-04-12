@@ -101,6 +101,7 @@ wire                 w_wait_end;
 reg                  r_pre_rdyout;
 reg [P_DT_W-1:0]     r_pre_rdata;
 reg                  r_pf_wait_end_lat;
+reg                  r_mstbusy_wait;
 
 reg [P_DT_W-1:0]     r_ram_rdata_rbten;
 
@@ -111,10 +112,10 @@ wire                 w_rdff_read;
 
 reg [7:0]            r_rdff_w_pntr;
 reg [7:0]            r_rdff_r_pntr;
-reg                  r_rdff_full;
+reg                  r_rdff_amfull;
 wire                 w_rdff_val;
 
-reg [P_DT_W-1:0]     r_ram_rdata_ff [0:P_RD_LTCY-1];
+reg [P_DT_W-1:0]     r_ram_rdata_ff [0:P_RD_LTCY*2-1];
 
 reg                  r_pf_acc_wait_lat;
 reg                  r_pf_acc_wait_lat_p1;
@@ -279,6 +280,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
     RAM_WBTEN         <= 0;
     r_pre_rdata       <= 0;
     r_pf_wait_end_lat <= 0;
+    r_mstbusy_wait    <= 0;
     SELF_STATE        <= P_IDLE;
   end
   else begin
@@ -290,6 +292,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
       RAM_WBTEN         <= 0;
       r_pre_rdata       <= 0;
       r_pf_wait_end_lat <= 0;
+      r_mstbusy_wait    <= 0;
       SELF_STATE        <= P_IDLE;
     end
     else begin
@@ -302,6 +305,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
           RAM_WBTEN         <= 0;
           r_pre_rdata       <= 0;
           r_pf_wait_end_lat <= 0;
+          r_mstbusy_wait    <= 0;
           if (w_self_acc_start) begin
             r_pre_rdyout <= 0;
             if (w_wait_flg)
@@ -337,23 +341,25 @@ always @ (posedge HCLK or negedge HRESETN) begin
         end
         P_WR_DATA : begin
           r_pre_rdyout <= 1'b1;
-          RAM_WEN      <= 1'b1;
-          RAM_WDATA    <= HWDATA;
-          RAM_WADR     <= r_haddr_lat;
-          if ((1 << r_hsize_lat) > (P_DT_W/8)) begin
-            RAM_WBTEN <= {(P_DT_W/8){1'b1}};
-          end
-          else begin
-            case (r_hsize_lat)
-              0:       RAM_WBTEN <= (  {1{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-              1:       RAM_WBTEN <= (  {2{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-              2:       RAM_WBTEN <= (  {4{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-              3:       RAM_WBTEN <= (  {8{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-              4:       RAM_WBTEN <= ( {16{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-              5:       RAM_WBTEN <= ( {32{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-              6:       RAM_WBTEN <= ( {64{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-              default: RAM_WBTEN <= ({128{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
-            endcase
+          if (~r_mstbusy_wait) begin
+            RAM_WEN      <= 1'b1;
+            RAM_WDATA    <= HWDATA;
+            RAM_WADR     <= r_haddr_lat;
+            if ((1 << r_hsize_lat) > (P_DT_W/8)) begin
+              RAM_WBTEN <= {(P_DT_W/8){1'b1}};
+            end
+            else begin
+              case (r_hsize_lat)
+                0:       RAM_WBTEN <= (  {1{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+                1:       RAM_WBTEN <= (  {2{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+                2:       RAM_WBTEN <= (  {4{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+                3:       RAM_WBTEN <= (  {8{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+                4:       RAM_WBTEN <= ( {16{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+                5:       RAM_WBTEN <= ( {32{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+                6:       RAM_WBTEN <= ( {64{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+                default: RAM_WBTEN <= ({128{1'b1}} << r_haddr_lat[P_BANK_W-1:0]);
+              endcase
+            end
           end
           SELF_STATE <= P_WR_RESP;
         end
@@ -362,29 +368,34 @@ always @ (posedge HCLK or negedge HRESETN) begin
           RAM_WADR  <= 0;
           RAM_WDATA <= 0;
           RAM_WBTEN <= 0;
-          if (SELF_WR_ACC_END) begin
-            if (w_self_acc_start) begin
-              r_pre_rdyout <= 0;
-              if (w_wait_flg)
-                SELF_STATE <= P_WAIT_CONF;
-              else if (HWRITE)
-                SELF_STATE <= P_WR_DATA;
-              else if (w_wr2rd_wait)
-                SELF_STATE <= P_WAIT_WR2RD;
-              else if (PF_SRCH_VAL)
-                SELF_STATE <= P_RD_PFER;
-              else
-                SELF_STATE <= P_RD_DATA;
+          if (~(r_mstbusy_wait & (HTRANS == 2'b01))) begin
+            r_mstbusy_wait <= 0;
+            if (SELF_WR_ACC_END) begin
+              if (w_self_acc_start) begin
+                r_pre_rdyout <= 0;
+                if (w_wait_flg)
+                  SELF_STATE <= P_WAIT_CONF;
+                else if (HWRITE)
+                  SELF_STATE <= P_WR_DATA;
+                else if (w_wr2rd_wait)
+                  SELF_STATE <= P_WAIT_WR2RD;
+                else if (PF_SRCH_VAL)
+                  SELF_STATE <= P_RD_PFER;
+                else
+                  SELF_STATE <= P_RD_DATA;
+              end
+              else begin
+                r_pre_rdyout <= 1'b1;
+                SELF_STATE   <= P_IDLE;
+              end
             end
             else begin
-              r_pre_rdyout <= 1'b1;
-              SELF_STATE   <= P_IDLE;
+              r_pre_rdyout  <= 0;
+              SELF_STATE    <= P_WR_DATA;
             end
           end
-          else begin
-            r_pre_rdyout  <= 0;
-            SELF_STATE    <= P_WR_DATA;
-          end
+          if (HTRANS == 2'b01)
+            r_mstbusy_wait <= 1'b1;
         end
         P_WAIT_WR2RD : begin
           if (~w_wr2rd_wait) begin
@@ -395,42 +406,50 @@ always @ (posedge HCLK or negedge HRESETN) begin
           end
         end
         P_RD_DATA : begin
-          if ((RAM_RDT_VAL & ~(r_self_rd_burst_dt_msk | w_rdff_write)) |
-              (w_rdff_val & HREADYIN & ~(HTRANS == 2'b01))) begin
+          if ((RAM_RDT_VAL & ~(r_self_rd_burst_dt_msk | (~w_rdff_val & w_rdff_write))) |
+              (r_mstbusy_wait & HREADYIN)) begin
             r_pre_rdyout <= 1'b1;
-            if (w_rdff_val)
-              r_pre_rdata <= r_ram_rdata_ff[r_rdff_r_pntr];
-            else
-              r_pre_rdata <= r_ram_rdata_rbten;
-            SELF_STATE <= P_RD_RESP;
+            if (~(r_mstbusy_wait & (HTRANS == 2'b01))) begin
+              r_mstbusy_wait <= 0;
+              if (w_rdff_val)
+                r_pre_rdata <= r_ram_rdata_ff[r_rdff_r_pntr];
+              else
+                r_pre_rdata <= r_ram_rdata_rbten;
+              SELF_STATE <= P_RD_RESP;
+            end
           end
         end
         P_RD_RESP : begin
           r_pre_rdata <= 0;
-          if (SELF_RD_ACC_END) begin
-            if (w_self_acc_start) begin
-              r_pre_rdyout <= 0;
-              if (w_wait_flg)
-                SELF_STATE <= P_WAIT_CONF;
-              else if (HWRITE)
-                SELF_STATE <= P_WR_DATA;
-              else if (w_wr2rd_wait)
-                SELF_STATE <= P_WAIT_WR2RD;
-              else if (PF_SRCH_VAL)
-                SELF_STATE <= P_RD_PFER;
-              else
-                SELF_STATE <= P_RD_DATA;
+          if (~(r_mstbusy_wait & (HTRANS == 2'b01))) begin
+            r_mstbusy_wait <= 0;
+            if (SELF_RD_ACC_END) begin
+              if (w_self_acc_start) begin
+                r_pre_rdyout <= 0;
+                if (w_wait_flg)
+                  SELF_STATE <= P_WAIT_CONF;
+                else if (HWRITE)
+                  SELF_STATE <= P_WR_DATA;
+                else if (w_wr2rd_wait)
+                  SELF_STATE <= P_WAIT_WR2RD;
+                else if (PF_SRCH_VAL)
+                  SELF_STATE <= P_RD_PFER;
+                else
+                  SELF_STATE <= P_RD_DATA;
+              end
+              else begin
+                if (SELF_BURST_EN)
+                  r_pre_rdyout <= 0;
+                SELF_STATE   <= P_IDLE;
+              end
             end
             else begin
-              if (SELF_BURST_EN)
-                r_pre_rdyout <= 0;
-              SELF_STATE   <= P_IDLE;
+              r_pre_rdyout  <= 0;
+              SELF_STATE    <= P_RD_DATA;
             end
           end
-          else begin
-            r_pre_rdyout  <= 0;
-            SELF_STATE    <= P_RD_DATA;
-          end
+          if (HTRANS == 2'b01)
+            r_mstbusy_wait <= 1'b1;
         end
         P_RD_PFER : begin
           if (w_hready) begin
@@ -461,6 +480,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
           RAM_WBTEN         <= 0;
           r_pre_rdata       <= 0;
           r_pf_wait_end_lat <= 0;
+          r_mstbusy_wait    <= 0;
           SELF_STATE        <= P_IDLE;
         end
       endcase
@@ -479,51 +499,52 @@ end
 
 assign w_pf_acc_wait = PF_ACC_VAL;
 
-assign w_rdff_write = (SELF_STATE == P_RD_DATA) & (~HREADYIN | (HTRANS == 2'b01) | w_rdff_val) &
+assign w_rdff_write = (((SELF_STATE == P_RD_DATA) & (~HREADYIN | r_mstbusy_wait | w_rdff_val)) |
+                       (SELF_STATE == P_RD_RESP)) &
                       (RAM_RDT_VAL & ~r_self_rd_burst_dt_msk);
-assign w_rdff_read  = (SELF_STATE == P_RD_DATA) & HREADYIN & ~(HTRANS == 2'b01) & w_rdff_val;
+assign w_rdff_read  = (SELF_STATE == P_RD_DATA) & HREADYIN & ~(r_mstbusy_wait & (HTRANS == 2'b01)) & w_rdff_val;
 
 always @ (posedge HCLK or negedge HRESETN) begin
   if (!HRESETN) begin
     r_rdff_w_pntr <= 0;
     r_rdff_r_pntr <= 0;
-    r_rdff_full   <= 0;
+    r_rdff_amfull <= 0;
   end
   else begin
     if (SELF_STATE == P_IDLE) begin
       r_rdff_w_pntr <= 0;
       r_rdff_r_pntr <= 0;
-      r_rdff_full   <= 0;
+      r_rdff_amfull <= 0;
     end
     else begin
       if (w_rdff_write) begin
-        if (r_rdff_w_pntr >= P_RD_LTCY-1)
+        if (r_rdff_w_pntr >= P_RD_LTCY*2-1)
           r_rdff_w_pntr <= 0;
         else
           r_rdff_w_pntr <= r_rdff_w_pntr + 8'h1;
       end
       if (w_rdff_read) begin
-        if (r_rdff_r_pntr >= P_RD_LTCY-1)
+        if (r_rdff_r_pntr >= P_RD_LTCY*2-1)
           r_rdff_r_pntr <= 0;
         else
           r_rdff_r_pntr <= r_rdff_r_pntr + 8'h1;
       end
       if (w_rdff_write & ~w_rdff_read) begin
-        if ((r_rdff_w_pntr + 8'h1 == r_rdff_r_pntr) |
-            (r_rdff_w_pntr == r_rdff_r_pntr + P_RD_LTCY - 8'h1))
-          r_rdff_full <= 1;
+        if ((r_rdff_w_pntr + P_RD_LTCY - 8'h1 == r_rdff_r_pntr) |
+            (r_rdff_w_pntr == r_rdff_r_pntr + P_RD_LTCY + 8'h1))
+          r_rdff_amfull <= 1'b1;
       end
       else if (w_rdff_read & ~w_rdff_write) begin
-        r_rdff_full <= 0;
+        r_rdff_amfull <= 0;
       end
     end
   end
 end
 
-assign w_rdff_val = r_rdff_w_pntr != r_rdff_r_pntr | r_rdff_full;
+assign w_rdff_val = r_rdff_w_pntr != r_rdff_r_pntr | r_rdff_amfull;
 
 generate
-  for(gn=0; gn<P_RD_LTCY; gn=gn+1) begin : ram_rdata_ff_gen
+  for(gn=0; gn<P_RD_LTCY*2; gn=gn+1) begin : ram_rdata_ff_gen
     always @ (posedge HCLK or negedge HRESETN) begin
       if (!HRESETN) begin
         r_ram_rdata_ff[gn] <= 0;
@@ -688,7 +709,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
       end
     end
     else if (((SELF_STATE == P_RD_DATA) | (SELF_STATE == P_RD_RESP)) &
-             (~(HTRANS == 2'b01) | r_ram_ren_burst)) begin
+             (~r_rdff_amfull | r_ram_ren_burst)) begin
       if (r_ram_rstart) begin
         if (SELF_RD_ACC_END) begin
           r_ram_ren_burst  <= 0;
