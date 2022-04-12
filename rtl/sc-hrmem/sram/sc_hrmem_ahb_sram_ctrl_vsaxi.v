@@ -57,6 +57,7 @@ module sc_hrmem_ahb_sram_ctrl_vsaxi # (
   output                      PF_SRCH_VAL,
   input                       PF_RD_VAL,
   input                       PF_RWAIT,
+  output                      PF_RD_DT_MSK,
   input                       PF_ACC_VAL,
   input      [P_AHB_AD_W-1:0] PF_ACC_ADR,
 
@@ -192,6 +193,8 @@ always @ (posedge HCLK or negedge HRESETN) begin
     r_other_rd_state_p1    <= OTHER_RD_STATE;
   end
 end
+
+assign PF_RD_DT_MSK = r_self_rd_burst_dt_msk;
 
 assign w_wr2rd_wait = SELF_WR_ACC_END  | r_self_wr_acc_end_p1  | r_self_wr_acc_end_p2 |
                       OTHER_WR_ACC_END | r_other_wr_acc_end_p1;
@@ -590,7 +593,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
   end
   else begin
     if ((SELF_STATE == P_IDLE) | ((SELF_STATE == P_WAIT_CONF) & ~r_hwrite_lat) |
-        (((SELF_STATE == P_WR_RESP) | (SELF_STATE == P_RD_RESP)) & (HTRANS == 2'b10)) |
+        (((SELF_STATE == P_WR_RESP) | (SELF_STATE == P_RD_RESP) | PF_RD_VAL) & (HTRANS == 2'b10)) |
         (SELF_STATE == P_WAIT_WR2RD)) begin
       r_ram_rstart     <= 0;
       r_ram_ren_burst  <= 0;

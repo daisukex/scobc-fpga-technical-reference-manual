@@ -198,6 +198,7 @@ wire [P_DT_W-1:0] w_sys_ram_rdata;
 wire w_pf_srch_val;
 wire w_pf_rd_val;
 wire w_pf_rwait;
+wire w_pf_rd_dt_msk;
 wire w_pf_acc_val;
 wire [P_BUS_AD_W-1:0] w_pf_acc_adr;
 
@@ -358,6 +359,7 @@ sc_hrmem_ahb_sram_ctrl_vsaxi # (
   .PF_SRCH_VAL(w_pf_srch_val),              // output
   .PF_RD_VAL(w_pf_rd_val),                  //  input
   .PF_RWAIT(w_pf_rwait),                    //  input
+  .PF_RD_DT_MSK(w_pf_rd_dt_msk),            // output
   .PF_ACC_VAL(1'b0),                        //  input
   .PF_ACC_ADR({P_BUS_AD_W{1'b0}}),          //  input [P_AHB_AD_W-1:0]
   // RAM Interface
@@ -538,6 +540,7 @@ sc_hrmem_sram_pfe_ctrl # (
   .RAM_RADR(w_code_ram_radr),       // input  [P_AD_W-1:0]
   .RAM_RBTEN(w_code_ram_rbten),     // input  [P_DT_W/8-1:0]
   .PF_RWAIT(w_pf_rwait),            // output
+  .PF_RD_DT_MSK(w_pf_rd_dt_msk),    // input
   .PF_RD_VAL(w_pf_rd_val),          // output
   .RAM_RDT_VAL(w_code_ram_rdt_val), // output
   .RAM_RDATA(w_code_ram_rdata),     // output [P_DT_W-1:0]

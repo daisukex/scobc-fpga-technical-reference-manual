@@ -23,6 +23,7 @@ module sc_hrmem_sram_pfe_ctrl # (
   input      [P_AD_W-1:0]                   RAM_RADR,
   input      [P_DT_W/8-1:0]                 RAM_RBTEN,
   output                                    PF_RWAIT,
+  input                                     PF_RD_DT_MSK,
 
   output                                    PF_RD_VAL,
   output                                    RAM_RDT_VAL,
@@ -179,15 +180,15 @@ always @ (posedge SYSCLK or negedge RESETB) begin
   end
 end
 
-assign w_pf_ram_rd_hit = r_pf_lat_en & r_pf_srch_val_lat & r_pf_acc_ren_retim[2] &
+assign w_pf_ram_rd_hit = r_pf_lat_en & r_pf_srch_val_lat & r_pf_acc_ren_retim[2] & ~PF_RD_DT_MSK &
                          (r_ram_radr_lat == r_pf_acc_radr_retim[2]);
 
 assign PF_RWAIT = r_pf_acc_rd | r_pf_lat_en;
 
-assign w_ram_radr_sel = (r_pf_lat_en) ? r_ram_radr_lat:
-                                        RAM_RADR;
-assign w_ram_rbten_sel = (r_pf_lat_en) ? r_ram_rbten_lat:
-                                         RAM_RBTEN;
+assign w_ram_radr_sel = (r_pf_lat_en & ~w_go_pf_ren) ? r_ram_radr_lat:
+                                                       RAM_RADR;
+assign w_ram_rbten_sel = (r_pf_lat_en & ~w_go_pf_ren) ? r_ram_rbten_lat:
+                                                        RAM_RBTEN;
 
 generate
   for(gn=0; gn<P_PFB_LINE_NUM; gn=gn+1) begin : pf_hit_gen
