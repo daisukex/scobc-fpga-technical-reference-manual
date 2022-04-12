@@ -68,7 +68,7 @@ generate
       end
     end
 
-    tmr_ff # (
+    sclib_tmr_ff # (
       .DW(1),
       .SRVAL(1'b0)
     ) clk_detect (

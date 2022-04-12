@@ -1,12 +1,12 @@
 //-----------------------------------------------
 // Space Cubics Standard IP Core
 //  Triple modular redundancy Flip Flop
-//  Module: tmr_ff
+//  Module: sclib_tmr_ff
 //-----------------------------------------------
 // Copyright © 2021 Space Cubics, LLC.
 //-----------------------------------------------
 
-module tmr_ff # (
+module sclib_tmr_ff # (
   parameter DW = 1,      // Data Width
   parameter SRVAL = 1'b0 // SetReset Value
 ) (

@@ -59,7 +59,7 @@ always @ (*) begin
     next_clkmode = REG_CLKMODE;
 end
 
-tmr_ff # (.DW(2), .SRVAL(2'b00))
+sclib_tmr_ff # (.DW(2), .SRVAL(2'b00))
 clkmode_ff (.D(next_clkmode), .CLK(REF_CLK), .SRB(REF_RSTB), .Q(REG_CLKMODE));
 
 // PLL Lock Synchronizer
@@ -110,7 +110,7 @@ always @ (*) begin
   else
     sleep_hold_data = sleep_valid;
 end
-tmr_ff # (.DW(1), .SRVAL(2'b00))
+sclib_tmr_ff # (.DW(1), .SRVAL(2'b00))
 sleep_hold (.D(sleep_hold_data), .CLK(REF_CLK), .SRB(REF_RSTB), .Q(sleep_valid));
 
 // SLEEPHOLDREQn control
@@ -125,7 +125,7 @@ always @ (*) begin
     holdreq_data = SLEEPHOLDREQN;
 end
 
-tmr_ff # (.DW(1), .SRVAL(1'b1))
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b1))
 hold_req  (.D(holdreq_data), .CLK(REF_CLK), .SRB(REF_RSTB), .Q(SLEEPHOLDREQN));
 
 // SLEEPHOLDACKn detect
@@ -144,7 +144,7 @@ always @ (posedge REF_CLK or negedge REF_RSTB) begin
     sleepholdack_p <= {sleepholdack_p[SLEEPHOLD_SYNC_BIT-2:0], sync_sleepholdack};
   end
 end
-tmr_ff # (.DW(1), .SRVAL(1'b1))
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b1))
 holdack  (.D(sleepholdack_data), .CLK(REF_CLK), .SRB(REF_RSTB), .Q(holdack_valid));
 
 // Clock Control State Machine
@@ -156,7 +156,7 @@ parameter SPEND  = 2'b00,
           ULWAIT = 2'b10,
           RUN    = 2'b11;
 
-tmr_ff # (.DW(2), .SRVAL(1'b0))
+sclib_tmr_ff # (.DW(2), .SRVAL(1'b0))
 n_state_ff (.D(next_state), .CLK(REF_CLK), .SRB(REF_RSTB), .Q(pll_state));
 
 always @ (posedge REF_CLK or negedge REF_RSTB) begin

@@ -68,8 +68,8 @@ wire sys_reset_reg;
 wire bus_reset_reg;
 wire por_reset_reg;
 
-tmr_ff # (.DW(1), .SRVAL(1'b0)) por_rst_ff (.D(por_rst), .CLK(REF_CLK), .SRB(1'b1), .Q(por_reset_latch));
-tmr_ff # (.DW(1), .SRVAL(1'b0)) cpu_rst_ff (.D(cpu_rst), .CLK(REF_CLK), .SRB(1'b1), .Q(cpu_reset_latch));
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) por_rst_ff (.D(por_rst), .CLK(REF_CLK), .SRB(1'b1), .Q(por_reset_latch));
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) cpu_rst_ff (.D(cpu_rst), .CLK(REF_CLK), .SRB(1'b1), .Q(cpu_reset_latch));
 
 always @ (posedge REF_CLK) begin
   if (!(por_reset_latch & sys_init_done) | !cpu_reset_latch)
@@ -103,9 +103,9 @@ always @ (*) begin
   end
 end
 
-tmr_ff # (.DW(1), .SRVAL(1'b0)) por_rst_reg (.D(por_reset), .CLK(REF_CLK), .SRB(1'b1), .Q(por_reset_reg));
-tmr_ff # (.DW(1), .SRVAL(1'b0)) cpu_rst_reg (.D(sys_reset), .CLK(REF_CLK), .SRB(1'b1), .Q(sys_reset_reg));
-tmr_ff # (.DW(1), .SRVAL(1'b0)) bus_rst_reg (.D(bus_reset), .CLK(REF_CLK), .SRB(1'b1), .Q(bus_reset_reg));
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) por_rst_reg (.D(por_reset), .CLK(REF_CLK), .SRB(1'b1), .Q(por_reset_reg));
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) cpu_rst_reg (.D(sys_reset), .CLK(REF_CLK), .SRB(1'b1), .Q(sys_reset_reg));
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) bus_rst_reg (.D(bus_reset), .CLK(REF_CLK), .SRB(1'b1), .Q(bus_reset_reg));
 
 tmr_syncff # (.SYNCC(2), .SRVAL(1'b0))
 sync_por_rst (.D_AS(por_reset_reg), .CLK(SYS_CLK), .SRB(1'b1), .Q_SY(POR_RSTB));
