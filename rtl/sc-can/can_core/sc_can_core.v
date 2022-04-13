@@ -95,11 +95,12 @@ wire [1:0] w_bsp_sync_stt;
 wire w_rx_valid;
 wire w_rx_data;
 wire w_tx_trig;
-wire w_txf_ren;
+wire w_txf_rd_end;
 wire [99:0] w_txf_rdata;
 wire [SC_CAN_FIFO_DEPTH:0] w_txf_cap [0:3];
 wire w_txhpb_dvalid;
 wire w_txhpb_ren;
+wire w_txhpb_rd_end;
 wire [99:0] w_txhpb_rdata;
 wire w_rxf_wen;
 wire [99:0] w_rxf_wdata;
@@ -175,8 +176,8 @@ sc_can_msg_strg # (
   .REG_INT_RXFUDF(REG_INT_RXFUDF),      // output
 
   // Bit Stream Processor Interface
-  .BSP_TXF_REN(w_txf_ren),              // input
   .BSP_TXF_RDATA(w_txf_rdata),          // output [99:0]
+  .BSP_TXF_RD_END(w_txf_rd_end),        // input
   .BSP_TXF1_CAP(w_txf_cap[0]),          // output [SC_CAN_FIFO_DEPTH:0]
   .BSP_TXF2_CAP(w_txf_cap[1]),          // output [SC_CAN_FIFO_DEPTH:0]
   .BSP_TXF3_CAP(w_txf_cap[2]),          // output [SC_CAN_FIFO_DEPTH:0]
@@ -185,6 +186,7 @@ sc_can_msg_strg # (
   .BSP_TXHPB_DVALID(w_txhpb_dvalid),    // output
   .BSP_TXHPB_REN(w_txhpb_ren),          // input
   .BSP_TXHPB_RDATA(w_txhpb_rdata),      // output [99:0]
+  .BSP_TXHPB_RD_END(w_txhpb_rd_end),    // input
 
   .BSP_RXF_WEN(w_rxf_wen),              // input
   .BSP_RXF_WDATA(w_rxf_wdata),          // input [99:0]
@@ -214,8 +216,8 @@ sc_can_bs_proc # (
   .TX_TRIG(w_tx_trig),                  // input
 
   // TX Message FIFO Interface
-  .TXF_REN(w_txf_ren),                  // output
   .TXF_RDATA(w_txf_rdata),              // input [99:0]
+  .TXF_RD_END(w_txf_rd_end),            // output
   .TXF1_CAP(w_txf_cap[0]),              // input [SC_CAN_FIFO_DEPTH:0]
   .TXF2_CAP(w_txf_cap[1]),              // input [SC_CAN_FIFO_DEPTH:0]
   .TXF3_CAP(w_txf_cap[2]),              // input [SC_CAN_FIFO_DEPTH:0]
@@ -225,6 +227,7 @@ sc_can_bs_proc # (
   .TXHPB_DVALID(w_txhpb_dvalid),        // input
   .TXHPB_REN(w_txhpb_ren),              // output
   .TXHPB_RDATA(w_txhpb_rdata),          // input [99:0]
+  .TXHPB_RD_END(w_txhpb_rd_end),        // output
 
   // RX Message FIFO Interface
   .RXF_WEN(w_rxf_wen),                  // output

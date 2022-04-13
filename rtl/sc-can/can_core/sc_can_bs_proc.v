@@ -21,8 +21,8 @@ module sc_can_bs_proc # (
   input TX_TRIG,
 
   // TX Message FIFO Interface
-  output reg TXF_REN,
   input [99:0] TXF_RDATA,
+  output TXF_RD_END,
   input [SC_CAN_FIFO_DEPTH:0] TXF1_CAP,
   input [SC_CAN_FIFO_DEPTH:0] TXF2_CAP,
   input [SC_CAN_FIFO_DEPTH:0] TXF3_CAP,
@@ -32,6 +32,7 @@ module sc_can_bs_proc # (
   input TXHPB_DVALID,
   output reg TXHPB_REN,
   input [99:0] TXHPB_RDATA,
+  output TXHPB_RD_END,
 
   // RX Message FIFO Interface
   output reg RXF_WEN,
@@ -80,8 +81,10 @@ reg r_txf_ren_p2;
 reg r_txhpb_ren_p1;
 reg r_txhpb_ren_p2;
 
-reg r_txf_val;
-reg r_rxf_val;
+wire w_txf_almost_empty;
+wire w_txf_val;
+wire w_rxf_val;
+reg r_txf_val_p1;
 
 wire [1:0] w_bsp_state;
 
@@ -139,9 +142,6 @@ wire [14:0] w_tx_crc_cal;
 
 wire w_tx_abt_field;
 reg r_tx_abt_field_p1;
-reg r_tx_abt_wait;
-reg r_tx_abt_wait_p1;
-reg r_tx_err_wait;
 
 reg [10:0] r_tx_id1;
 reg r_tx_srr;
@@ -154,6 +154,9 @@ reg [63:0] r_tx_data;
 reg r_tx_node_on;
 reg [63:0] r_tx_data_sft;
 reg [5:0] r_tx_bit_cnt;
+reg r_txf_rdval;
+reg r_txhpb_rdval;
+reg r_txf_ren;
 reg [4:0] r_tx_state;
 
 wire w_tx_aerr_trns;
@@ -256,7 +259,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
   end else begin
     r_rx_valid_p1  <= RX_VALID;
     r_tx_trig_p1   <= TX_TRIG;
-    r_txf_ren_p1   <= TXF_REN;
+    r_txf_ren_p1   <= r_txf_ren;
     r_txf_ren_p2   <= r_txf_ren_p1;
     r_txhpb_ren_p1 <= TXHPB_REN;
     r_txhpb_ren_p2 <= r_txhpb_ren_p1;
@@ -264,14 +267,16 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
 end
 
 // FIFO Data Capacity
+assign w_txf_almost_empty = ~|TXF1_CAP[SC_CAN_FIFO_DEPTH:1] & ~|TXF2_CAP[SC_CAN_FIFO_DEPTH:1] &
+                            ~|TXF3_CAP[SC_CAN_FIFO_DEPTH:1] & ~|TXF4_CAP[SC_CAN_FIFO_DEPTH:1];
+assign w_txf_val = |TXF1_CAP & |TXF2_CAP & |TXF3_CAP & |TXF4_CAP;
+assign w_rxf_val = |RXF1_CAP & |RXF2_CAP & |RXF3_CAP & |RXF4_CAP;
+
 always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
-  if (!CAN_RSTB) begin
-    r_txf_val    <= 0;
-    r_rxf_val    <= 0;
-  end else begin
-    r_txf_val    <= |TXF1_CAP & |TXF2_CAP & |TXF3_CAP & |TXF4_CAP;
-    r_rxf_val    <= |RXF1_CAP & |RXF2_CAP & |RXF3_CAP & |RXF4_CAP;
-  end
+  if (!CAN_RSTB)
+    r_txf_val_p1 <= 0;
+  else
+    r_txf_val_p1 <= w_txf_val;
 end
 
 // Bit Stream Processor Main State
@@ -294,8 +299,10 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
   end else begin
     REG_BUS_BUSY   <= (w_bsp_state != STT_BSP_IDLE);
     REG_ERRWRN     <= (REG_TX_ECNT >= 8'd96) | (REG_RX_ECNT >= 8'd96);
-    if (~REG_TXF_NEMPTY | ~REG_CAN_EN | REG_INT_TRNSDN)
-      REG_TXF_NEMPTY <= r_txf_val;
+    if (w_txf_val & (~r_txf_val_p1 | ((r_tx_state == STT_TX_IDLE) & w_tx_start_prmt)))
+      REG_TXF_NEMPTY <= 1'b1;
+    else if ((~w_txf_val & r_txf_val_p1) | (REG_INT_TRNSDN & w_txf_almost_empty))
+      REG_TXF_NEMPTY <= 0;
     REG_TXF_FULL   <= TXF1_CAP[SC_CAN_FIFO_DEPTH] & TXF2_CAP[SC_CAN_FIFO_DEPTH] &
                       TXF3_CAP[SC_CAN_FIFO_DEPTH] & TXF4_CAP[SC_CAN_FIFO_DEPTH];
     REG_RXF_FULL   <= RXF1_CAP[SC_CAN_FIFO_DEPTH] & RXF2_CAP[SC_CAN_FIFO_DEPTH] &
@@ -839,21 +846,8 @@ assign w_tx_abt_field = (w_bsp_state == STT_BSP_TX) & (r_rx_state >= STT_RX_ID1)
 always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
   if (!CAN_RSTB) begin
     r_tx_abt_field_p1 <= 0;
-    r_tx_abt_wait     <= 0;
-    r_tx_abt_wait_p1  <= 0;
-    r_tx_err_wait     <= 0;
   end else begin
     r_tx_abt_field_p1 <= w_tx_abt_field;
-    r_tx_abt_wait_p1  <= r_tx_abt_wait;
-    if (~r_commu_ok | (w_tx_start_prmt & (REG_ERR_STS != STT_STS_BUS_OFF))) begin
-      r_tx_abt_wait <= 0;
-      r_tx_err_wait <= 0;
-    end else begin
-      if (w_tx_abt_field & RX_VALID & CAN_TX & ~RX_DATA & ~((r_rx_nchg_cnt >= 3'h4) & ~r_rx_data_before))
-        r_tx_abt_wait <= 1'b1;
-      if (r_tx_node_on & w_error_detect & (r_rx_state_p1 != STT_RX_OLFLG) & (r_rx_state_p1 != STT_RX_OLDLM))
-        r_tx_err_wait <= 1'b1;
-    end
   end
 end
 
@@ -901,14 +895,18 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     r_tx_node_on  <= 0;
     r_tx_data_sft <= {64{1'b1}};
     r_tx_bit_cnt  <= 0;
-    TXF_REN       <= 0;
+    r_txf_rdval   <= 0;
+    r_txhpb_rdval <= 0;
+    r_txf_ren     <= 0;
     TXHPB_REN     <= 0;
     r_tx_state    <= STT_TX_IDLE;
   end else if (w_bus_no_connect) begin
     r_tx_node_on  <= 0;
     r_tx_data_sft <= {64{1'b1}};
     r_tx_bit_cnt  <= 0;
-    TXF_REN       <= 0;
+    r_txf_rdval   <= 0;
+    r_txhpb_rdval <= 0;
+    r_txf_ren     <= 0;
     TXHPB_REN     <= 0;
     r_tx_state    <= STT_TX_IDLE;
   end else begin
@@ -920,7 +918,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     end
     if (w_tx_bitval)
       r_tx_data_sft <= {r_tx_data_sft[62:0], 1'b1};
-    TXF_REN   <= 0;
+    r_txf_ren <= 0;
     TXHPB_REN <= 0;
     if (w_error_detect) begin
       r_tx_bit_cnt <= 6'd5;
@@ -941,17 +939,20 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
           r_tx_node_on  <= 0;
           r_tx_data_sft <= {64{1'b1}};
           r_tx_bit_cnt  <= 0;
-          if (w_tx_start_prmt &
-              (r_tx_abt_wait | r_tx_err_wait | TXHPB_DVALID | r_txf_val)) begin
+          r_txf_rdval   <= 0;
+          r_txhpb_rdval <= 0;
+          if (w_tx_start_prmt & (TXHPB_DVALID | w_txf_val)) begin
             r_tx_node_on  <= 1'b1;
             r_tx_data_sft <= {1'b0, {63{1'b1}}};
             r_tx_bit_cnt  <= 0;
             r_tx_state    <= STT_TX_SOF;
-            if (~(r_tx_abt_wait | r_tx_err_wait)) begin
-              if (TXHPB_DVALID)
-                TXHPB_REN <= 1'b1;
-              else if (r_txf_val)
-                TXF_REN <= 1'b1;
+            if (TXHPB_DVALID) begin
+              r_txhpb_rdval <= 1'b1;
+              TXHPB_REN     <= 1'b1;
+            end
+            else if (w_txf_val) begin
+              r_txf_rdval <= 1'b1;
+              r_txf_ren   <= 1'b1;
             end
           end
         end
@@ -1174,7 +1175,9 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
           r_tx_node_on  <= 0;
           r_tx_data_sft <= {64{1'b1}};
           r_tx_bit_cnt  <= 0;
-          TXF_REN       <= 0;
+          r_txf_rdval   <= 0;
+          r_txhpb_rdval <= 0;
+          r_txf_ren     <= 0;
           TXHPB_REN     <= 0;
           r_tx_state    <= STT_TX_IDLE;
         end
@@ -1182,6 +1185,9 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     end
   end
 end
+
+assign TXF_RD_END   = REG_INT_TRNSDN & r_txf_rdval & w_txf_val;
+assign TXHPB_RD_END = REG_INT_TRNSDN & r_txhpb_rdval;
 
 always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
   if (!CAN_RSTB) begin
@@ -1224,9 +1230,9 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     REG_INT_BUSOFF <= 0;
   end else begin
     REG_INT_TRNSDN <= r_tx_node_on & w_rx_eof_end & RX_VALID & RX_DATA;
-    REG_INT_ARBLST <= r_tx_abt_wait & ~r_tx_abt_wait_p1;
+    REG_INT_ARBLST <= w_tx_abt_field & RX_VALID & CAN_TX & ~RX_DATA & ~((r_rx_nchg_cnt >= 3'h4) & ~r_rx_data_before);
     REG_INT_RCVDN  <= RXF_WEN;
-    REG_INT_RXFVAL <= r_rxf_val;
+    REG_INT_RXFVAL <= w_rxf_val;
     REG_INT_CRCER  <= (~r_tx_node_on | REG_SELF_TMODE) & (r_rx_state == STT_RX_CDLM) & r_rx_valid_p1 & (r_rx_nchg_cnt < 3'h4) &
                       (r_rx_crc != w_rx_crc_cal);
     REG_INT_FMER   <= w_rx_bitval & ~RX_DATA & ( (r_rx_state == STT_RX_CDLM) |

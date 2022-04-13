@@ -23,6 +23,7 @@ module sc_can_txhpb (
 
   input TXHPB_REN,
   output reg [99:0] TXHPB_RDATA,
+  input TXHPB_RD_END,
 
   output reg TXHPB_OVERFLOW,
   output reg TXHPB_UNDERFLOW
@@ -46,31 +47,32 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     TXHPB_DVALID <= 0;
     TXHPB_RDATA  <= 0;
   end else begin
-    if (TXHPB1_WEN & ~r_txhpb_en[0]) begin
-      r_txhpb_en[0]       <= 1'b1;
-      r_txhpb_data[99:68] <= TXHPB1_WDATA;
-    end
-    if (TXHPB2_WEN & ~r_txhpb_en[1]) begin
-      r_txhpb_en[1]       <= 1'b1;
-      r_txhpb_data[67:64] <= TXHPB2_WDATA;
-    end
-    if (TXHPB3_WEN & ~r_txhpb_en[2]) begin
-      r_txhpb_en[2]       <= 1'b1;
-      r_txhpb_data[63:32] <= TXHPB3_WDATA;
-    end
-    if (TXHPB4_WEN & ~r_txhpb_en[3]) begin
-      r_txhpb_en[3]       <= 1'b1;
-      r_txhpb_data[31:0]  <= TXHPB4_WDATA;
-    end
-    if (TXHPB_REN & TXHPB_DVALID) begin
+    if (TXHPB_RD_END) begin
       r_txhpb_en   <= 0;
       r_txhpb_data <= 0;
-      TXHPB_DVALID <= 0;
-      r_txhpb_rout <= r_txhpb_data;
-    end else if (&r_txhpb_en) begin
-      TXHPB_DVALID <= 1'b1;
     end
-    TXHPB_RDATA <= r_txhpb_rout;
+    else begin
+      if (TXHPB1_WEN & ~r_txhpb_en[0]) begin
+        r_txhpb_en[0]       <= 1'b1;
+        r_txhpb_data[99:68] <= TXHPB1_WDATA;
+      end
+      if (TXHPB2_WEN & ~r_txhpb_en[1]) begin
+        r_txhpb_en[1]       <= 1'b1;
+        r_txhpb_data[67:64] <= TXHPB2_WDATA;
+      end
+      if (TXHPB3_WEN & ~r_txhpb_en[2]) begin
+        r_txhpb_en[2]       <= 1'b1;
+        r_txhpb_data[63:32] <= TXHPB3_WDATA;
+      end
+      if (TXHPB4_WEN & ~r_txhpb_en[3]) begin
+        r_txhpb_en[3]       <= 1'b1;
+        r_txhpb_data[31:0]  <= TXHPB4_WDATA;
+      end
+    end
+    if (TXHPB_REN & TXHPB_DVALID)
+      r_txhpb_rout <= r_txhpb_data;
+    TXHPB_DVALID <= &r_txhpb_en;
+    TXHPB_RDATA  <= r_txhpb_rout;
   end
 end
 

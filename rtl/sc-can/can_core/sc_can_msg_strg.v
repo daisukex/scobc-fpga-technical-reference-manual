@@ -50,8 +50,8 @@ module sc_can_msg_strg # (
   output REG_INT_RXFUDF,
 
   // Bit Stream Processor Interface
-  input BSP_TXF_REN,
   output [99:0] BSP_TXF_RDATA,
+  input BSP_TXF_RD_END,
   output [SC_CAN_FIFO_DEPTH:0] BSP_TXF1_CAP,
   output [SC_CAN_FIFO_DEPTH:0] BSP_TXF2_CAP,
   output [SC_CAN_FIFO_DEPTH:0] BSP_TXF3_CAP,
@@ -60,6 +60,7 @@ module sc_can_msg_strg # (
   output BSP_TXHPB_DVALID,
   input BSP_TXHPB_REN,
   output [99:0] BSP_TXHPB_RDATA,
+  input BSP_TXHPB_RD_END,
 
   input BSP_RXF_WEN,
   input [99:0] BSP_RXF_WDATA,
@@ -142,7 +143,7 @@ generate
         .DATA_COUNT(w_txf_cap[gn]),                    // output [P_FIFO_DEPTH:0]
 
         // Read Port (RD_CLK Sync)
-        .RD_EN(BSP_TXF_REN),                           // input
+        .RD_EN(BSP_TXF_RD_END),                        // input
         .DOUT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
 
         .EMPTY(/*open*/),                              // output
@@ -199,7 +200,7 @@ generate
 
         .WR_EN(w_txf_wen[gn]),                         // input
         .DIN(w_txf_wdata[gn][0 +: 32-(28*(gn==1))]),   // input [P_FIFO_WIDTH-1:0]
-        .RD_EN(BSP_TXF_REN),                           // input
+        .RD_EN(BSP_TXF_RD_END),                        // input
         .DOUT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
 
         .OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),     // input [P_FIFO_DEPTH:0]
@@ -265,6 +266,7 @@ sc_can_txhpb can_txhpb (
 
   .TXHPB_REN(BSP_TXHPB_REN),         // input
   .TXHPB_RDATA(BSP_TXHPB_RDATA),     // output [99:0]
+  .TXHPB_RD_END(BSP_TXHPB_RD_END),   // input
 
   .TXHPB_OVERFLOW(REG_INT_TXHBOVF),  // output
   .TXHPB_UNDERFLOW(/*open*/)         // output
