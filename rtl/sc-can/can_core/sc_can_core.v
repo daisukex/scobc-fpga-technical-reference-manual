@@ -107,7 +107,6 @@ wire w_txhpb_rd_end;
 wire [99:0] w_txhpb_rdata;
 wire w_rxf_wen;
 wire [99:0] w_rxf_wdata;
-wire [SC_CAN_FIFO_DEPTH:0] w_rxf_cap [0:3];
 
 // Bit Timing Generator
 sc_can_bt_gen can_bt_gen (
@@ -176,6 +175,9 @@ sc_can_msg_strg # (
   .REG_RXF4_REN(REG_RXF4_REN),          // input
   .REG_RXF4_RDATA(REG_RXF4_RDATA),      // output [31:0]
   .REG_RXF_RST(REG_RXF_RST),            // input
+  .REG_TXF_FULL(REG_TXF_FULL),          // output
+  .REG_RXF_FULL(REG_RXF_FULL),          // output
+  .REG_INT_RXFVAL(REG_INT_RXFVAL),      // output
   .REG_INT_RXFOVF(REG_INT_RXFOVF),      // output
   .REG_INT_RXFUDF(REG_INT_RXFUDF),      // output
 
@@ -195,11 +197,7 @@ sc_can_msg_strg # (
   .BSP_TXHPB_RD_END(w_txhpb_rd_end),    // input
 
   .BSP_RXF_WEN(w_rxf_wen),              // input
-  .BSP_RXF_WDATA(w_rxf_wdata),          // input [99:0]
-  .BSP_RXF1_CAP(w_rxf_cap[0]),          // output [SC_CAN_FIFO_DEPTH:0]
-  .BSP_RXF2_CAP(w_rxf_cap[1]),          // output [SC_CAN_FIFO_DEPTH:0]
-  .BSP_RXF3_CAP(w_rxf_cap[2]),          // output [SC_CAN_FIFO_DEPTH:0]
-  .BSP_RXF4_CAP(w_rxf_cap[3])           // output [SC_CAN_FIFO_DEPTH:0]
+  .BSP_RXF_WDATA(w_rxf_wdata)           // input [99:0]
 );
 
 assign REG_TXHPB_FULL = w_txhpb_dvalid;
@@ -241,10 +239,6 @@ sc_can_bs_proc # (
   // RX Message FIFO Interface
   .RXF_WEN(w_rxf_wen),                  // output
   .RXF_WDATA(w_rxf_wdata),              // output [99:0]
-  .RXF1_CAP(w_rxf_cap[0]),              // input [SC_CAN_FIFO_DEPTH:0]
-  .RXF2_CAP(w_rxf_cap[1]),              // input [SC_CAN_FIFO_DEPTH:0]
-  .RXF3_CAP(w_rxf_cap[2]),              // input [SC_CAN_FIFO_DEPTH:0]
-  .RXF4_CAP(w_rxf_cap[3]),              // input [SC_CAN_FIFO_DEPTH:0]
 
   // Register Interface
   .REG_CAN_EN(REG_CAN_EN),              // input
@@ -264,12 +258,9 @@ sc_can_bs_proc # (
   .REG_ERRWRN(REG_ERRWRN),              // output
   .REG_ERR_STS(REG_ERR_STS),            // output [1:0]
   .REG_TXF_NEMPTY(REG_TXF_NEMPTY),      // output
-  .REG_TXF_FULL(REG_TXF_FULL),          // output
-  .REG_RXF_FULL(REG_RXF_FULL),          // output
   .REG_INT_TRNSDN(REG_INT_TRNSDN),      // output
   .REG_INT_ARBLST(REG_INT_ARBLST),      // output
   .REG_INT_RCVDN(REG_INT_RCVDN),        // output
-  .REG_INT_RXFVAL(REG_INT_RXFVAL),      // output
   .REG_INT_CRCER(REG_INT_CRCER),        // output
   .REG_INT_FMER(REG_INT_FMER),          // output
   .REG_INT_STFER(REG_INT_STFER),        // output

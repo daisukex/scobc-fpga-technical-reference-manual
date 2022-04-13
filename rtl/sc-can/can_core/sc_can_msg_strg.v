@@ -47,6 +47,9 @@ module sc_can_msg_strg # (
   input REG_RXF4_REN,
   output [31:0] REG_RXF4_RDATA,
   input REG_RXF_RST,
+  output reg REG_TXF_FULL,
+  output reg REG_RXF_FULL,
+  output reg REG_INT_RXFVAL,
   output REG_INT_RXFOVF,
   output REG_INT_RXFUDF,
 
@@ -66,11 +69,7 @@ module sc_can_msg_strg # (
   input BSP_TXHPB_RD_END,
 
   input BSP_RXF_WEN,
-  input [99:0] BSP_RXF_WDATA,
-  output [SC_CAN_FIFO_DEPTH:0] BSP_RXF1_CAP,
-  output [SC_CAN_FIFO_DEPTH:0] BSP_RXF2_CAP,
-  output [SC_CAN_FIFO_DEPTH:0] BSP_RXF3_CAP,
-  output [SC_CAN_FIFO_DEPTH:0] BSP_RXF4_CAP
+  input [99:0] BSP_RXF_WDATA
 );
 
 wire [3:0] w_txf_wen;
@@ -86,7 +85,6 @@ wire [3:0] w_rxf_ren;
 wire [31:0] w_rxf_rdata [0:3];
 wire [3:0] w_rxf_udf;
 wire [SC_CAN_FIFO_DEPTH:0] w_rxf_cap [0:3];
-wire [SC_CAN_FIFO_DEPTH:0] w_rxf_cap_wsync [0:3];
 
 wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_wadr;
 wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_radr;
@@ -116,10 +114,6 @@ assign REG_RXF2_RDATA = w_rxf_rdata[1][3:0];
 assign REG_RXF3_RDATA = w_rxf_rdata[2];
 assign REG_RXF4_RDATA = w_rxf_rdata[3];
 assign REG_INT_RXFUDF = |w_rxf_udf;
-assign BSP_RXF1_CAP = w_rxf_cap_wsync[0];
-assign BSP_RXF2_CAP = w_rxf_cap_wsync[1];
-assign BSP_RXF3_CAP = w_rxf_cap_wsync[2];
-assign BSP_RXF4_CAP = w_rxf_cap_wsync[3];
 
 genvar gn;
 generate
@@ -322,21 +316,6 @@ generate
         .DATA_COUNT(w_rxf_cap[gn])                     // output [P_FIFO_DEPTH:0]
       );
 
-      // Clock Converter
-      sc_clk_conv_bus # (
-        .P_USE_VLD(0),
-        .P_DT_WIDTH(SC_CAN_FIFO_DEPTH+1)
-      ) cconv_rxf_cap_wr (
-        .IN_RSTB(REG_RSTB),              // input
-        .IN_CLK(REG_CLK),                // input
-        .IN_VALID(1'b0),                 // input
-        .IN_DATA(w_rxf_cap[gn]),         // input [P_DT_WIDTH-1:0]
-        .SYNC_RSTB(CAN_RSTB),            // input
-        .SYNC_CLK(CAN_CLK),              // input
-        .SYNC_VALID(/*open*/),           // output
-        .SYNC_DATA(w_rxf_cap_wsync[gn])  // output [P_DT_WIDTH-1:0]
-      );
-
     end
     else begin
 
@@ -368,11 +347,26 @@ generate
         .UNDER_TH(/*open*/),                           // output
         .DATA_COUNT(w_rxf_cap[gn])                     // output [P_FIFO_DEPTH:0]
       );
-      assign w_rxf_cap_wsync[gn] = w_rxf_cap[gn];
 
     end
   end
 endgenerate
+
+// FIFO Status, Interrupt
+always @ (posedge REG_CLK or negedge REG_RSTB) begin
+  if (!REG_RSTB) begin
+    REG_TXF_FULL   <= 0;
+    REG_RXF_FULL   <= 0;
+    REG_INT_RXFVAL <= 0;
+  end
+  else begin
+    REG_TXF_FULL   <= w_txf_cap[0][SC_CAN_FIFO_DEPTH] & w_txf_cap[1][SC_CAN_FIFO_DEPTH] &
+                      w_txf_cap[2][SC_CAN_FIFO_DEPTH] & w_txf_cap[3][SC_CAN_FIFO_DEPTH];
+    REG_RXF_FULL   <= w_rxf_cap[0][SC_CAN_FIFO_DEPTH] & w_rxf_cap[1][SC_CAN_FIFO_DEPTH] &
+                      w_rxf_cap[2][SC_CAN_FIFO_DEPTH] & w_rxf_cap[3][SC_CAN_FIFO_DEPTH];
+    REG_INT_RXFVAL <= |w_rxf_cap[0] & |w_rxf_cap[1] & |w_rxf_cap[2] & |w_rxf_cap[3];
+  end
+end
 
 // TX High Priority Buffer
 sc_can_txhpb can_txhpb (

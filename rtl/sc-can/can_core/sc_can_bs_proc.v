@@ -40,10 +40,6 @@ module sc_can_bs_proc # (
   // RX Message FIFO Interface
   output reg RXF_WEN,
   output reg [99:0] RXF_WDATA,
-  input [SC_CAN_FIFO_DEPTH:0] RXF1_CAP,
-  input [SC_CAN_FIFO_DEPTH:0] RXF2_CAP,
-  input [SC_CAN_FIFO_DEPTH:0] RXF3_CAP,
-  input [SC_CAN_FIFO_DEPTH:0] RXF4_CAP,
 
   // Register Interface
   input REG_CAN_EN,
@@ -63,12 +59,9 @@ module sc_can_bs_proc # (
   output reg REG_ERRWRN,
   output reg [1:0] REG_ERR_STS,
   output reg REG_TXF_NEMPTY,
-  output reg REG_TXF_FULL,
-  output reg REG_RXF_FULL,
   output reg REG_INT_TRNSDN,
   output reg REG_INT_ARBLST,
   output reg REG_INT_RCVDN,
-  output reg REG_INT_RXFVAL,
   output reg REG_INT_CRCER,
   output reg REG_INT_FMER,
   output reg REG_INT_STFER,
@@ -86,7 +79,6 @@ reg r_txhpb_ren_p2;
 
 wire w_txf_almost_empty;
 wire w_txf_val;
-wire w_rxf_val;
 wire w_txf_dvalid;
 reg r_txf_val_p1;
 
@@ -273,7 +265,6 @@ end
 assign w_txf_almost_empty = ~|TXF1_CAP[SC_CAN_FIFO_DEPTH:1] & ~|TXF2_CAP[SC_CAN_FIFO_DEPTH:1] &
                             ~|TXF3_CAP[SC_CAN_FIFO_DEPTH:1] & ~|TXF4_CAP[SC_CAN_FIFO_DEPTH:1];
 assign w_txf_val = |TXF1_CAP & |TXF2_CAP & |TXF3_CAP & |TXF4_CAP;
-assign w_rxf_val = |RXF1_CAP & |RXF2_CAP & |RXF3_CAP & |RXF4_CAP;
 
 assign w_txf_dvalid = (SC_CAN_PRIO_MGMT & TXPM_RVAL) |
                       (~SC_CAN_PRIO_MGMT & w_txf_val);
@@ -300,8 +291,6 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     REG_BUS_BUSY   <= 0;
     REG_ERRWRN     <= 0;
     REG_TXF_NEMPTY <= 0;
-    REG_TXF_FULL   <= 0;
-    REG_RXF_FULL   <= 0;
   end else begin
     REG_BUS_BUSY   <= (w_bsp_state != STT_BSP_IDLE);
     REG_ERRWRN     <= (REG_TX_ECNT >= 8'd96) | (REG_RX_ECNT >= 8'd96);
@@ -309,10 +298,6 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
       REG_TXF_NEMPTY <= 1'b1;
     else if ((~w_txf_val & r_txf_val_p1) | (REG_INT_TRNSDN & w_txf_almost_empty))
       REG_TXF_NEMPTY <= 0;
-    REG_TXF_FULL   <= TXF1_CAP[SC_CAN_FIFO_DEPTH] & TXF2_CAP[SC_CAN_FIFO_DEPTH] &
-                      TXF3_CAP[SC_CAN_FIFO_DEPTH] & TXF4_CAP[SC_CAN_FIFO_DEPTH];
-    REG_RXF_FULL   <= RXF1_CAP[SC_CAN_FIFO_DEPTH] & RXF2_CAP[SC_CAN_FIFO_DEPTH] &
-                      RXF3_CAP[SC_CAN_FIFO_DEPTH] & RXF4_CAP[SC_CAN_FIFO_DEPTH];
   end
 end
 
@@ -1227,7 +1212,6 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     REG_INT_TRNSDN <= 0;
     REG_INT_ARBLST <= 0;
     REG_INT_RCVDN  <= 0;
-    REG_INT_RXFVAL <= 0;
     REG_INT_CRCER  <= 0;
     REG_INT_FMER   <= 0;
     REG_INT_STFER  <= 0;
@@ -1238,7 +1222,6 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     REG_INT_TRNSDN <= r_tx_node_on & w_rx_eof_end & RX_VALID & RX_DATA;
     REG_INT_ARBLST <= w_tx_abt_field & RX_VALID & CAN_TX & ~RX_DATA & ~((r_rx_nchg_cnt >= 3'h4) & ~r_rx_data_before);
     REG_INT_RCVDN  <= RXF_WEN;
-    REG_INT_RXFVAL <= w_rxf_val;
     REG_INT_CRCER  <= (~r_tx_node_on | REG_SELF_TMODE) & (r_rx_state == STT_RX_CDLM) & r_rx_valid_p1 & (r_rx_nchg_cnt < 3'h4) &
                       (r_rx_crc != w_rx_crc_cal);
     REG_INT_FMER   <= w_rx_bitval & ~RX_DATA & ( (r_rx_state == STT_RX_CDLM) |

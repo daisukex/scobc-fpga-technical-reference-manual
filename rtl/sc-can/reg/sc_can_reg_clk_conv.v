@@ -32,12 +32,9 @@ module sc_can_reg_clk_conv (
   output REG_ERRWRN_SYNC,
   output [1:0] REG_ERR_STS_SYNC,
   output REG_TXF_NEMPTY_SYNC,
-  output REG_TXF_FULL_SYNC,
-  output REG_RXF_FULL_SYNC,
   output REG_INT_TRNSDN_SYNC,
   output REG_INT_ARBLST_SYNC,
   output REG_INT_RCVDN_SYNC,
-  output REG_INT_RXFVAL_SYNC,
   output REG_INT_CRCER_SYNC,
   output REG_INT_FMER_SYNC,
   output REG_INT_STFER_SYNC,
@@ -80,12 +77,9 @@ module sc_can_reg_clk_conv (
   input REG_ERRWRN,
   input [1:0] REG_ERR_STS,
   input REG_TXF_NEMPTY,
-  input REG_TXF_FULL,
-  input REG_RXF_FULL,
   input REG_INT_TRNSDN,
   input REG_INT_ARBLST,
   input REG_INT_RCVDN,
-  input REG_INT_RXFVAL,
   input REG_INT_CRCER,
   input REG_INT_FMER,
   input REG_INT_STFER,
@@ -475,30 +469,6 @@ sc_clk_conv_lvl # (
   .SYNC_SIG(REG_TXF_NEMPTY_SYNC) // output
 );
 
-// REG_TXF_FULL
-sc_clk_conv_lvl # (
-  .P_INIT_VAL(0)
-) cconv_txf_full (
-  .IN_RSTB(CAN_RSTB),          // input
-  .IN_CLK(CAN_CLK),            // input
-  .IN_SIG(REG_TXF_FULL),       // input
-  .SYNC_RSTB(REG_RSTB),        // input
-  .SYNC_CLK(REG_CLK),          // input
-  .SYNC_SIG(REG_TXF_FULL_SYNC) // output
-);
-
-// REG_RXF_FULL
-sc_clk_conv_lvl # (
-  .P_INIT_VAL(0)
-) cconv_rxf_full (
-  .IN_RSTB(CAN_RSTB),          // input
-  .IN_CLK(CAN_CLK),            // input
-  .IN_SIG(REG_RXF_FULL),       // input
-  .SYNC_RSTB(REG_RSTB),        // input
-  .SYNC_CLK(REG_CLK),          // input
-  .SYNC_SIG(REG_RXF_FULL_SYNC) // output
-);
-
 // REG_INT_TRNSDN
 sc_clk_conv_pls # (
   .P_POLARITY(1) // 1: Positive 0: Negative
@@ -533,18 +503,6 @@ sc_clk_conv_pls # (
   .SYNC_RSTB(REG_RSTB),         // input
   .SYNC_CLK(REG_CLK),           // input
   .SYNC_PLS(REG_INT_RCVDN_SYNC) // output
-);
-
-// REG_INT_RXFVAL
-sc_clk_conv_lvl # (
-  .P_INIT_VAL(0)
-) cconv_int_rxfval (
-  .IN_RSTB(CAN_RSTB),            // input
-  .IN_CLK(CAN_CLK),              // input
-  .IN_SIG(REG_INT_RXFVAL),       // input
-  .SYNC_RSTB(REG_RSTB),          // input
-  .SYNC_CLK(REG_CLK),            // input
-  .SYNC_SIG(REG_INT_RXFVAL_SYNC) // output
 );
 
 // REG_INT_CRCER

@@ -165,12 +165,9 @@ wire w_reg_bus_busy_sync;
 wire w_reg_errwrn_sync;
 wire [1:0] w_reg_err_sts_sync;
 wire w_reg_txf_nempty_sync;
-wire w_reg_txf_full_sync;
-wire w_reg_rxf_full_sync;
 wire w_reg_int_trnsdn_sync;
 wire w_reg_int_arblst_sync;
 wire w_reg_int_rcvdn_sync;
-wire w_reg_int_rxfval_sync;
 wire w_reg_int_crcer_sync;
 wire w_reg_int_fmer_sync;
 wire w_reg_int_stfer_sync;
@@ -291,12 +288,12 @@ sc_can_reg can_reg (
   .REG_ERRWRN(w_reg_errwrn_sync),            // input
   .REG_ERR_STS(w_reg_err_sts_sync),          // input [1:0]
   .REG_TXF_NEMPTY(w_reg_txf_nempty_sync),    // input
-  .REG_TXF_FULL(w_reg_txf_full_sync),        // input
-  .REG_RXF_FULL(w_reg_rxf_full_sync),        // input
+  .REG_TXF_FULL(REG_TXF_FULL),               // input
+  .REG_RXF_FULL(REG_RXF_FULL),               // input
   .REG_INT_TRNSDN(w_reg_int_trnsdn_sync),    // input
   .REG_INT_ARBLST(w_reg_int_arblst_sync),    // input
   .REG_INT_RCVDN(w_reg_int_rcvdn_sync),      // input
-  .REG_INT_RXFVAL(w_reg_int_rxfval_sync),    // input
+  .REG_INT_RXFVAL(REG_INT_RXFVAL),           // input
   .REG_INT_CRCER(w_reg_int_crcer_sync),      // input
   .REG_INT_FMER(w_reg_int_fmer_sync),        // input
   .REG_INT_STFER(w_reg_int_stfer_sync),      // input
@@ -381,12 +378,9 @@ generate
       .REG_ERRWRN_SYNC(w_reg_errwrn_sync),            // output
       .REG_ERR_STS_SYNC(w_reg_err_sts_sync),          // output [1:0]
       .REG_TXF_NEMPTY_SYNC(w_reg_txf_nempty_sync),    // output
-      .REG_TXF_FULL_SYNC(w_reg_txf_full_sync),        // output
-      .REG_RXF_FULL_SYNC(w_reg_rxf_full_sync),        // output
       .REG_INT_TRNSDN_SYNC(w_reg_int_trnsdn_sync),    // output
       .REG_INT_ARBLST_SYNC(w_reg_int_arblst_sync),    // output
       .REG_INT_RCVDN_SYNC(w_reg_int_rcvdn_sync),      // output
-      .REG_INT_RXFVAL_SYNC(w_reg_int_rxfval_sync),    // output
       .REG_INT_CRCER_SYNC(w_reg_int_crcer_sync),      // output
       .REG_INT_FMER_SYNC(w_reg_int_fmer_sync),        // output
       .REG_INT_STFER_SYNC(w_reg_int_stfer_sync),      // output
@@ -429,12 +423,9 @@ generate
       .REG_ERRWRN(REG_ERRWRN),                        // input
       .REG_ERR_STS(REG_ERR_STS),                      // input [1:0]
       .REG_TXF_NEMPTY(REG_TXF_NEMPTY),                // input
-      .REG_TXF_FULL(REG_TXF_FULL),                    // input
-      .REG_RXF_FULL(REG_RXF_FULL),                    // input
       .REG_INT_TRNSDN(REG_INT_TRNSDN),                // input
       .REG_INT_ARBLST(REG_INT_ARBLST),                // input
       .REG_INT_RCVDN(REG_INT_RCVDN),                  // input
-      .REG_INT_RXFVAL(REG_INT_RXFVAL),                // input
       .REG_INT_CRCER(REG_INT_CRCER),                  // input
       .REG_INT_FMER(REG_INT_FMER),                    // input
       .REG_INT_STFER(REG_INT_STFER),                  // input
@@ -479,12 +470,9 @@ generate
     assign w_reg_errwrn_sync = REG_ERRWRN;
     assign w_reg_err_sts_sync = REG_ERR_STS;
     assign w_reg_txf_nempty_sync = REG_TXF_NEMPTY;
-    assign w_reg_txf_full_sync = REG_TXF_FULL;
-    assign w_reg_rxf_full_sync = REG_RXF_FULL;
     assign w_reg_int_trnsdn_sync = REG_INT_TRNSDN;
     assign w_reg_int_arblst_sync = REG_INT_ARBLST;
     assign w_reg_int_rcvdn_sync = REG_INT_RCVDN;
-    assign w_reg_int_rxfval_sync = REG_INT_RXFVAL;
     assign w_reg_int_crcer_sync = REG_INT_CRCER;
     assign w_reg_int_fmer_sync = REG_INT_FMER;
     assign w_reg_int_stfer_sync = REG_INT_STFER;
