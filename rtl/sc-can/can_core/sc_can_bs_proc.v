@@ -5,7 +5,8 @@
 // Copyright © 2021 Space Cubics, LLC.
 //-----------------------------------------------
 module sc_can_bs_proc # (
-  parameter SC_CAN_FIFO_DEPTH = 6
+  parameter SC_CAN_FIFO_DEPTH = 6,
+  parameter SC_CAN_PRIO_MGMT  = 1
 ) (
   // System Interface
   input CAN_RSTB,
@@ -21,6 +22,8 @@ module sc_can_bs_proc # (
   input TX_TRIG,
 
   // TX Message FIFO Interface
+  input TXPM_RVAL,
+  output reg TXF_REN,
   input [99:0] TXF_RDATA,
   output TXF_RD_END,
   input [SC_CAN_FIFO_DEPTH:0] TXF1_CAP,
@@ -84,6 +87,7 @@ reg r_txhpb_ren_p2;
 wire w_txf_almost_empty;
 wire w_txf_val;
 wire w_rxf_val;
+wire w_txf_dvalid;
 reg r_txf_val_p1;
 
 wire [1:0] w_bsp_state;
@@ -156,7 +160,6 @@ reg [63:0] r_tx_data_sft;
 reg [5:0] r_tx_bit_cnt;
 reg r_txf_rdval;
 reg r_txhpb_rdval;
-reg r_txf_ren;
 reg [4:0] r_tx_state;
 
 wire w_tx_aerr_trns;
@@ -259,7 +262,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
   end else begin
     r_rx_valid_p1  <= RX_VALID;
     r_tx_trig_p1   <= TX_TRIG;
-    r_txf_ren_p1   <= r_txf_ren;
+    r_txf_ren_p1   <= TXF_REN;
     r_txf_ren_p2   <= r_txf_ren_p1;
     r_txhpb_ren_p1 <= TXHPB_REN;
     r_txhpb_ren_p2 <= r_txhpb_ren_p1;
@@ -271,6 +274,9 @@ assign w_txf_almost_empty = ~|TXF1_CAP[SC_CAN_FIFO_DEPTH:1] & ~|TXF2_CAP[SC_CAN_
                             ~|TXF3_CAP[SC_CAN_FIFO_DEPTH:1] & ~|TXF4_CAP[SC_CAN_FIFO_DEPTH:1];
 assign w_txf_val = |TXF1_CAP & |TXF2_CAP & |TXF3_CAP & |TXF4_CAP;
 assign w_rxf_val = |RXF1_CAP & |RXF2_CAP & |RXF3_CAP & |RXF4_CAP;
+
+assign w_txf_dvalid = (SC_CAN_PRIO_MGMT & TXPM_RVAL) |
+                      (~SC_CAN_PRIO_MGMT & w_txf_val);
 
 always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
   if (!CAN_RSTB)
@@ -897,7 +903,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     r_tx_bit_cnt  <= 0;
     r_txf_rdval   <= 0;
     r_txhpb_rdval <= 0;
-    r_txf_ren     <= 0;
+    TXF_REN       <= 0;
     TXHPB_REN     <= 0;
     r_tx_state    <= STT_TX_IDLE;
   end else if (w_bus_no_connect) begin
@@ -906,7 +912,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     r_tx_bit_cnt  <= 0;
     r_txf_rdval   <= 0;
     r_txhpb_rdval <= 0;
-    r_txf_ren     <= 0;
+    TXF_REN       <= 0;
     TXHPB_REN     <= 0;
     r_tx_state    <= STT_TX_IDLE;
   end else begin
@@ -918,7 +924,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
     end
     if (w_tx_bitval)
       r_tx_data_sft <= {r_tx_data_sft[62:0], 1'b1};
-    r_txf_ren <= 0;
+    TXF_REN   <= 0;
     TXHPB_REN <= 0;
     if (w_error_detect) begin
       r_tx_bit_cnt <= 6'd5;
@@ -941,7 +947,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
           r_tx_bit_cnt  <= 0;
           r_txf_rdval   <= 0;
           r_txhpb_rdval <= 0;
-          if (w_tx_start_prmt & (TXHPB_DVALID | w_txf_val)) begin
+          if (w_tx_start_prmt & (TXHPB_DVALID | w_txf_dvalid)) begin
             r_tx_node_on  <= 1'b1;
             r_tx_data_sft <= {1'b0, {63{1'b1}}};
             r_tx_bit_cnt  <= 0;
@@ -950,9 +956,9 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
               r_txhpb_rdval <= 1'b1;
               TXHPB_REN     <= 1'b1;
             end
-            else if (w_txf_val) begin
+            else if (w_txf_dvalid) begin
               r_txf_rdval <= 1'b1;
-              r_txf_ren   <= 1'b1;
+              TXF_REN     <= 1'b1;
             end
           end
         end
@@ -1177,7 +1183,7 @@ always @ (posedge CAN_CLK or negedge CAN_RSTB) begin
           r_tx_bit_cnt  <= 0;
           r_txf_rdval   <= 0;
           r_txhpb_rdval <= 0;
-          r_txf_ren     <= 0;
+          TXF_REN       <= 0;
           TXHPB_REN     <= 0;
           r_tx_state    <= STT_TX_IDLE;
         end

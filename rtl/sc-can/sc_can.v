@@ -7,7 +7,8 @@
 module sc_can # (
   parameter SC_CAN_AXI_ID_WIDTH = 1,
   parameter SC_CAN_FIFO_DEPTH = 6,
-  parameter SC_CAN_CLK_ASYNC  = 1 // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  parameter SC_CAN_CLK_ASYNC  = 1, // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  parameter SC_CAN_PRIO_MGMT  = 1
 ) (
   // System Interface
   input S_AXI_ARESETN,
@@ -289,7 +290,8 @@ sc_can_reg_wrap # (
 // CAN Control Core
 sc_can_core # (
   .SC_CAN_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
-  .SC_CAN_CLK_ASYNC(SC_CAN_CLK_ASYNC)
+  .SC_CAN_CLK_ASYNC(SC_CAN_CLK_ASYNC),
+  .SC_CAN_PRIO_MGMT(SC_CAN_PRIO_MGMT)
 ) can_core (
   // System Interface
   .REG_RSTB(w_can_axi_resetn),            // input

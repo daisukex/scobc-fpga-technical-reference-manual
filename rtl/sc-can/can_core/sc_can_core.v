@@ -6,7 +6,8 @@
 //-----------------------------------------------
 module sc_can_core # (
   parameter SC_CAN_FIFO_DEPTH = 6,
-  parameter SC_CAN_CLK_ASYNC  = 1 // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  parameter SC_CAN_CLK_ASYNC  = 1, // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  parameter SC_CAN_PRIO_MGMT  = 1
 ) (
   // System Interface
   input REG_RSTB,
@@ -95,6 +96,8 @@ wire [1:0] w_bsp_sync_stt;
 wire w_rx_valid;
 wire w_rx_data;
 wire w_tx_trig;
+wire w_txpm_rval;
+wire w_txf_ren;
 wire w_txf_rd_end;
 wire [99:0] w_txf_rdata;
 wire [SC_CAN_FIFO_DEPTH:0] w_txf_cap [0:3];
@@ -132,7 +135,8 @@ sc_can_bt_gen can_bt_gen (
 // Message Storage
 sc_can_msg_strg # (
   .SC_CAN_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
-  .SC_CAN_CLK_ASYNC(SC_CAN_CLK_ASYNC)  // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  .SC_CAN_CLK_ASYNC(SC_CAN_CLK_ASYNC),  // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  .SC_CAN_PRIO_MGMT(SC_CAN_PRIO_MGMT)
 ) can_msg_strg (
   // System Interface
   .REG_RSTB(REG_RSTB),                  // input
@@ -176,6 +180,8 @@ sc_can_msg_strg # (
   .REG_INT_RXFUDF(REG_INT_RXFUDF),      // output
 
   // Bit Stream Processor Interface
+  .BSP_TXPM_RVAL(w_txpm_rval),          // output
+  .BSP_TXF_REN(w_txf_ren),              // input
   .BSP_TXF_RDATA(w_txf_rdata),          // output [99:0]
   .BSP_TXF_RD_END(w_txf_rd_end),        // input
   .BSP_TXF1_CAP(w_txf_cap[0]),          // output [SC_CAN_FIFO_DEPTH:0]
@@ -200,7 +206,8 @@ assign REG_TXHPB_FULL = w_txhpb_dvalid;
 
 // Bit Stream Processor
 sc_can_bs_proc # (
-  .SC_CAN_FIFO_DEPTH(SC_CAN_FIFO_DEPTH)
+  .SC_CAN_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
+  .SC_CAN_PRIO_MGMT(SC_CAN_PRIO_MGMT)
 ) can_bs_proc (
   // System Interface
   .CAN_RSTB(CAN_RSTB),                  // input
@@ -216,6 +223,8 @@ sc_can_bs_proc # (
   .TX_TRIG(w_tx_trig),                  // input
 
   // TX Message FIFO Interface
+  .TXPM_RVAL(w_txpm_rval),              // input
+  .TXF_REN(w_txf_ren),                  // output
   .TXF_RDATA(w_txf_rdata),              // input [99:0]
   .TXF_RD_END(w_txf_rd_end),            // output
   .TXF1_CAP(w_txf_cap[0]),              // input [SC_CAN_FIFO_DEPTH:0]

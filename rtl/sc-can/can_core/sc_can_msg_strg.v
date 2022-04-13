@@ -6,7 +6,8 @@
 //-----------------------------------------------
 module sc_can_msg_strg # (
   parameter SC_CAN_FIFO_DEPTH = 6,
-  parameter SC_CAN_CLK_ASYNC  = 1 // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  parameter SC_CAN_CLK_ASYNC  = 1, // 1: Two Phase Asynchronous 0: Single Phase Synchronous
+  parameter SC_CAN_PRIO_MGMT  = 1
 ) (
   // System Interface
   input REG_RSTB,
@@ -50,6 +51,8 @@ module sc_can_msg_strg # (
   output REG_INT_RXFUDF,
 
   // Bit Stream Processor Interface
+  output BSP_TXPM_RVAL,
+  input BSP_TXF_REN,
   output [99:0] BSP_TXF_RDATA,
   input BSP_TXF_RD_END,
   output [SC_CAN_FIFO_DEPTH:0] BSP_TXF1_CAP,
@@ -83,6 +86,9 @@ wire [31:0] w_rxf_rdata [0:3];
 wire [3:0] w_rxf_udf;
 wire [SC_CAN_FIFO_DEPTH:0] w_rxf_cap [0:3];
 
+wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_wadr;
+wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_radr;
+
 assign w_txf_wen = {REG_TXF4_WEN, REG_TXF3_WEN, REG_TXF2_WEN, REG_TXF1_WEN};
 assign w_txf_wdata[0] = REG_TXF1_WDATA;
 assign w_txf_wdata[1] = {28'h0, REG_TXF2_WDATA};
@@ -115,42 +121,151 @@ assign BSP_RXF4_CAP = w_rxf_cap[3];
 
 genvar gn;
 generate
-  for(gn=0; gn<4; gn=gn+1) begin : can_fifo_gen
-    if (SC_CAN_CLK_ASYNC) begin
+  if (SC_CAN_PRIO_MGMT) begin
 
-      // TX_FIFO
-      sc_fifo_async # (
-        .P_FIFO_WIDTH(32-(28*(gn==1))),
-        .P_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
-        .P_FIFO_TYPE(0)                                // 0: BlockRAM 1: Shift Register
-      ) tx_fifo (
-        .WR_RSTB(REG_RSTB),                            // input
-        .WR_CLK(REG_CLK),                              // input
-        .RD_RSTB(CAN_RSTB),                            // input
-        .RD_CLK(CAN_CLK),                              // input
+    // TX Priority Controller
+    sc_can_tx_prio_ctl # (
+      .SC_CAN_MEM_AD_WIDTH(SC_CAN_FIFO_DEPTH),
+      .SC_CAN_CLK_ASYNC(SC_CAN_CLK_ASYNC)
+    ) tx_prio_ctl (
+      .WR_RSTB(REG_RSTB),                               // input
+      .WR_CLK(REG_CLK),                                 // input
+      .RD_RSTB(CAN_RSTB),                               // input
+      .RD_CLK(CAN_CLK),                                 // input
+
+      // Write Port (WR_CLK Sync)
+      .TXPM_WEN(w_txf_wen),                             // input [3:0]
+      .TXPM_WADR(w_txpm_wadr),                          // output [SC_CAN_MEM_AD_WIDTH-1:0]
+
+      .TXPM_RST(REG_TXF_RST),                           // input
+
+      .TXPM_FULL(/*open*/),                             // output
+      .TXPM_OVERFLOW(w_txf_ovf[0]),                     // output
+      .TXPM_OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),   // input [SC_CAN_MEM_AD_WIDTH:0]
+      .TXPM_OVER_TH(/*open*/),                          // output
+
+      .TXPM1_DATA_COUNT(w_txf_cap[0]),                  // output [SC_CAN_MEM_AD_WIDTH:0]
+      .TXPM2_DATA_COUNT(w_txf_cap[1]),                  // output [SC_CAN_MEM_AD_WIDTH:0]
+      .TXPM3_DATA_COUNT(w_txf_cap[2]),                  // output [SC_CAN_MEM_AD_WIDTH:0]
+      .TXPM4_DATA_COUNT(w_txf_cap[3]),                  // output [SC_CAN_MEM_AD_WIDTH:0]
+
+      // Read Port (RD_CLK Sync)
+      .TXPM_RVAL(BSP_TXPM_RVAL),                        // output
+      .TXPM_REN(BSP_TXF_REN),                           // input
+      .TXPM_RADR(w_txpm_radr),                          // output [SC_CAN_MEM_AD_WIDTH-1:0]
+      .PRIO_SEARCH_RDATA(w_txf_rdata[0]),               // input [31:0]
+      .TXPM_RD_END(BSP_TXF_RD_END),                     // input
+
+      .TXPM_EMPTY(/*open*/),                            // output
+      .TXPM_UNDERFLOW(/*open*/),                        // output
+      .TXPM_UNDER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),  // input [SC_CAN_MEM_AD_WIDTH:0]
+      .TXPM_UNDER_TH(/*open*/)                          // output
+    );
+
+    assign w_txf_ovf[3:1] = 0;
+  end
+  else begin
+    assign w_txpm_wadr = 0;
+    assign w_txpm_radr = 0;
+    assign BSP_TXPM_RVAL = 0;
+  end
+
+  for(gn=0; gn<4; gn=gn+1) begin : can_fifo_gen
+    if (SC_CAN_PRIO_MGMT) begin
+
+      // TX_Memory
+      sc_can_mem # (
+        .SC_CAN_MEM_DT_WIDTH(32-(28*(gn==1))),
+        .SC_CAN_MEM_AD_WIDTH(SC_CAN_FIFO_DEPTH),
+        .SC_CAN_MEM_TYPE(0)                             // 0: BlockRAM 1: Shift Register
+      ) tx_mem (
+        .WR_RSTB(REG_RSTB),                             // input
+        .WR_CLK(REG_CLK),                               // input
+        .RD_RSTB(CAN_RSTB),                             // input
+        .RD_CLK(CAN_CLK),                               // input
 
         // Write Port (WR_CLK Sync)
-        .WR_EN(w_txf_wen[gn]),                         // input
-        .DIN(w_txf_wdata[gn][0 +: 32-(28*(gn==1))]),   // input [P_FIFO_WIDTH-1:0]
-
-        .FIFO_RST(REG_TXF_RST),                        // input
-
-        .FULL(/*open*/),                               // output
-        .OVERFLOW(w_txf_ovf[gn]),                      // output
-        .OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),     // input [P_FIFO_DEPTH:0]
-        .OVER_TH(/*open*/),                            // output
-
-        .DATA_COUNT(w_txf_cap[gn]),                    // output [P_FIFO_DEPTH:0]
+        .WR_EN(w_txf_wen[gn]),                          // input
+        .WR_ADR(w_txpm_wadr),                           // input [SC_CAN_MEM_AD_WIDTH-1:0]
+        .WR_DAT(w_txf_wdata[gn][0 +: 32-(28*(gn==1))]), // input [SC_CAN_MEM_DT_WIDTH-1:0]
 
         // Read Port (RD_CLK Sync)
-        .RD_EN(BSP_TXF_RD_END),                        // input
-        .DOUT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
-
-        .EMPTY(/*open*/),                              // output
-        .UNDERFLOW(/*open*/),                          // output
-        .UNDER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),    // input [P_FIFO_DEPTH:0]
-        .UNDER_TH(/*open*/)                            // output
+        .RD_ADR(w_txpm_radr),                           // input [SC_CAN_MEM_AD_WIDTH-1:0]
+        .RD_DAT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))])  // output [SC_CAN_MEM_DT_WIDTH-1:0]
       );
+
+    end
+    else begin
+      if (SC_CAN_CLK_ASYNC) begin
+
+        // TX_FIFO
+        sc_fifo_async # (
+          .P_FIFO_WIDTH(32-(28*(gn==1))),
+          .P_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
+          .P_FIFO_TYPE(0)                                // 0: BlockRAM 1: Shift Register
+        ) tx_fifo (
+          .WR_RSTB(REG_RSTB),                            // input
+          .WR_CLK(REG_CLK),                              // input
+          .RD_RSTB(CAN_RSTB),                            // input
+          .RD_CLK(CAN_CLK),                              // input
+
+          // Write Port (WR_CLK Sync)
+          .WR_EN(w_txf_wen[gn]),                         // input
+          .DIN(w_txf_wdata[gn][0 +: 32-(28*(gn==1))]),   // input [P_FIFO_WIDTH-1:0]
+
+          .FIFO_RST(REG_TXF_RST),                        // input
+
+          .FULL(/*open*/),                               // output
+          .OVERFLOW(w_txf_ovf[gn]),                      // output
+          .OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),     // input [P_FIFO_DEPTH:0]
+          .OVER_TH(/*open*/),                            // output
+
+          .DATA_COUNT(w_txf_cap[gn]),                    // output [P_FIFO_DEPTH:0]
+
+          // Read Port (RD_CLK Sync)
+          .RD_EN(BSP_TXF_RD_END),                        // input
+          .DOUT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
+
+          .EMPTY(/*open*/),                              // output
+          .UNDERFLOW(/*open*/),                          // output
+          .UNDER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),    // input [P_FIFO_DEPTH:0]
+          .UNDER_TH(/*open*/)                            // output
+        );
+
+      end
+      else begin
+
+        // TX_FIFO
+        sc_fifo # (
+          .P_FIFO_WIDTH(32-(28*(gn==1))),
+          .P_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
+          .P_FIFO_TYPE(0)                                // 0: BlockRAM 1: Shift Register
+        ) tx_fifo (
+          .CLK(CAN_CLK),                                 // input
+          .SRST_N(CAN_RSTB),                             // input
+          .FIFO_RST(REG_TXF_RST),                        // input
+
+          .WR_EN(w_txf_wen[gn]),                         // input
+          .DIN(w_txf_wdata[gn][0 +: 32-(28*(gn==1))]),   // input [P_FIFO_WIDTH-1:0]
+          .RD_EN(BSP_TXF_RD_END),                        // input
+          .DOUT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
+
+          .OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),     // input [P_FIFO_DEPTH:0]
+          .UNDER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),    // input [P_FIFO_DEPTH:0]
+
+          .FULL(/*open*/),                               // output
+          .EMPTY(/*open*/),                              // output
+          .OVERFLOW(w_txf_ovf[gn]),                      // output
+          .UNDERFLOW(/*open*/),                          // output
+          .OVER_TH(/*open*/),                            // output
+          .UNDER_TH(/*open*/),                           // output
+          .DATA_COUNT(w_txf_cap[gn])                     // output [P_FIFO_DEPTH:0]
+        );
+
+      end
+    end
+
+    if (SC_CAN_CLK_ASYNC) begin
 
       // RX_FIFO
       sc_fifo_async # (
@@ -186,34 +301,8 @@ generate
         .UNDER_TH(/*open*/)                            // output
       );
 
-    end else begin
-
-      // TX_FIFO
-      sc_fifo # (
-        .P_FIFO_WIDTH(32-(28*(gn==1))),
-        .P_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
-        .P_FIFO_TYPE(0)                                // 0: BlockRAM 1: Shift Register
-      ) tx_fifo (
-        .CLK(CAN_CLK),                                 // input
-        .SRST_N(CAN_RSTB),                             // input
-        .FIFO_RST(REG_TXF_RST),                        // input
-
-        .WR_EN(w_txf_wen[gn]),                         // input
-        .DIN(w_txf_wdata[gn][0 +: 32-(28*(gn==1))]),   // input [P_FIFO_WIDTH-1:0]
-        .RD_EN(BSP_TXF_RD_END),                        // input
-        .DOUT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
-
-        .OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),     // input [P_FIFO_DEPTH:0]
-        .UNDER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),    // input [P_FIFO_DEPTH:0]
-
-        .FULL(/*open*/),                               // output
-        .EMPTY(/*open*/),                              // output
-        .OVERFLOW(w_txf_ovf[gn]),                      // output
-        .UNDERFLOW(/*open*/),                          // output
-        .OVER_TH(/*open*/),                            // output
-        .UNDER_TH(/*open*/),                           // output
-        .DATA_COUNT(w_txf_cap[gn])                     // output [P_FIFO_DEPTH:0]
-      );
+    end
+    else begin
 
       // RX_FIFO
       sc_fifo # (
