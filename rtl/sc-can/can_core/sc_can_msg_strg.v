@@ -78,6 +78,7 @@ wire [31:0] w_txf_wdata [0:3];
 wire [3:0] w_txf_ovf;
 wire [31:0] w_txf_rdata [0:3];
 wire [SC_CAN_FIFO_DEPTH:0] w_txf_cap [0:3];
+wire [SC_CAN_FIFO_DEPTH:0] w_txf_cap_rsync [0:3];
 
 wire [31:0] w_rxf_wdata [0:3];
 wire [3:0] w_rxf_ovf;
@@ -97,10 +98,10 @@ assign w_txf_wdata[3] = REG_TXF4_WDATA;
 assign REG_INT_TXFOVF = |w_txf_ovf;
 assign w_txf_rdata[1][31:4] = 28'h0;
 assign BSP_TXF_RDATA = {w_txf_rdata[0], w_txf_rdata[1][3:0], w_txf_rdata[2], w_txf_rdata[3]};
-assign BSP_TXF1_CAP = w_txf_cap[0];
-assign BSP_TXF2_CAP = w_txf_cap[1];
-assign BSP_TXF3_CAP = w_txf_cap[2];
-assign BSP_TXF4_CAP = w_txf_cap[3];
+assign BSP_TXF1_CAP = w_txf_cap_rsync[0];
+assign BSP_TXF2_CAP = w_txf_cap_rsync[1];
+assign BSP_TXF3_CAP = w_txf_cap_rsync[2];
+assign BSP_TXF4_CAP = w_txf_cap_rsync[3];
 
 assign w_rxf_wdata[0] = BSP_RXF_WDATA[99:68];
 assign w_rxf_wdata[1] = {28'h0, BSP_RXF_WDATA[67:64]};
@@ -267,6 +268,21 @@ generate
 
     if (SC_CAN_CLK_ASYNC) begin
 
+      // Clock Converter
+      sc_clk_conv_bus # (
+        .P_USE_VLD(0),
+        .P_DT_WIDTH(SC_CAN_FIFO_DEPTH+1)
+      ) cconv_txf_cap_rd (
+        .IN_RSTB(REG_RSTB),              // input
+        .IN_CLK(REG_CLK),                // input
+        .IN_VALID(1'b0),                 // input
+        .IN_DATA(w_txf_cap[gn]),         // input [P_DT_WIDTH-1:0]
+        .SYNC_RSTB(CAN_RSTB),            // input
+        .SYNC_CLK(CAN_CLK),              // input
+        .SYNC_VALID(/*open*/),           // output
+        .SYNC_DATA(w_txf_cap_rsync[gn])  // output [P_DT_WIDTH-1:0]
+      );
+
       // RX_FIFO
       sc_fifo_async # (
         .P_FIFO_WIDTH(32-(28*(gn==1))),
@@ -303,6 +319,8 @@ generate
 
     end
     else begin
+
+      assign w_txf_cap_rsync[gn] = w_txf_cap[gn];
 
       // RX_FIFO
       sc_fifo # (
