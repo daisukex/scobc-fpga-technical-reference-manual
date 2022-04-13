@@ -879,7 +879,8 @@ sc_axi_slave # (
 sc_can # (
   .SC_CAN_AXI_ID_WIDTH(MAINAXI_S_AXI_ID_WIDTH),
   .SC_CAN_FIFO_DEPTH(6),
-  .SC_CAN_CLK_ASYNC(1)
+  .SC_CAN_CLK_ASYNC(1),
+  .SC_CAN_PRIO_MGMT(1)
 ) can (
   // System Interface
   .S_AXI_ARESETN(SYS_RSTB),
