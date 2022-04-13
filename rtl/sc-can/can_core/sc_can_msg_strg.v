@@ -86,6 +86,7 @@ wire [3:0] w_rxf_ren;
 wire [31:0] w_rxf_rdata [0:3];
 wire [3:0] w_rxf_udf;
 wire [SC_CAN_FIFO_DEPTH:0] w_rxf_cap [0:3];
+wire [SC_CAN_FIFO_DEPTH:0] w_rxf_cap_wsync [0:3];
 
 wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_wadr;
 wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_radr;
@@ -115,10 +116,10 @@ assign REG_RXF2_RDATA = w_rxf_rdata[1][3:0];
 assign REG_RXF3_RDATA = w_rxf_rdata[2];
 assign REG_RXF4_RDATA = w_rxf_rdata[3];
 assign REG_INT_RXFUDF = |w_rxf_udf;
-assign BSP_RXF1_CAP = w_rxf_cap[0];
-assign BSP_RXF2_CAP = w_rxf_cap[1];
-assign BSP_RXF3_CAP = w_rxf_cap[2];
-assign BSP_RXF4_CAP = w_rxf_cap[3];
+assign BSP_RXF1_CAP = w_rxf_cap_wsync[0];
+assign BSP_RXF2_CAP = w_rxf_cap_wsync[1];
+assign BSP_RXF3_CAP = w_rxf_cap_wsync[2];
+assign BSP_RXF4_CAP = w_rxf_cap_wsync[3];
 
 genvar gn;
 generate
@@ -203,7 +204,8 @@ generate
         sc_fifo_async # (
           .P_FIFO_WIDTH(32-(28*(gn==1))),
           .P_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
-          .P_FIFO_TYPE(0)                                // 0: BlockRAM 1: Shift Register
+          .P_FIFO_TYPE(0),                               // 0: BlockRAM 1: Shift Register
+          .P_DCNT_SYNC_TYPE(0)                           // 0: WR_CLK SYNC 1: RD_CLK SYNC
         ) tx_fifo (
           .WR_RSTB(REG_RSTB),                            // input
           .WR_CLK(REG_CLK),                              // input
@@ -221,8 +223,6 @@ generate
           .OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),     // input [P_FIFO_DEPTH:0]
           .OVER_TH(/*open*/),                            // output
 
-          .DATA_COUNT(w_txf_cap[gn]),                    // output [P_FIFO_DEPTH:0]
-
           // Read Port (RD_CLK Sync)
           .RD_EN(BSP_TXF_RD_END),                        // input
           .DOUT(w_txf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
@@ -230,7 +230,10 @@ generate
           .EMPTY(/*open*/),                              // output
           .UNDERFLOW(/*open*/),                          // output
           .UNDER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),    // input [P_FIFO_DEPTH:0]
-          .UNDER_TH(/*open*/)                            // output
+          .UNDER_TH(/*open*/),                           // output
+
+          // Data Count (DCNT_SYNC_TYPE Sync)
+          .DATA_COUNT(w_txf_cap[gn])                     // output [P_FIFO_DEPTH:0]
         );
 
       end
@@ -287,7 +290,8 @@ generate
       sc_fifo_async # (
         .P_FIFO_WIDTH(32-(28*(gn==1))),
         .P_FIFO_DEPTH(SC_CAN_FIFO_DEPTH),
-        .P_FIFO_TYPE(0)                                // 0: BlockRAM 1: Shift Register
+        .P_FIFO_TYPE(0),                               // 0: BlockRAM 1: Shift Register
+        .P_DCNT_SYNC_TYPE(1)                           // 0: WR_CLK SYNC 1: RD_CLK SYNC
       ) rx_fifo (
         .WR_RSTB(CAN_RSTB),                            // input
         .WR_CLK(CAN_CLK),                              // input
@@ -305,8 +309,6 @@ generate
         .OVER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),     // input [P_FIFO_DEPTH:0]
         .OVER_TH(/*open*/),                            // output
 
-        .DATA_COUNT(w_rxf_cap[gn]),                    // output [P_FIFO_DEPTH:0]
-
         // Read Port (RD_CLK Sync)
         .RD_EN(w_rxf_ren[gn]),                         // input
         .DOUT(w_rxf_rdata[gn][0 +: 32-(28*(gn==1))]),  // output [P_FIFO_WIDTH-1:0]
@@ -314,7 +316,25 @@ generate
         .EMPTY(/*open*/),                              // output
         .UNDERFLOW(w_rxf_udf[gn]),                     // output
         .UNDER_TH_LVL({SC_CAN_FIFO_DEPTH+1{1'b0}}),    // input [P_FIFO_DEPTH:0]
-        .UNDER_TH(/*open*/)                            // output
+        .UNDER_TH(/*open*/),                           // output
+
+        // Data Count (DCNT_SYNC_TYPE Sync)
+        .DATA_COUNT(w_rxf_cap[gn])                     // output [P_FIFO_DEPTH:0]
+      );
+
+      // Clock Converter
+      sc_clk_conv_bus # (
+        .P_USE_VLD(0),
+        .P_DT_WIDTH(SC_CAN_FIFO_DEPTH+1)
+      ) cconv_rxf_cap_wr (
+        .IN_RSTB(REG_RSTB),              // input
+        .IN_CLK(REG_CLK),                // input
+        .IN_VALID(1'b0),                 // input
+        .IN_DATA(w_rxf_cap[gn]),         // input [P_DT_WIDTH-1:0]
+        .SYNC_RSTB(CAN_RSTB),            // input
+        .SYNC_CLK(CAN_CLK),              // input
+        .SYNC_VALID(/*open*/),           // output
+        .SYNC_DATA(w_rxf_cap_wsync[gn])  // output [P_DT_WIDTH-1:0]
       );
 
     end
@@ -348,6 +368,7 @@ generate
         .UNDER_TH(/*open*/),                           // output
         .DATA_COUNT(w_rxf_cap[gn])                     // output [P_FIFO_DEPTH:0]
       );
+      assign w_rxf_cap_wsync[gn] = w_rxf_cap[gn];
 
     end
   end
