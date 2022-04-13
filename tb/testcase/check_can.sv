@@ -109,9 +109,10 @@ initial begin
   write_transaction(.master(2), .addr(`CAN_BASE+`CAN_IER),      .data(0<<`CAN_RCVDNENB));
 
   display_text("RXFVAL Interrupt Check", 0, 1);
-  read_transaction( .master(2), .addr(`CAN_BASE+`CAN_ISR),   .expdata(1<<`CAN_RXFVAL),  .check(1));
-  write_transaction(.master(2), .addr(`CAN_BASE+`CAN_ISR),      .data(1<<`CAN_RXFVAL));
-  read_transaction( .master(2), .addr(`CAN_BASE+`CAN_ISR),   .expdata(1<<`CAN_RXFVAL),  .check(1));
+  write_transaction(.master(2), .addr(`CAN_BASE+`CAN_IER),      .data(1<<`CAN_RXFVALENB));
+  cm3_isr_check(`CM3_ISR_CAN, 20000);
+  cm3_sys_ipcore_interrupt_check_and_write_clear(`CAN_BASE+`CAN_ISR, 1<<`CAN_RXFVAL);
+  write_transaction(.master(2), .addr(`CAN_BASE+`CAN_IER),      .data(0<<`CAN_RXFVALENB));
 
   //--------------------------------------------------
   label    = "Receive Message Check";
@@ -134,8 +135,8 @@ initial begin
   read_transaction( .master(2), .addr(`CAN_BASE+`CAN_RMR4),  .expdata(DW[31:0]),              .check(1));
   repeat(30) @(posedge SYS_CLK);
 
-  display_subcount_text(1, "Interrupt Clear Check", 1);
-  cm3_sys_ipcore_interrupt_check_and_write_clear(`CAN_BASE+`CAN_ISR, 1<<`CAN_RXFVAL);
+  display_subcount_text(1, "Interrupt Nothing Check", 1);
+  read_transaction( .master(2), .addr(`CAN_BASE+`CAN_ISR),   .expdata(32'h0000_0000),    .check(1));
   repeat(100) @(posedge SYS_CLK);
   write_transaction(.master(2), .addr(`CAN_BASE+`CAN_STSR),     .data(`CAN_ESTS));
 

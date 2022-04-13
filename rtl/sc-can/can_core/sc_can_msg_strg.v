@@ -86,6 +86,9 @@ wire [31:0] w_rxf_rdata [0:3];
 wire [3:0] w_rxf_udf;
 wire [SC_CAN_FIFO_DEPTH:0] w_rxf_cap [0:3];
 
+wire w_rxfval_notrd;
+reg r_rxfval_notrd_p1;
+
 wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_wadr;
 wire [SC_CAN_FIFO_DEPTH-1:0] w_txpm_radr;
 
@@ -353,6 +356,15 @@ generate
 endgenerate
 
 // FIFO Status, Interrupt
+assign w_rxfval_notrd = (|w_rxf_cap[0] & ~REG_RXF1_REN) & (|w_rxf_cap[1] & ~REG_RXF2_REN) &
+                        (|w_rxf_cap[2] & ~REG_RXF3_REN) & (|w_rxf_cap[3] & ~REG_RXF4_REN);
+always @ (posedge REG_CLK or negedge REG_RSTB) begin
+  if (!REG_RSTB)
+    r_rxfval_notrd_p1 <= 0;
+  else
+    r_rxfval_notrd_p1 <= w_rxfval_notrd;
+end
+
 always @ (posedge REG_CLK or negedge REG_RSTB) begin
   if (!REG_RSTB) begin
     REG_TXF_FULL   <= 0;
@@ -364,7 +376,7 @@ always @ (posedge REG_CLK or negedge REG_RSTB) begin
                       w_txf_cap[2][SC_CAN_FIFO_DEPTH] & w_txf_cap[3][SC_CAN_FIFO_DEPTH];
     REG_RXF_FULL   <= w_rxf_cap[0][SC_CAN_FIFO_DEPTH] & w_rxf_cap[1][SC_CAN_FIFO_DEPTH] &
                       w_rxf_cap[2][SC_CAN_FIFO_DEPTH] & w_rxf_cap[3][SC_CAN_FIFO_DEPTH];
-    REG_INT_RXFVAL <= |w_rxf_cap[0] & |w_rxf_cap[1] & |w_rxf_cap[2] & |w_rxf_cap[3];
+    REG_INT_RXFVAL <= w_rxfval_notrd & ~r_rxfval_notrd_p1;
   end
 end
 
