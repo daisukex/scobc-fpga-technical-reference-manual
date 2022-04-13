@@ -27,9 +27,9 @@ always @ (posedge CLK or negedge SRB) begin
     d_tmr_2 <= SRVAL;
   end
   else begin
-    d_tmr_0 <= {DW{D}};
-    d_tmr_1 <= {DW{D}};
-    d_tmr_2 <= {DW{D}};
+    d_tmr_0 <= D;
+    d_tmr_1 <= D;
+    d_tmr_2 <= D;
   end
 end
 
