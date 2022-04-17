@@ -13,6 +13,8 @@ module lpahb_ss # (
   // System Interface
   input ACLK,
   input ARESETN,
+  input REF_CLK,
+  input SYS_RSTB_SYNC_REFCLK,
   output UARTLITE_ISR,
   output INTERNAL_I2CM_ISR,
   output EXTERNAL_I2CM_ISR,
@@ -75,9 +77,14 @@ module lpahb_ss # (
 
   // External I2C
   inout EXTERNAL_I2CM_SDA,
-  inout EXTERNAL_I2CM_SCL
+  inout EXTERNAL_I2CM_SCL,
+
+  output FPGA_WATCHDOG
 );
 
+wire reg_rst_req;
+wire wdog_rst_req;
+assign SYSREG_RST_REQ = reg_rst_req | wdog_rst_req;
 wire hclk = ACLK;
 wire hresetn = ARESETN;
 wire [31:0] mhaddr;
@@ -95,7 +102,7 @@ wire dhreadyout;
 wire [1:0] dhresp;
 
 localparam LPAHB_HCLK_IDLE_BIT = 5;
-localparam AHB_NUMBER_OF_SLAVE = 4;
+localparam AHB_NUMBER_OF_SLAVE = 5;
 localparam AHB_S0_BASE_ADDR = 16'h4F00;
 localparam AHB_S0_ADDR_WIDTH = 16;
 localparam AHB_S1_BASE_ADDR = 16'h4F01;
@@ -104,6 +111,8 @@ localparam AHB_S2_BASE_ADDR = 16'h4F02;
 localparam AHB_S2_ADDR_WIDTH = 16;
 localparam AHB_S3_BASE_ADDR = 16'h4F03;
 localparam AHB_S3_ADDR_WIDTH = 16;
+localparam AHB_S4_BASE_ADDR = 16'h4F04;
+localparam AHB_S4_ADDR_WIDTH = 16;
 
 wire [AHB_NUMBER_OF_SLAVE-1:0] shsel;
 wire [32*AHB_NUMBER_OF_SLAVE-1:0] shrdata;
@@ -115,6 +124,7 @@ localparam AHB_SYSREG_CH = 0;
 localparam AHB_UARTLT_CH = 1;
 localparam AHB_ITI2CM_CH = 2;
 localparam AHB_ETI2CM_CH = 3;
+localparam AHB_SYSMON_CH = 4;
 
 // AXI-AHB Bridge
 // --------------------------------------------------
@@ -190,7 +200,9 @@ sc_ahbip_decoder # (
   .SC_AHBIP_S2_BASE_ADDR(AHB_S2_BASE_ADDR),
   .SC_AHBIP_S2_ADDR_WIDTH(AHB_S2_ADDR_WIDTH),
   .SC_AHBIP_S3_BASE_ADDR(AHB_S3_BASE_ADDR),
-  .SC_AHBIP_S3_ADDR_WIDTH(AHB_S3_ADDR_WIDTH)
+  .SC_AHBIP_S3_ADDR_WIDTH(AHB_S3_ADDR_WIDTH),
+  .SC_AHBIP_S4_BASE_ADDR(AHB_S4_BASE_ADDR),
+  .SC_AHBIP_S4_ADDR_WIDTH(AHB_S4_ADDR_WIDTH)
 ) ahb_addr_dec (
   // System Interface
   .HCLK(hclk),
@@ -261,7 +273,7 @@ sysreg sysreg (
   .SHRESP(shresp[2*AHB_SYSREG_CH +:2]),
 
   // Output Signal
-  .SYS_RESET_REQ(SYSREG_RST_REQ),
+  .SYS_RESET_REQ(reg_rst_req),
   .CFGITCMEN(CFGITCMEN),
   .TRCH_BOOT(TRCH_BOOT),
   .CLKMODE(CLKMODE),
@@ -375,6 +387,30 @@ i2c_master # (
   // I2C Bus Interface
   .I2C_SDA(EXTERNAL_I2CM_SDA),
   .I2C_SCL(EXTERNAL_I2CM_SCL)
+);
+
+system_monitor system_monitor (
+  // System Interface
+  .HCLK(hclk),
+  .HRESETN(hresetn),
+  .REF_CLK(REF_CLK),
+  .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
+
+  // AHB Interface
+  .HSEL(shsel[AHB_SYSMON_CH]),
+  .HADDR(mhaddr),
+  .HTRANS(mhtrans),
+  .HSIZE(mhsize),
+  .HBURST(mhburst),
+  .HWRITE(mhwrite),
+  .HREADYIN(shreadyin[AHB_SYSMON_CH]),
+  .HREADYOUT(shreadyout[AHB_SYSMON_CH]),
+  .HWDATA(mhwdata),
+  .HRDATA(shrdata[32*AHB_SYSMON_CH +:32]),
+  .HRESP(shresp[2*AHB_SYSMON_CH +:2]),
+
+  .FPGA_WATCHDOG(FPGA_WATCHDOG),
+  .WDOG_RST_REQ(wdog_rst_req)
 );
 
 endmodule

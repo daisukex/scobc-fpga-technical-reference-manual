@@ -996,6 +996,8 @@ lpahb_ss # (
   // System Interface,
   .ACLK(SYS_CLK),
   .ARESETN(SYS_RSTB),
+  .REF_CLK(REF_CLK),
+  .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
   .UARTLITE_ISR(uartlite_isr),
   .INTERNAL_I2CM_ISR(internal_i2c_isr),
   .EXTERNAL_I2CM_ISR(external_i2c_isr),
@@ -1058,11 +1060,13 @@ lpahb_ss # (
 
   // External I2C
   .EXTERNAL_I2CM_SDA(EXTERNAL_I2CM_SDA),
-  .EXTERNAL_I2CM_SCL(EXTERNAL_I2CM_SCL)
+  .EXTERNAL_I2CM_SCL(EXTERNAL_I2CM_SCL),
+
+  // Watchdog Signal
+  .FPGA_WATCHDOG(FPGA_WATCHDOG)
 );
 
 assign CFG_DONE = 1'b1;
-assign FPGA_WATCHDOG = 1'b0;
 
 assign CFG_MEM_SEL = 1'b0;
 
