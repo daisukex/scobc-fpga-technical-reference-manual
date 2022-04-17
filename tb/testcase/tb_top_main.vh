@@ -43,6 +43,7 @@ wire PLLLOCK  = dut.plllock;
 wire CMC_REQ  = dut.cmc_req;
 wire CMC_ACK  = dut.cmc_ack;
 reg [1:0] FPGA_BOOT = 2'b01;
+wire FPGA_WATCHDOG;
 
 wire (pull1, pull0) cm3_tms_swdio = 1'b0;
 wire console_tx;
@@ -178,7 +179,7 @@ sc_obc_a1_fpga # (
   // TRCH Interface
   .FPGA_BOOT0(FPGA_BOOT[0]),
   .FPGA_BOOT1(FPGA_BOOT[1]),
-  .FPGA_WATCHDOG(/*open*/),
+  .FPGA_WATCHDOG(FPGA_WATCHDOG),
   .FPGA_RESERVE(/*open*/),
 
   // ULPI Interface
