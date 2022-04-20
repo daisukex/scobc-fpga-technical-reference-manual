@@ -61,7 +61,7 @@ initial begin
   //--------------------------------------------------
   @(posedge SYS_CLK);
   display_subcount_text(1, "Set Baudrate 9.6Mbp", 1);
-  write_transaction(.master(2), .addr(`UARTLITE_BASE+`AHBUUBRSR),       .data(16'h0009<<`AHBUUDIVSET));
+  write_transaction(.master(2), .addr(`UARTLITE_BASE+`AHBUUBRSR),       .data(16'h0004<<`AHBUUDIVSET));
 
   //--------------------------------------------------
   label    = "Set Interrupt Enable";
