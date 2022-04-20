@@ -46,7 +46,7 @@ initial begin
   //--------------------------------------------------
   @(posedge SYS_CLK);
   display_subcount_text(1, "Check CFGITCMEN Initial Value", 1);
-  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(1<<`SYSREG_ITCMEN), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .expdata(1<<`SR_ITCMEN), .check(1));
   display_subcount_text(2, "ITCM Write Access", 1);
   write_transaction(.master(1), .addr(32'h0000_0000), .data(32'h1234_5678));
   write_transaction(.master(1), .addr(32'h0000_0004), .data(32'h2345_6789));
@@ -71,13 +71,13 @@ initial begin
   simcount = 2;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .data(0<<`SYSREG_ITCMEN));
-  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(1<<`SYSREG_ITCMEN), .check(1));
-  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .data(16'h5A5A<<`SYSREG_CFGMEMCTLPKC |
-                                                                             0<<`SYSREG_ITCMEN));
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .data(0<<`SR_ITCMEN));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .expdata(1<<`SR_ITCMEN), .check(1));
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .data(16'h5A5A<<`SR_ITCMENPKC |
+                                                                             0<<`SR_ITCMEN));
   @ (posedge SYS_RSTB);
   repeat (100) @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SYSREG_ITCMEN), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .expdata(0<<`SR_ITCMEN), .check(1));
 
   //--------------------------------------------------
   label    = "SRAM Access Check ";
@@ -175,11 +175,11 @@ initial begin
   simcount = 4;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .data(16'h5A5A<<`SYSREG_CFGMEMCTLPKC |
-                                                                             1<<`SYSREG_ITCMEN));
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .data(16'h5A5A<<`SR_ITCMENPKC |
+                                                                             1<<`SR_ITCMEN));
   @ (posedge SYS_RSTB);
   repeat (100) @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(1<<`SYSREG_ITCMEN), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .expdata(1<<`SR_ITCMEN), .check(1));
 
   //--------------------------------------------------
   label    = "Cortex-M3 ITCM Re-Access Check ";
