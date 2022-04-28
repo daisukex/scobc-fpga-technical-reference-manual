@@ -26,7 +26,15 @@ module sysmon_reg (
   output REG_RWAT,
 
   output reg FPGA_WATCHDOG,
-  output WDOG_RST_REQ
+  output WDOG_RST_REQ,
+
+  // XADC Interace
+  output [6:0] XADC_DADDR,
+  output XADC_DEN,
+  output XADC_DWE,
+  input XADC_DRDY,
+  output [15:0] XADC_DI,
+  input [15:0] XADC_DO
 );
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
@@ -36,8 +44,14 @@ integer bt;
 wire [15:0] WADR = {REG_WADR[15:2],2'b00};
 wire [15:0] RADR = {REG_RADR[15:2],2'b00};
 
-assign REG_WWAT  = 1'b0;
-assign REG_RWAT  = 1'b0;
+reg xadc_access;
+wire xadc_wcycle = {WADR[15:12], 12'h000} == `SYSMON_XADC_BASE & |REG_WENB;
+wire xadc_rcycle = {RADR[15:12], 12'h000} == `SYSMON_XADC_BASE & REG_RENB;
+reg xadc_rcycle_latch;
+reg xadc_dvalid;
+wire xadc_valid = xadc_access & XADC_DRDY;
+assign REG_WWAT  = xadc_wcycle & ~xadc_valid;
+assign REG_RWAT  = xadc_rcycle_latch & ~xadc_dvalid;
 
 // Watchdog Control Register
 // ----------------------------------------
@@ -218,14 +232,50 @@ always @ (posedge REF_CLK) begin
   end
 end
 
+// XADC Register Access
+// ----------------------------------------
+reg [6:0] latch_reg_radr;
+assign XADC_DADDR = xadc_wcycle ? REG_WADR[10:4]: latch_reg_radr;
+assign XADC_DEN = xadc_wcycle | xadc_rcycle_latch;
+assign XADC_DWE = xadc_wcycle ? 1'b1: 1'b0;
+assign XADC_DI = REG_WDAT[15:0];
+
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    xadc_rcycle_latch <= 1'b0;
+  else if (xadc_rcycle_latch & xadc_dvalid)
+    xadc_rcycle_latch <= 1'b0;
+  else if (xadc_rcycle) begin
+    xadc_rcycle_latch <= 1'b1;
+    latch_reg_radr <= REG_RADR[10:4];
+  end
+end
+
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    xadc_access <= 1'b0;
+    xadc_dvalid <= 1'b0;
+  end
+  else begin
+    xadc_dvalid <= 1'b0;
+    if (xadc_valid) begin
+      xadc_access <= 1'b0;
+      xadc_dvalid <= 1'b1;
+    end
+    else if (xadc_wcycle | xadc_rcycle)
+      xadc_access <= 1'b1;
+  end
+end
+
 // Register Read
 // ----------------------------------------
 always @ (posedge HCLK) begin
   if (!HRESETN)
     REG_RDAT <= 32'h0000_0000;
-  else if (REG_RENB) begin
+  else if (REG_RENB | xadc_valid) begin
     if      (RADR == `SYSMON_WDOG_CTRL)  REG_RDAT <= rd_wdogctrl;
     else if (RADR == `SYSMON_WDOG_SIVAL) REG_RDAT <= rd_wdogsigival;
+    else if (xadc_valid)                 REG_RDAT <= {16'h0000, XADC_DO};
     else                                 REG_RDAT <= 32'h0000_00000;
   end
 end

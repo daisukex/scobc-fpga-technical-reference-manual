@@ -36,6 +36,15 @@ wire REG_WWAT;
 wire [31:0] REG_RADR;
 wire REG_RENB;
 wire [31:0] REG_RDAT;
+wire REG_RWAT;
+wire [6:0] XADC_DADDR;
+wire XADC_DEN;
+wire XADC_DWE;
+wire XADC_DRDY;
+wire [15:0] XADC_DI;
+wire [15:0] XADC_DO;
+wire [7:0] XADC_ALARM;
+wire XADC_OVER_TEMP;
 
 sc_ahbip_slave # (
   .CYCLE_MODE(1)
@@ -67,7 +76,7 @@ sc_ahbip_slave # (
   .REG_RTYP(/*open*/),
   .REG_RENB(REG_RENB),
   .REG_RDAT(REG_RDAT),
-  .REG_RWAT(1'b0),
+  .REG_RWAT(REG_RWAT),
   .REG_RERR(1'b0)
 );
 
@@ -89,7 +98,29 @@ sysmon_reg sysmon_reg (
   .REG_RWAT(REG_RWAT),
 
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
-  .WDOG_RST_REQ(WDOG_RST_REQ)
+  .WDOG_RST_REQ(WDOG_RST_REQ),
+
+  .XADC_DADDR(XADC_DADDR),
+  .XADC_DEN(XADC_DEN),
+  .XADC_DWE(XADC_DWE),
+  .XADC_DRDY(XADC_DRDY),
+  .XADC_DI(XADC_DI),
+  .XADC_DO(XADC_DO)
+);
+
+xadc_ctrl xadc_ctrl (
+  .REF_CLK(REF_CLK),
+  .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
+  .HCLK(HCLK),
+  .HRESETN(HRESETN),
+  .XADC_DADDR(XADC_DADDR),
+  .XADC_DEN(XADC_DEN),
+  .XADC_DWE(XADC_DWE),
+  .XADC_DRDY(XADC_DRDY),
+  .XADC_DI(XADC_DI),
+  .XADC_DO(XADC_DO),
+  .XADC_ALARM(XADC_ALARM),
+  .XADC_OVER_TEMP(XADC_OVER_TEMP)
 );
 
 endmodule

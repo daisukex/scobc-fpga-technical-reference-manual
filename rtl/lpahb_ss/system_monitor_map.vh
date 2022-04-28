@@ -20,3 +20,6 @@
 // System Monitor Watchdog Interval Register
 `define SYSMON_WDOG_SIVAL  16'h0010
 `define  SM_WDOG_SIVAL            0
+
+// XADC Access Register Field
+`define SYSMON_XADC_BASE   16'h1000
