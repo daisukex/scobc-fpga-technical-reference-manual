@@ -164,6 +164,8 @@ always @ (posedge REF_CLK) begin
     st_clk <= ~st_clk;
     st_divider <= 0;
   end
+  else
+    st_divider <= st_divider + 1;
 end
 wire [25:0] stcalib;
 assign stcalib[25]   = 1'b0;
