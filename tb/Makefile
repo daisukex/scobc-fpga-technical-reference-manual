@@ -103,7 +103,7 @@ testcase_compile: sim_preparation
 # Elaborate design
 PHONY += elaborate
 elaborate: dut_compile tb_compile testcase_compile
-	$(ELAB) $(XLIB) -s tb_top --log $(LOG_DIR)/$(TESTCASE)_elab.log tb_top glbl
+	$(ELAB) -s tb_top --log $(LOG_DIR)/$(TESTCASE)_elab.log tb_top glbl
 
 # Run simulation
 PHONY += simulation
