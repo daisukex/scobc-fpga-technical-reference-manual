@@ -6,6 +6,7 @@
 // Copyright © 2022 Space Cubics, LLC.
 //-----------------------------------------------
 module sc_obc_a1_fpga # (
+  parameter BUILD_INFO = 32'h00000000,
   parameter SYSCTRL_USER_CLK1_DIVIDE = 100,
   parameter SYSCTRL_USER_CLK1_MODE = 0,
   parameter SYSCTRL_USER_CLK2_DIVIDE = 100,
@@ -271,6 +272,7 @@ scobca1_sysctrl # (
 
 // OBC Core TOP
 sc_obc_core # (
+  .BUILD_INFO(BUILD_INFO),
   .CM3SS_UDL_ISR_NUM(CM3SS_UDL_ISR_NUM),
   .CM3SS_ITCM_SIZE_KB(CM3SS_ITCM_SIZE_KB),
   .CM3SS_ITCM_ADDR_BW(CM3SS_ITCM_ADDR_BW),

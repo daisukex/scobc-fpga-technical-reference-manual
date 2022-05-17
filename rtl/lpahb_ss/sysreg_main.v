@@ -8,7 +8,9 @@
 `include "sysreg_version.vh"
 `include "sysreg_map.vh"
 
-module sysreg_main (
+module sysreg_main # (
+  parameter BUILD_INFO = 32'h00000000
+) (
   // System Interface
   input HCLK,
   input HRESETN,
@@ -169,6 +171,7 @@ always @ (posedge HCLK) begin
     else if (RDAD == `SYSREG_SPAD3)     REG_RDAT <= rd_spad3;
     else if (RDAD == `SYSREG_SPAD4)     REG_RDAT <= rd_spad4;
     else if (RDAD == `SYSREG_VER)       REG_RDAT <= rd_version;
+    else if (RDAD == `SYSREG_BUILDINFO) REG_RDAT <= BUILD_INFO;
     else                                REG_RDAT <= 32'h0000_00000;
   end
 end

@@ -7,6 +7,7 @@
 //-----------------------------------------------
 
 module sc_obc_core # (
+  parameter BUILD_INFO = 32'h00000000,
   parameter CM3SS_UDL_ISR_NUM = 16,
   parameter CM3SS_ITCM_SIZE_KB = 128,
   parameter CM3SS_ITCM_ADDR_BW = 17,
@@ -990,6 +991,7 @@ main_axi_ss # (
 );
 
 lpahb_ss # (
+  .BUILD_INFO(BUILD_INFO),
   .LPAHB_AXI_ID_WIDTH(MAINAXI_S_AXI_ID_WIDTH),
   .LPAHB_UART_DIV_INIT(LPAHB_CONSOLE_UART_DIV)
 ) lpahb (

@@ -5,7 +5,9 @@
 // Copyright © 2021-2022 Space Cubics, LLC.
 //-----------------------------------------------
 
-module sysreg (
+module sysreg # (
+  parameter BUILD_INFO = 32'h0000_0000
+) (
   // System Interface
   input SYSCLK,
   input RESETB,
@@ -75,7 +77,9 @@ sc_ahbip_slave # (
   .REG_RERR(1'b0)
 );
 
-sysreg_main sysreg_main (
+sysreg_main # (
+  .BUILD_INFO(BUILD_INFO)
+) sysreg_main (
   // System Interface
   .HCLK(SYSCLK),
   .HRESETN(RESETB),

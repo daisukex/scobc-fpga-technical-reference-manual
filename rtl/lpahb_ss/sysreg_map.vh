@@ -28,3 +28,6 @@
 `define  SR_PATVER                    0
 `define  SR_MINVER                   16
 `define  SR_MAJVER                   24
+// Git Hash Register
+`define SYSREG_BUILDINFO       16'hFF00
+`define  SR_BUILDINFO                 0

@@ -6,6 +6,7 @@
 // Copyright © 2022 Space Cubics, LLC.
 //-----------------------------------------------
 
+parameter BUILD_INFO = 32'h00000000;
 localparam SYSCLK_PERIOD = 41666;
 localparam I2CCLK_PERIOD = 33333;
 
@@ -97,6 +98,7 @@ wire fram2_cs_b;
 wire (pull1, pull0) [3:0] fram2_io = 4'b1111;
 
 sc_obc_a1_fpga # (
+  .BUILD_INFO(BUILD_INFO),
   .SYSCTRL_USER_CLK1_DIVIDE(100),
   .SYSCTRL_USER_CLK1_MODE(0),
   .SYSCTRL_USER_CLK2_DIVIDE(100),

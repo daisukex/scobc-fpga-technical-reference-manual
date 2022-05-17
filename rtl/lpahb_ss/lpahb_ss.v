@@ -7,6 +7,7 @@
 //-----------------------------------------------
 
 module lpahb_ss # (
+  parameter BUILD_INFO = 32'h00000000,
   parameter LPAHB_AXI_ID_WIDTH = 3,
   parameter LPAHB_UART_DIV_INIT = 16'h0340
 ) (
@@ -253,7 +254,9 @@ sc_ahbip_rdmux # (
   .SHREADYIN(shreadyin)
 );
 
-sysreg sysreg (
+sysreg # (
+  .BUILD_INFO(BUILD_INFO)
+) sysreg (
   // System Interface
   .SYSCLK(hclk),
   .RESETB(hresetn),
