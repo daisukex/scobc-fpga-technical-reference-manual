@@ -496,7 +496,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
 end
 
 assign HRESP = 2'b00;
-assign HREADYOUT = (r_pre_rdyout & ~w_pf_acc_wait) | PF_RD_VAL;
+assign HREADYOUT = ((r_pre_rdyout & ~w_pf_acc_wait) | PF_RD_VAL) & ~((HTRANS == 2'b10) & (r_htrans_p1 == 2'b01));
 
 always @ (*) begin
   for (i=0; i<P_DT_W/8; i=i+1) begin
