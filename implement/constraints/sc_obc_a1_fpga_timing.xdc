@@ -7,14 +7,19 @@
 
 set sysclk_period 42.0
 set tclk_period   63.0
+set uclk1_period 104.0
+set uclk2_period 104.0
 
 create_clock -name refclk1 -period $sysclk_period [get_ports SYSCLK1]
 create_clock -name refclk2 -period $sysclk_period [get_ports SYSCLK2]
-create_clock -name tclk     -period $tclk_period   [get_ports CM3_TCK_SWCLK]
+create_clock -name tclk    -period $tclk_period   [get_ports CM3_TCK_SWCLK]
+
+create_clock -name user_clk1 -period $uclk1_period [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT4]
+create_clock -name user_clk2 -period $uclk2_period [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT5]
 
 set_case_analysis 1 [get_pins  sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKINSEL]
-set_case_analysis 1 [get_pins {sysctrl/clk_gen/scobca1_outsel/reg_clkmode[1]}]
-set_case_analysis 0 [get_pins {sysctrl/clk_gen/scobca1_outsel/reg_clkmode[0]}]
+set_case_analysis 0 [get_pins sysctrl/clk_gen/scobca1_outsel/reg_clkmode[0]]
+set_case_analysis 1 [get_pins sysctrl/clk_gen/scobca1_outsel/reg_clkmode[1]]
 
 set_clock_groups \
     -asynchronous \
@@ -22,5 +27,5 @@ set_clock_groups \
     -group [get_clocks refclk2] \
     -group [get_clocks pllclk96m] \
     -group [get_clocks tclk] \
-    -group [get_clocks w_user_clk1] \
-    -group [get_clocks w_user_clk2]
+    -group [get_clocks user_clk1] \
+    -group [get_clocks user_clk2]
