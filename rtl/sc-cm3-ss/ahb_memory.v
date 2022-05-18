@@ -62,7 +62,7 @@ assign HREADY = 1'b1;
 
 // Memory Initialize
 // --------------------------------------------------
-if (MEM_INIT) begin
+if (MEM_INIT == "on") begin
   initial begin
     $readmemh(MEM_INIT_FILE, mem, 0, 256*MEM_SIZE_KB-1);
   end
