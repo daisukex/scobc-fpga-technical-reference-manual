@@ -49,6 +49,10 @@ if {$itcm_init_mode == "on" } then {
 }
 set arglist [lreplace ${arglist} 0 0];
 
+# set BUILD_INFO parameter
+append build_info "32'h" [lindex ${arglist} 0]
+set arglist [lreplace ${arglist} 0 0];
+
 # Create design export directory
 set outdir ${rootd}/synthesis
 file mkdir ${outdir}
@@ -71,10 +75,10 @@ if { [ file exists ${xdcd}/${topmodule}_timing.xdc ] == 1 } then {
 # Synthesis TOP Module
 if {$sdc} then {
     synth_design -constrset ${topmodule}_timing_xdc -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule} \
-        -generic CM3SS_ITCM_INIT=${itcm_init_mode} -generic CM3SS_ITCM_INIT_FILE=${itcm_init_file}
+        -generic CM3SS_ITCM_INIT=${itcm_init_mode} -generic CM3SS_ITCM_INIT_FILE=${itcm_init_file} -generic BUILD_INFO=${build_info}
 } else {
     synth_design -retiming -name ${topmodule} -verbose -part ${xil_part} -top ${topmodule} \
-        -generic CM3SS_ITCM_INIT=${itcm_init_mode} -generic CM3SS_ITCM_INIT_FILE=${itcm_init_file}
+        -generic CM3SS_ITCM_INIT=${itcm_init_mode} -generic CM3SS_ITCM_INIT_FILE=${itcm_init_file} -generic BUILD_INFO=${build_info}
 }
 
 # Report Timing

@@ -41,6 +41,12 @@ LOG_DIR              := log
 DESIGN_DIR           := output
 CONSTRAINTS_DIR      := constraints
 BIT_DIR              := bitstream
+GIT_DIR              := ../.git
+ifeq ("$(wildcard $(GIT_DIR)/config)","")
+	BUILD_INFO = 00000000
+else
+	BUILD_INFO = $(shell git rev-parse HEAD | cut -c 1-8)
+endif
 
 CF                   := $(CIP_DIR) $(DESIGN_DIR) $(LOG_DIR) $(BIT_DIR) rtl.list
 CF                   += vivado* .Xil .hbs
@@ -91,7 +97,7 @@ $(DESIGN_DIR)/synthesis/$(TOPMODULE)_synthesis.dcp: $(RTL_LIST) $(CM3_SYNTH_DIR)
 		$(ELF2MHEX) $(ITCM_INIT_FILE)
     endif
 	$(VIVADOTCL) -source tcl/synthesis.tcl -log $(LOG_DIR)/$(TOPMODULE)_synthesis.log\
-		-tclargs $(TOPMODULE) rtl.list $(ITCM_INIT) $(notdir $(ITCM_INIT_FILE:.elf=.hex)) $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp  $(AXI_CROSSBAR_DCP)
+		-tclargs $(TOPMODULE) rtl.list $(ITCM_INIT) $(notdir $(ITCM_INIT_FILE:.elf=.hex)) $(BUILD_INFO) $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp  $(AXI_CROSSBAR_DCP)
 
 # Place and Route TOP Module
 # ---------------------------------------------------------------------------
