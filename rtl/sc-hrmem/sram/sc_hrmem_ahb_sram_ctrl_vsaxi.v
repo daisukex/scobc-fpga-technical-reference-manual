@@ -540,12 +540,14 @@ always @ (posedge HCLK or negedge HRESETN) begin
           r_rdff_r_pntr <= r_rdff_r_pntr + 8'h1;
       end
       if (w_rdff_write & ~w_rdff_read) begin
-        if ((r_rdff_w_pntr + P_RD_LTCY - 8'h1 == r_rdff_r_pntr) |
-            (r_rdff_w_pntr == r_rdff_r_pntr + P_RD_LTCY + 8'h1))
+        if ((r_rdff_w_pntr + P_RD_LTCY == r_rdff_r_pntr) |
+            (r_rdff_w_pntr == r_rdff_r_pntr + P_RD_LTCY))
           r_rdff_amfull <= 1'b1;
       end
       else if (w_rdff_read & ~w_rdff_write) begin
-        r_rdff_amfull <= 0;
+        if ((r_rdff_w_pntr + P_RD_LTCY - 8'h1 == r_rdff_r_pntr) |
+            (r_rdff_w_pntr == r_rdff_r_pntr + P_RD_LTCY + 8'h1))
+          r_rdff_amfull <= 0;
       end
     end
   end
