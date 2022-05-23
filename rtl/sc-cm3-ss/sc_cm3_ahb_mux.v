@@ -69,9 +69,11 @@ reg [31:0] mhrdata;
 wire itstart = (HTRANSI == NSQ);
 wire ittrans = (HTRANSI == SEQ);
 wire itidle  = (HTRANSI == IDL);
+wire itwait  = (HTRANSI == BSY);
 wire dtstart = (HTRANSD == NSQ);
 wire dttrans = (HTRANSD == SEQ);
 wire dtidle  = (HTRANSD == IDL);
+wire dtwait  = (HTRANSD == BSY);
 
 // I-Code/D-Code AHB Controller
 // ------------------------------
