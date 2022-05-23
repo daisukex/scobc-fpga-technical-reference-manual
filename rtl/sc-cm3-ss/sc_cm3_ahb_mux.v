@@ -28,6 +28,7 @@ module sc_cm3_ahb_mux (
   input  [2:0] HBURSTD,
   input  HWRITED,
   input  [2:0] HSIZED,
+  input  [3:0] HPROTD,
   input  [31:0] HWDATAD,
   output reg [31:0] HRDATAD,
   output reg HREADYD,
@@ -121,7 +122,7 @@ always @ (posedge HCLK) begin
       bst[1] <= HBURSTD;
       wrt[1] <= HWRITED;
       sze[1] <= HSIZED;
-      prt[1] <= 4'b1111;
+      prt[1] <= HPROTD;
       HREADYD <= 1'b0;
     end
     else if ((dttrans | dtwait) & HREADY)
