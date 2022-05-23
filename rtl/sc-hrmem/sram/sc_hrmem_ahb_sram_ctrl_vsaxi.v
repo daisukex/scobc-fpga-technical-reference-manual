@@ -115,6 +115,7 @@ wire                 w_rdff_read;
 reg [7:0]            r_rdff_w_pntr;
 reg [7:0]            r_rdff_r_pntr;
 reg                  r_rdff_amfull;
+reg                  r_rdff_r_mask;
 wire                 w_rdff_val;
 
 reg [P_DT_W-1:0]     r_ram_rdata_ff [0:P_RD_LTCY*2-1];
@@ -519,12 +520,14 @@ always @ (posedge HCLK or negedge HRESETN) begin
     r_rdff_w_pntr <= 0;
     r_rdff_r_pntr <= 0;
     r_rdff_amfull <= 0;
+    r_rdff_r_mask <= 0;
   end
   else begin
     if (SELF_RD_ACC_END) begin
       r_rdff_w_pntr <= 0;
       r_rdff_r_pntr <= 0;
       r_rdff_amfull <= 0;
+      r_rdff_r_mask <= 0;
     end
     else begin
       if (w_rdff_write) begin
@@ -549,11 +552,18 @@ always @ (posedge HCLK or negedge HRESETN) begin
             (r_rdff_w_pntr == r_rdff_r_pntr + P_RD_LTCY + 8'h1))
           r_rdff_amfull <= 0;
       end
+      if (HTRANS == 2'b01) begin
+        if (SELF_STATE == P_RD_RESP)
+          r_rdff_r_mask <= 1'b1;
+      end
+      else if (w_hready)
+        r_rdff_r_mask <= 0;
     end
   end
 end
 
-assign w_rdff_val = r_rdff_w_pntr != r_rdff_r_pntr | r_rdff_amfull;
+assign w_rdff_val = ((r_rdff_w_pntr != r_rdff_r_pntr) | r_rdff_amfull) &
+                    ~(r_rdff_r_mask & ~((HTRANS != 2'b01) & w_hready));
 
 generate
   for(gn=0; gn<P_RD_LTCY*2; gn=gn+1) begin : ram_rdata_ff_gen
