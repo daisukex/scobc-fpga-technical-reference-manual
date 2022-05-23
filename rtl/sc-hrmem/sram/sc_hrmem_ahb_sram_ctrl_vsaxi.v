@@ -521,7 +521,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
     r_rdff_amfull <= 0;
   end
   else begin
-    if (SELF_STATE == P_IDLE) begin
+    if (SELF_RD_ACC_END) begin
       r_rdff_w_pntr <= 0;
       r_rdff_r_pntr <= 0;
       r_rdff_amfull <= 0;
