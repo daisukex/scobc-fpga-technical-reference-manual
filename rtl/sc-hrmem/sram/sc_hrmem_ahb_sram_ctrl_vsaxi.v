@@ -834,7 +834,7 @@ end
 assign RAM_REN  = (SELF_RD_ACC_START & ~w_wait_flg & ~w_wr2rd_wait) |
                   ((((SELF_STATE == P_WAIT_CONF) & SELF_RD_ACC_BUSY & w_wait_end) |
                     (SELF_STATE == P_WAIT_WR2RD)) & ~w_wr2rd_wait) |
-                  (r_ram_ren_burst & ~((HTRANS == 2'b10) & (r_htrans_p1 == 2'b11) & ~HREADYOUT));
+                  (r_ram_ren_burst & ~(((HTRANS == 2'b10) & (r_htrans_p1 == 2'b11) & ~HREADYOUT) | SELF_RD_ACC_END));
 assign RAM_RADR = (SELF_RD_ACC_START & ~w_wait_flg & ~w_wr2rd_wait)                 ? HADDR:
                   ((((SELF_STATE == P_WAIT_CONF) & SELF_RD_ACC_BUSY & w_wait_end) |
                     (SELF_STATE == P_WAIT_WR2RD)) & ~w_wr2rd_wait)                  ? r_haddr_lat:
