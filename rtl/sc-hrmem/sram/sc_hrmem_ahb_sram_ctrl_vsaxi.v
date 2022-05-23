@@ -418,7 +418,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
         end
         P_RD_DATA : begin
           if ((RAM_RDT_VAL & ~(r_self_rd_burst_dt_msk | (~w_rdff_val & w_rdff_write))) |
-              (r_mstbusy_wait & HREADYIN)) begin
+              w_rdff_read | (r_mstbusy_wait & HREADYIN)) begin
             r_pre_rdyout <= 1'b1;
             if (~(r_mstbusy_wait & (HTRANS == 2'b01))) begin
               r_mstbusy_wait <= 0;
