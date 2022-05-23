@@ -133,6 +133,9 @@ reg [P_DT_W/8-1:0]   r_rbten_lat;
 reg                  r_pf_val_lat;
 reg [P_DT_W-1:0]     r_pf_data_lat;
 
+reg                  r_by2nsq_rdt_lat_en;
+reg [P_DT_W-1:0]     r_by2nsq_rdt_lat_val;
+
 integer i;
 genvar gn;
 
@@ -854,8 +857,33 @@ always @ (posedge HCLK or negedge HRESETN) begin
   end
 end
 
-assign HRDATA  = (PF_RD_VAL)    ? r_ram_rdata_rbten:
-                 (r_pf_val_lat) ? r_pf_data_lat:
-                                  r_pre_rdata;
+always @ (posedge HCLK or negedge HRESETN) begin
+  if (!HRESETN) begin
+    r_by2nsq_rdt_lat_en  <= 0;
+    r_by2nsq_rdt_lat_val <= 0;
+  end
+  else begin
+    if ((HTRANS == 2'b10) & (r_htrans_p1 == 2'b01) &
+        ((SELF_STATE == P_RD_RESP) |
+         ((SELF_STATE == P_RD_PFER) & (PF_RD_VAL | r_pf_val_lat)))) begin
+      r_by2nsq_rdt_lat_en <= 1'b1;
+      if (SELF_STATE == P_RD_RESP)
+        r_by2nsq_rdt_lat_val <= r_pre_rdata;
+      else begin
+        if (r_pf_val_lat)
+          r_by2nsq_rdt_lat_val <= r_pf_data_lat;
+        else
+          r_by2nsq_rdt_lat_val <= r_ram_rdata_rbten;
+      end
+    end
+    else if (w_hready)
+      r_by2nsq_rdt_lat_en <= 0;
+  end
+end
+
+assign HRDATA  = (r_by2nsq_rdt_lat_en) ? r_by2nsq_rdt_lat_val:
+                 (PF_RD_VAL)           ? r_ram_rdata_rbten:
+                 (r_pf_val_lat)        ? r_pf_data_lat:
+                                         r_pre_rdata;
 
 endmodule
