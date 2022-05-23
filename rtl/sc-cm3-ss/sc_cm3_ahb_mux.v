@@ -93,14 +93,12 @@ always @ (posedge HCLK) begin
       tbuf[tbwp][2] <= 1'b0;
       tbuf[tbwp][3] <= HBURSTI != 3'b000;
       tbwp <= ~tbwp;
-      HREADYI <= 1'b0;
     end
     else if (HREADYD & dtstart) begin
       tbuf[tbwp][1:0] <= 2'b10;
       tbuf[tbwp][2] <= HWRITED;
       tbuf[tbwp][3] <= HBURSTD != 3'b000;
       tbwp <= ~tbwp;
-      HREADYD <= 1'b0;
     end
 
     if (HREADYI & (itstart | ittrans)) begin
