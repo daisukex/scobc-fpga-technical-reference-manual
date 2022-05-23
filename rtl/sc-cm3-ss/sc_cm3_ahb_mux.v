@@ -112,7 +112,7 @@ always @ (posedge HCLK) begin
       prt[0] <= HPROTI;
       HREADYI <= 1'b0;
     end
-    else if (ittrans & HREADY)
+    else if ((ittrans | itwait) & HREADY)
       tns[0] <= BSY;
 
     if (HREADYD & (dtstart | dttrans)) begin
@@ -124,7 +124,7 @@ always @ (posedge HCLK) begin
       prt[1] <= 4'b1111;
       HREADYD <= 1'b0;
     end
-    else if (dttrans & HREADY)
+    else if ((dttrans | dtwait) & HREADY)
       tns[1] <= BSY;
 
     // Trans queue read pointer
