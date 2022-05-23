@@ -101,6 +101,8 @@ reg [3:0]            r_hprot_lat;
 wire                 w_wait_flg;
 wire                 w_wait_end;
 
+reg                  r_no_dt_phese;
+
 reg                  r_pre_rdyout;
 reg [P_DT_W-1:0]     r_pre_rdata;
 reg                  r_pf_wait_end_lat;
@@ -286,6 +288,17 @@ assign w_wait_end = (SELF_WR_ACC_BUSY & ~OTHER_RD_BURST_EN &
                      (SELF_RD_ACC_BUSY | ~PF_RWAIT));
 
 always @ (posedge HCLK or negedge HRESETN) begin
+  if (!HRESETN)
+    r_no_dt_phese <= 0;
+  else if (w_hready) begin
+    if (HTRANS == 2'b01)
+      r_no_dt_phese <= 1'b1;
+    else if (HTRANS[1])
+      r_no_dt_phese <= 0;
+  end
+end
+
+always @ (posedge HCLK or negedge HRESETN) begin
   if (!HRESETN) begin
     r_pre_rdyout      <= 0;
     RAM_WEN           <= 0;
@@ -355,7 +368,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
         end
         P_WR_DATA : begin
           r_pre_rdyout <= 1'b1;
-          if (~r_mstbusy_wait) begin
+          if (~r_mstbusy_wait & ~r_no_dt_phese) begin
             RAM_WEN      <= 1'b1;
             RAM_WDATA    <= HWDATA;
             RAM_WADR     <= r_haddr_lat;
@@ -896,7 +909,8 @@ always @ (posedge HCLK or negedge HRESETN) begin
   end
 end
 
-assign HRDATA  = (r_by2nsq_rdt_lat_en) ? r_by2nsq_rdt_lat_val:
+assign HRDATA  = (r_no_dt_phese)       ? 0:
+                 (r_by2nsq_rdt_lat_en) ? r_by2nsq_rdt_lat_val:
                  (PF_RD_VAL)           ? r_ram_rdata_rbten:
                  (r_pf_val_lat)        ? r_pf_data_lat:
                                          r_pre_rdata;
