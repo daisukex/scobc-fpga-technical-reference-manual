@@ -142,6 +142,16 @@ always @ (posedge HCLK) begin
         tbuf[tbrp][1:0] <= 2'b00;
       end
     end
+    else if (HTRANS == BSY) begin
+      if (!mhdtp & HREADYI & itidle & tbuf[tbrp][3] & tbuf[tbrp][1:0] == 2'b01) begin
+        tbrp <= ~tbrp;
+        tbuf[tbrp][1:0] <= 2'b00;
+      end
+      else if (!mhdtp & HREADYD & dtidle & tbuf[tbrp][3] & tbuf[tbrp][1:0] == 2'b10) begin
+        tbrp <= ~tbrp;
+        tbuf[tbrp][1:0] <= 2'b00;
+      end
+    end
 
     if (HREADY) begin
       hdtval <= 2'b00;
