@@ -84,15 +84,12 @@ initial begin
   @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0  <<`SM_WDOG_START |
                                                                                  1'b0  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b0  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
                                                                                  1'b1  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b1  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME));
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
                                                                                  1'b1  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b1  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
   repeat (20) @ (posedge SYS_CLK);
   i=1;
@@ -142,15 +139,12 @@ initial begin
   @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0  <<`SM_WDOG_START |
                                                                                  1'b0  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b0  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
                                                                                  1'b1  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b0  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME));
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
                                                                                  1'b1  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b0  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
 
   repeat (20) @ (posedge SYS_CLK);
@@ -178,6 +172,18 @@ initial begin
   simcount = 13;
   //--------------------------------------------------
   @ (posedge dut.obc_core.lpahb.system_monitor.sysmon_reg.wdog_expire);
+  @ (posedge dut.obc_core.lpahb.system_monitor.sysmon_reg.HRESETN);
+
+  @(posedge SYS_CLK);
+  force dut.obc_core.lpahb.system_monitor.sysmon_reg.SWDOG_LOWCUP_VALUE = 24'h01546;
+  repeat (10) @(posedge SYS_CLK);
+
+  @(posedge SYS_CLK);
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h03A97F<<`SM_WDOG_SIVAL), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h00095F<<`SM_WDOG_SIVAL));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h00095F<<`SM_WDOG_SIVAL), .check(1));
+  repeat (10) @(posedge SYS_CLK);
+
   clear_toggle_counter;
   i = 1;
   repeat (20) begin
@@ -197,11 +203,9 @@ initial begin
   @(posedge SYS_CLK);
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
                                                                                  1'b0  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b0  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME));
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
                                                                                  1'b0  <<`SM_TRCH_WDOG_SE |
-                                                                                 1'b0  <<`SM_SW_WDOG_RESET |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
 
   clear_toggle_counter;

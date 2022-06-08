@@ -60,14 +60,11 @@ reg wdog_start_d;
 reg [2:0] sync_wdog_start;
 wire trch_wdog_enable;
 reg trch_wdog_enable_d;
-wire wdog_sw_reset;
-reg wdog_sw_reset_d;
 wire [7:0] swdog_time;
 reg [7:0] swdog_time_d;
 always @ (*) begin
   wdog_start_d = wdog_start;
   trch_wdog_enable_d = trch_wdog_enable;
-  wdog_sw_reset_d = wdog_sw_reset;
   swdog_time_d = swdog_time;
   if (WADR == `SYSMON_WDOG_CTRL) begin
     if (chk_enbit(1, `SM_WDOG_START, REG_WENB)) begin
@@ -78,20 +75,15 @@ always @ (*) begin
     if (chk_enbit(1, `SM_TRCH_WDOG_SE, REG_WENB))
       trch_wdog_enable_d = REG_WDAT[`SM_TRCH_WDOG_SE];
 
-    if (chk_enbit(1, `SM_SW_WDOG_RESET, REG_WENB))
-      wdog_sw_reset_d = REG_WDAT[`SM_SW_WDOG_RESET];
-
     if (chk_enbit(8, `SM_SW_WDOG_TIME, REG_WENB))
       swdog_time_d = REG_WDAT[`SM_SW_WDOG_TIME +:8];
   end
 end
 sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_start_reg       (.D(wdog_start_d),       .CLK(HCLK), .SRB(HRESETN), .Q(wdog_start));
 sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) trch_wdog_enable_reg (.D(trch_wdog_enable_d), .CLK(HCLK), .SRB(HRESETN), .Q(trch_wdog_enable));
-sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_sw_reset_reg    (.D(wdog_sw_reset_d),    .CLK(HCLK), .SRB(HRESETN), .Q(wdog_sw_reset));
 sclib_tmr_ff # (.DW(8), .SRVAL(1'b0)) swdog_time_reg       (.D(swdog_time_d),       .CLK(HCLK), .SRB(HRESETN), .Q(swdog_time));
 wire [31:0] rd_wdogctrl = 32'h0000_0000 | (wdog_start << `SM_WDOG_START)
                                         | (trch_wdog_enable << `SM_TRCH_WDOG_SE)
-                                        | (wdog_sw_reset << `SM_SW_WDOG_RESET)
                                         | (swdog_time << `SM_SW_WDOG_TIME);
 
 // Watchdog Expire after Reset
@@ -107,7 +99,7 @@ always @ (posedge HCLK) begin
 end
 always @ (*) begin
   wdog_expire_hclk = WDOG_RST_REQ;
-  if (wdog_sw_reset & |sync_wdog_expire[3:1])
+  if (|sync_wdog_expire[3:1])
     wdog_expire_hclk = 1'b1;
 end
 sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_reset_req_reg (.D(wdog_expire_hclk), .CLK(HCLK), .SRB(HRESETN), .Q(WDOG_RST_REQ));
