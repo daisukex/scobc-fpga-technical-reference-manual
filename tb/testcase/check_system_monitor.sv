@@ -83,13 +83,10 @@ initial begin
   //--------------------------------------------------
   @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0  <<`SM_WDOG_START |
-                                                                                 1'b0  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
-                                                                                 1'b1  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME));
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
-                                                                                 1'b1  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
   repeat (20) @ (posedge SYS_CLK);
   i=1;
@@ -138,13 +135,10 @@ initial begin
   //--------------------------------------------------
   @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0  <<`SM_WDOG_START |
-                                                                                 1'b0  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
-                                                                                 1'b1  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME));
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
-                                                                                 1'b1  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
 
   repeat (20) @ (posedge SYS_CLK);
@@ -197,15 +191,13 @@ initial begin
   end
 
   //--------------------------------------------------
-  label    = "TRCH Watchdog Stop Enable OFF";
+  label    = "TRCH Watchdog Restart";
   simcount = 14;
   //--------------------------------------------------
   @(posedge SYS_CLK);
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
-                                                                                 1'b0  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME));
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
-                                                                                 1'b0  <<`SM_TRCH_WDOG_SE |
                                                                                  8'h00 <<`SM_SW_WDOG_TIME), .check(1));
 
   clear_toggle_counter;

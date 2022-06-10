@@ -58,13 +58,10 @@ assign REG_RWAT  = xadc_rcycle_latch & ~xadc_dvalid;
 wire wdog_start;
 reg wdog_start_d;
 reg [2:0] sync_wdog_start;
-wire trch_wdog_enable;
-reg trch_wdog_enable_d;
 wire [7:0] swdog_time;
 reg [7:0] swdog_time_d;
 always @ (*) begin
   wdog_start_d = wdog_start;
-  trch_wdog_enable_d = trch_wdog_enable;
   swdog_time_d = swdog_time;
   if (WADR == `SYSMON_WDOG_CTRL) begin
     if (chk_enbit(1, `SM_WDOG_START, REG_WENB)) begin
@@ -72,18 +69,13 @@ always @ (*) begin
         wdog_start_d = REG_WDAT[`SM_WDOG_START];
     end
 
-    if (chk_enbit(1, `SM_TRCH_WDOG_SE, REG_WENB))
-      trch_wdog_enable_d = REG_WDAT[`SM_TRCH_WDOG_SE];
-
     if (chk_enbit(8, `SM_SW_WDOG_TIME, REG_WENB))
       swdog_time_d = REG_WDAT[`SM_SW_WDOG_TIME +:8];
   end
 end
 sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_start_reg       (.D(wdog_start_d),       .CLK(HCLK), .SRB(HRESETN), .Q(wdog_start));
-sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) trch_wdog_enable_reg (.D(trch_wdog_enable_d), .CLK(HCLK), .SRB(HRESETN), .Q(trch_wdog_enable));
 sclib_tmr_ff # (.DW(8), .SRVAL(1'b0)) swdog_time_reg       (.D(swdog_time_d),       .CLK(HCLK), .SRB(HRESETN), .Q(swdog_time));
 wire [31:0] rd_wdogctrl = 32'h0000_0000 | (wdog_start << `SM_WDOG_START)
-                                        | (trch_wdog_enable << `SM_TRCH_WDOG_SE)
                                         | (swdog_time << `SM_SW_WDOG_TIME);
 
 // Watchdog Expire after Reset
@@ -205,7 +197,7 @@ always @ (posedge REF_CLK) begin
     FPGA_WATCHDOG <= 1'b0;
   end
   else if (sync_wdog_start) begin
-    if (!trch_wdog_enable | !wdog_expire) begin
+    if (!wdog_expire) begin
       if (wdog_sig_interval == wdog_sig_counter) begin
         wdog_sig_counter <= 24'h000000;
         FPGA_WATCHDOG <= ~FPGA_WATCHDOG;
