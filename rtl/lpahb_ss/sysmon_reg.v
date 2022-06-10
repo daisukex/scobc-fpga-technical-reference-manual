@@ -38,6 +38,7 @@ module sysmon_reg (
 );
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
+localparam SW_WDOC_TIME_INIT = 3'h7;
 localparam WDOG_TGL_ITVAL = 24'h03A97F;
 localparam SWDOG_RELOAD_WIDTH = 5;
 integer bt;
@@ -58,8 +59,8 @@ assign REG_RWAT  = xadc_rcycle_latch & ~xadc_dvalid;
 wire wdog_start;
 reg wdog_start_d;
 reg [2:0] sync_wdog_start;
-wire [7:0] swdog_time;
-reg [7:0] swdog_time_d;
+wire [2:0] swdog_time;
+reg [2:0] swdog_time_d;
 always @ (*) begin
   wdog_start_d = wdog_start;
   swdog_time_d = swdog_time;
@@ -69,12 +70,12 @@ always @ (*) begin
         wdog_start_d = REG_WDAT[`SM_WDOG_START];
     end
 
-    if (chk_enbit(8, `SM_SW_WDOG_TIME, REG_WENB))
-      swdog_time_d = REG_WDAT[`SM_SW_WDOG_TIME +:8];
+    if (chk_enbit(3, `SM_SW_WDOG_TIME, REG_WENB))
+      swdog_time_d = REG_WDAT[`SM_SW_WDOG_TIME +:3];
   end
 end
 sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_start_reg       (.D(wdog_start_d),       .CLK(HCLK), .SRB(HRESETN), .Q(wdog_start));
-sclib_tmr_ff # (.DW(8), .SRVAL(1'b0)) swdog_time_reg       (.D(swdog_time_d),       .CLK(HCLK), .SRB(HRESETN), .Q(swdog_time));
+sclib_tmr_ff # (.DW(3), .SRVAL(SW_WDOC_TIME_INIT)) swdog_time_reg       (.D(swdog_time_d),       .CLK(HCLK), .SRB(HRESETN), .Q(swdog_time));
 wire [31:0] rd_wdogctrl = 32'h0000_0000 | (wdog_start << `SM_WDOG_START)
                                         | (swdog_time << `SM_SW_WDOG_TIME);
 
@@ -152,7 +153,7 @@ always @ (posedge REF_CLK) begin
   if (sync_wdog_start) begin
     if (!sync_swdog_reload[2] & sync_swdog_reload[1]) begin
       swdog_l_cnt <= SWDOG_LOWCUP_VALUE;
-      swdog_h_cnt <= swdog_time;
+      swdog_h_cnt <= 8'hFF >> 7-swdog_time;
     end
     else if (swdog_l_cnt == 24'h00_0000) begin
       if (swdog_h_cnt != 8'h00) begin
@@ -165,7 +166,7 @@ always @ (posedge REF_CLK) begin
   end
   else begin
     swdog_l_cnt <= SWDOG_LOWCUP_VALUE;
-    swdog_h_cnt <= swdog_time;
+    swdog_h_cnt <= 8'hFF >> 7-swdog_time;
   end
 end
 always @ (*) begin

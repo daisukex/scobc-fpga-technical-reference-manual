@@ -82,12 +82,12 @@ initial begin
   simcount = 3;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0 <<`SM_WDOG_START |
+                                                                                 3'h7 <<`SM_SW_WDOG_TIME), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1 <<`SM_WDOG_START |
+                                                                                 3'h0 <<`SM_SW_WDOG_TIME));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1 <<`SM_WDOG_START |
+                                                                                 3'h0 <<`SM_SW_WDOG_TIME), .check(1));
   repeat (20) @ (posedge SYS_CLK);
   i=1;
   repeat (20) begin
@@ -134,12 +134,12 @@ initial begin
   simcount = 12;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0 <<`SM_WDOG_START |
+                                                                                 3'h7 <<`SM_SW_WDOG_TIME), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1 <<`SM_WDOG_START |
+                                                                                 3'h0 <<`SM_SW_WDOG_TIME));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1 <<`SM_WDOG_START |
+                                                                                 3'h0 <<`SM_SW_WDOG_TIME), .check(1));
 
   repeat (20) @ (posedge SYS_CLK);
   i=1;
@@ -195,10 +195,10 @@ initial begin
   simcount = 14;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1  <<`SM_WDOG_START |
-                                                                                 8'h00 <<`SM_SW_WDOG_TIME), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1 <<`SM_WDOG_START |
+                                                                                 3'h0 <<`SM_SW_WDOG_TIME));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1 <<`SM_WDOG_START |
+                                                                                 3'h0 <<`SM_SW_WDOG_TIME), .check(1));
 
   clear_toggle_counter;
   i = 1;
