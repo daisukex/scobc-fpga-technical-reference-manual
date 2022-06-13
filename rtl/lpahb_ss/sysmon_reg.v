@@ -39,7 +39,7 @@ module sysmon_reg (
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
 localparam SW_WDOC_TIME_INIT = 3'h7;
-localparam WDOG_TGL_ITVAL = 24'h03A97F;
+localparam WDOG_TGL_ITVAL = 24'hB71AFF;
 localparam SWDOG_RELOAD_WIDTH = 5;
 integer bt;
 wire [15:0] WADR = {REG_WADR[15:2],2'b00};

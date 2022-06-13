@@ -55,9 +55,9 @@ initial begin
   repeat (10) @(posedge SYS_CLK);
 
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h03A97F<<`SM_WDOG_SIVAL), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h00095F<<`SM_WDOG_SIVAL));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h00095F<<`SM_WDOG_SIVAL), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(24'hB71AFF<<`SM_WDOG_SIVAL), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(24'h00095F<<`SM_WDOG_SIVAL));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(24'h00095F<<`SM_WDOG_SIVAL), .check(1));
   repeat (10) @(posedge SYS_CLK);
 
   //--------------------------------------------------
@@ -124,9 +124,9 @@ initial begin
   repeat (10) @(posedge SYS_CLK);
 
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h03A97F<<`SM_WDOG_SIVAL), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h00095F<<`SM_WDOG_SIVAL));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h00095F<<`SM_WDOG_SIVAL), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(24'hB71AFF<<`SM_WDOG_SIVAL), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(24'h00095F<<`SM_WDOG_SIVAL));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(24'h00095F<<`SM_WDOG_SIVAL), .check(1));
   repeat (10) @(posedge SYS_CLK);
 
   //--------------------------------------------------
@@ -173,9 +173,9 @@ initial begin
   repeat (10) @(posedge SYS_CLK);
 
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h03A97F<<`SM_WDOG_SIVAL), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h00095F<<`SM_WDOG_SIVAL));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h00095F<<`SM_WDOG_SIVAL), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(24'hB71AFF<<`SM_WDOG_SIVAL), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(24'h00095F<<`SM_WDOG_SIVAL));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(24'h00095F<<`SM_WDOG_SIVAL), .check(1));
   repeat (10) @(posedge SYS_CLK);
 
   clear_toggle_counter;
