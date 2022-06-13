@@ -72,12 +72,14 @@ initial begin
   i=1;
   repeat (20) begin
     display_subcount_text(i, "Software Watchdog Kick", 1);
-    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'h5A5A <<`SM_WDOG_WSR));
+    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),  .data(3'h0     <<`SM_SW_WDOG_TIME |
+                                                                                 16'h5A5A <<`SM_WDOG_WSR));
     #(10_000_000);
     i = i + 1;
 
     display_subcount_text(i, "Software Watchdog Kick", 1);
-    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'hA5A5 <<`SM_WDOG_WSR));
+    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),  .data(3'h0     <<`SM_SW_WDOG_TIME |
+                                                                                 16'hA5A5 <<`SM_WDOG_WSR));
     #(10_000_000);
     i = i + 1;
   end
@@ -122,12 +124,14 @@ initial begin
   i=1;
   repeat (20) begin
     display_subcount_text(i, "Software Watchdog Kick", 1);
-    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'h5A5A <<`SM_WDOG_WSR));
+    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),  .data(3'h0     <<`SM_SW_WDOG_TIME |
+                                                                                 16'h5A5A <<`SM_WDOG_WSR));
     #(10_000_000);
     i = i + 1;
 
     display_subcount_text(i, "Software Watchdog Kick", 1);
-    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'hA5A5 <<`SM_WDOG_WSR));
+    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),  .data(3'h0     <<`SM_SW_WDOG_TIME |
+                                                                                 16'hA5A5 <<`SM_WDOG_WSR));
     #(10_000_000);
     i = i + 1;
   end

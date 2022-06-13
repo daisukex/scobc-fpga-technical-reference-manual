@@ -99,7 +99,7 @@ always @ (posedge HCLK) begin
   end
   else begin
     swdog_reload <= 1'b0;
-    if (WADR == `SYSMON_WDOG_WSR & chk_enbit(16, `SM_WDOG_WSR, REG_WENB)) begin
+    if (WADR == `SYSMON_WDOG_CTRL & chk_enbit(16, `SM_WDOG_WSR, REG_WENB)) begin
       if (!wdog_wsr_phase & REG_WDAT[`SM_WDOG_WSR +:16] == 16'h5A5A |
            wdog_wsr_phase & REG_WDAT[`SM_WDOG_WSR +:16] == 16'hA5A5) begin
         swdog_reload <= 1'b1;
