@@ -7,7 +7,6 @@
 
 // System Monitor Watchdog Control Register
 `define SYSMON_WDOG_CTRL   16'h0000
-`define  SM_WDOG_START            0
 `define  SM_SW_WDOG_TIME         16
 
 // System Monitor Watchdog Service Register

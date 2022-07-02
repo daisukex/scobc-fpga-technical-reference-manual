@@ -56,28 +56,17 @@ assign REG_RWAT  = xadc_rcycle_latch & ~xadc_dvalid;
 
 // Watchdog Control Register
 // ----------------------------------------
-wire wdog_start;
-reg wdog_start_d;
-reg [2:0] sync_wdog_start;
 wire [2:0] swdog_time;
 reg [2:0] swdog_time_d;
 always @ (*) begin
-  wdog_start_d = wdog_start;
   swdog_time_d = swdog_time;
   if (WADR == `SYSMON_WDOG_CTRL) begin
-    if (chk_enbit(1, `SM_WDOG_START, REG_WENB)) begin
-      if (REG_WDAT[`SM_WDOG_START])
-        wdog_start_d = REG_WDAT[`SM_WDOG_START];
-    end
-
     if (chk_enbit(3, `SM_SW_WDOG_TIME, REG_WENB))
       swdog_time_d = REG_WDAT[`SM_SW_WDOG_TIME +:3];
   end
 end
-sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_start_reg       (.D(wdog_start_d),       .CLK(HCLK), .SRB(HRESETN), .Q(wdog_start));
 sclib_tmr_ff # (.DW(3), .SRVAL(SW_WDOC_TIME_INIT)) swdog_time_reg       (.D(swdog_time_d),       .CLK(HCLK), .SRB(HRESETN), .Q(swdog_time));
-wire [31:0] rd_wdogctrl = 32'h0000_0000 | (wdog_start << `SM_WDOG_START)
-                                        | (swdog_time << `SM_SW_WDOG_TIME);
+wire [31:0] rd_wdogctrl = 32'h0000_0000 | (swdog_time << `SM_SW_WDOG_TIME);
 
 // Watchdog Expire after Reset
 // ----------------------------------------
@@ -150,7 +139,11 @@ reg [7:0] swdog_h_cnt;
 reg wdog_expire_d;
 reg [2:0] sync_swdog_reload;
 always @ (posedge REF_CLK) begin
-  if (sync_wdog_start) begin
+  if (!SYS_RSTB_SYNC_REFCLK) begin
+    swdog_l_cnt <= SWDOG_LOWCUP_VALUE;
+    swdog_h_cnt <= 8'hFF >> 7-swdog_time;
+  end
+  else begin
     if (!sync_swdog_reload[2] & sync_swdog_reload[1]) begin
       swdog_l_cnt <= SWDOG_LOWCUP_VALUE;
       swdog_h_cnt <= 8'hFF >> 7-swdog_time;
@@ -164,10 +157,6 @@ always @ (posedge REF_CLK) begin
     else
       swdog_l_cnt <= swdog_l_cnt - 1;
   end
-  else begin
-    swdog_l_cnt <= SWDOG_LOWCUP_VALUE;
-    swdog_h_cnt <= 8'hFF >> 7-swdog_time;
-  end
 end
 always @ (*) begin
   wdog_expire_d = wdog_expire;
@@ -179,14 +168,10 @@ sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_expire_reg (.D(wdog_expire_d), .CLK(R
 // Synchronizer for Software watchdog
 // ----------------------------------------
 always @ (posedge REF_CLK) begin
-  if (!SYS_RSTB_SYNC_REFCLK) begin
-    sync_wdog_start <= 0;
+  if (!SYS_RSTB_SYNC_REFCLK)
     sync_swdog_reload <= 0;
-  end
-  else begin
-    sync_wdog_start <= {sync_wdog_start[1:0], wdog_start};
+  else
     sync_swdog_reload <= {sync_swdog_reload[1:0], swdog_reload_pulse};
-  end
 end
 
 // Watchdog Signal Counter
@@ -197,15 +182,13 @@ always @ (posedge REF_CLK) begin
     wdog_sig_counter <= 24'h000000;
     FPGA_WATCHDOG <= 1'b0;
   end
-  else if (sync_wdog_start) begin
-    if (!wdog_expire) begin
-      if (wdog_sig_interval == wdog_sig_counter) begin
-        wdog_sig_counter <= 24'h000000;
-        FPGA_WATCHDOG <= ~FPGA_WATCHDOG;
-      end
-      else
-        wdog_sig_counter <= wdog_sig_counter + 1;
+  else if (!wdog_expire) begin
+    if (wdog_sig_interval == wdog_sig_counter) begin
+      wdog_sig_counter <= 24'h000000;
+      FPGA_WATCHDOG <= ~FPGA_WATCHDOG;
     end
+    else
+      wdog_sig_counter <= wdog_sig_counter + 1;
   end
 end
 

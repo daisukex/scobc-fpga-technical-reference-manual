@@ -61,33 +61,13 @@ initial begin
   repeat (10) @(posedge SYS_CLK);
 
   //--------------------------------------------------
-  label    = "Check Watchdog Signal (Not Incriment)";
+  label    = "Check Software Watchdog";
   simcount = 2;
   //--------------------------------------------------
-  clear_toggle_counter;
-  i = 1;
-  repeat (20) begin
-    #(10_000_000);
-    display_subcount_text(i, "Watchdog Wait", 1);
-    i = i + 1;
-  end
-  if (fpga_toggle_counter != 0) begin
-    display_text("Watchdog Toggle Error", 1, 1);
-    $finish();
-  end
-  repeat (10) @(posedge SYS_CLK);
-
-  //--------------------------------------------------
-  label    = "Check Software Watchdog";
-  simcount = 3;
-  //--------------------------------------------------
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0 <<`SM_WDOG_START |
-                                                                                 3'h7 <<`SM_SW_WDOG_TIME), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1 <<`SM_WDOG_START |
-                                                                                 3'h0 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1 <<`SM_WDOG_START |
-                                                                                 3'h0 <<`SM_SW_WDOG_TIME), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h7 <<`SM_SW_WDOG_TIME), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(3'h0 <<`SM_SW_WDOG_TIME));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME), .check(1));
   repeat (20) @ (posedge SYS_CLK);
   i=1;
   repeat (20) begin
@@ -110,7 +90,7 @@ initial begin
 
   //--------------------------------------------------
   label    = "Software Watchdog Kick Stop (Software Reset)";
-  simcount = 4;
+  simcount = 3;
   //--------------------------------------------------
   @ (posedge dut.obc_core.lpahb.system_monitor.sysmon_reg.wdog_expire);
   @ (posedge dut.obc_core.lpahb.system_monitor.sysmon_reg.HRESETN);
@@ -134,12 +114,9 @@ initial begin
   simcount = 12;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b0 <<`SM_WDOG_START |
-                                                                                 3'h7 <<`SM_SW_WDOG_TIME), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1 <<`SM_WDOG_START |
-                                                                                 3'h0 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1 <<`SM_WDOG_START |
-                                                                                 3'h0 <<`SM_SW_WDOG_TIME), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h7 <<`SM_SW_WDOG_TIME), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(3'h0 <<`SM_SW_WDOG_TIME));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME), .check(1));
 
   repeat (20) @ (posedge SYS_CLK);
   i=1;
@@ -168,6 +145,10 @@ initial begin
   @ (posedge dut.obc_core.lpahb.system_monitor.sysmon_reg.wdog_expire);
   @ (posedge dut.obc_core.lpahb.system_monitor.sysmon_reg.HRESETN);
 
+  //--------------------------------------------------
+  label    = "TRCH Watchdog Restart";
+  simcount = 14;
+  //--------------------------------------------------
   @(posedge SYS_CLK);
   force dut.obc_core.lpahb.system_monitor.sysmon_reg.SWDOG_LOWCUP_VALUE = 24'h01546;
   repeat (10) @(posedge SYS_CLK);
@@ -178,27 +159,9 @@ initial begin
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(24'h00095F<<`SM_WDOG_SIVAL), .check(1));
   repeat (10) @(posedge SYS_CLK);
 
-  clear_toggle_counter;
-  i = 1;
-  repeat (20) begin
-    #(10_000_000);
-    display_subcount_text(i, "Watchdog Wait", 0);
-    i = i + 1;
-  end
-  if (fpga_toggle_counter != 0) begin
-    display_text("Watchdog Toggle Error", 1, 1);
-    $finish();
-  end
-
-  //--------------------------------------------------
-  label    = "TRCH Watchdog Restart";
-  simcount = 14;
-  //--------------------------------------------------
   @(posedge SYS_CLK);
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(1'b1 <<`SM_WDOG_START |
-                                                                                 3'h0 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(1'b1 <<`SM_WDOG_START |
-                                                                                 3'h0 <<`SM_SW_WDOG_TIME), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(3'h0 <<`SM_SW_WDOG_TIME));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME), .check(1));
 
   clear_toggle_counter;
   i = 1;
