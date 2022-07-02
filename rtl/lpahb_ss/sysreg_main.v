@@ -31,7 +31,11 @@ module sysreg_main # (
   input [1:0] TRCH_BOOT,
   output [1:0] CLKMODE,
   output reg CMC_REQ,
-  input CMC_ACK
+  input CMC_ACK,
+  input CFG_MEM_MON,
+  output CFG_MEM_OWNER,
+  output CFG_MEM_REGSEL,
+  input CFG_MEM_BUSY
 );
 
 integer n, b;
@@ -103,6 +107,52 @@ always @ (posedge HCLK) begin
 end
 assign REG_WWAT = WRAD == `SYSREG_SYSCLKCTL & |REG_WENB & (CMC_REQ | sync_cmc_ack[2]);
 
+// Configuration Memory Register
+//----------------------------------------------
+(* dont_touch = "yes" *) reg [2:0] cfgmem_boot_mem;
+wire cfgmem_bootmem;
+always @ (posedge POR_RSTB) begin
+  cfgmem_boot_mem <= {3{CFG_MEM_MON}};
+end
+sclib_mvote cfgmem_bootmem_mvote (.IN(cfgmem_boot_mem), .OUT(cfgmem_bootmem));
+
+(* dont_touch = "yes" *) reg [2:0] cfgmem_owner;
+reg cfgmem_l_owner;
+(* dont_touch = "yes" *) reg [2:0] cfgmem_regsel;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    cfgmem_owner <= 3'b000;
+    cfgmem_l_owner <= 1'b0;
+    cfgmem_regsel <= 3'b000;
+  end
+  else begin
+    if (!CFG_MEM_BUSY & (cfgmem_l_owner ^ CFG_MEM_OWNER))
+      cfgmem_owner <= {3{cfgmem_l_owner}};
+
+    if (WRAD == `SYSREG_CFGMEMCTL) begin
+      if (REG_WENB[0] & !REG_WWAT) begin
+        cfgmem_l_owner <= REG_WDAT[`SR_CFGMEMOWNER];
+        cfgmem_regsel <= {3{REG_WDAT[`SR_CFGMEMSEL]}};
+      end
+    end
+  end
+end
+sclib_mvote cfgmem_owner_mvote (.IN(cfgmem_owner), .OUT(CFG_MEM_OWNER));
+sclib_mvote cfgmem_regsel_mvote (.IN(cfgmem_regsel), .OUT(CFG_MEM_REGSEL));
+
+reg [1:0] sync_cfgmem_mon;
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    sync_cfgmem_mon <= 2'b00;
+  else
+    sync_cfgmem_mon <= {sync_cfgmem_mon[0], CFG_MEM_MON};
+end
+
+wire [31:0] rd_cfgmemctl  = 32'h0000_0000 | (cfgmem_bootmem << `SR_CFGBOOTMEM) |
+                                            (sync_cfgmem_mon[1] << `SR_CFGMEMSELMON) |
+                                            (CFG_MEM_REGSEL << `SR_CFGMEMSEL) |
+                                            (CFG_MEM_OWNER << `SR_CFGMEMOWNER);
+
 // Scratch Pad Register
 //----------------------------------------------
 (* dont_touch = "yes" *) reg [31:0] spad1 [0:3];
@@ -166,6 +216,7 @@ always @ (posedge HCLK) begin
   else if (REG_RENB) begin
     if      (RDAD == `SYSREG_CODEMSEL)  REG_RDAT <= rd_codemsel;
     else if (RDAD == `SYSREG_SYSCLKCTL) REG_RDAT <= rd_sysclkctl;
+    else if (RDAD == `SYSREG_CFGMEMCTL) REG_RDAT <= rd_cfgmemctl;
     else if (RDAD == `SYSREG_SPAD1)     REG_RDAT <= rd_spad1;
     else if (RDAD == `SYSREG_SPAD2)     REG_RDAT <= rd_spad2;
     else if (RDAD == `SYSREG_SPAD3)     REG_RDAT <= rd_spad3;

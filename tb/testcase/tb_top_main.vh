@@ -43,6 +43,8 @@ wire SYS_RSTB = dut.sys_rstb;
 wire PLLLOCK  = dut.plllock;
 wire CMC_REQ  = dut.cmc_req;
 wire CMC_ACK  = dut.cmc_ack;
+wire cfg_mem_sel;
+wire cfg_mem_mon;
 reg [1:0] FPGA_BOOT = 2'b01;
 wire FPGA_WATCHDOG;
 
@@ -140,8 +142,8 @@ sc_obc_a1_fpga # (
   .SRAM2_IO(sram2_io),
 
   // CFG QSPI Flash Interface
-  .CFG_MEM_SEL(/*open*/),
-  .CFG_MEM_MON(1'b0),
+  .CFG_MEM_SEL(cfg_mem_sel),
+  .CFG_MEM_MON(cfg_mem_mon),
   .CFG_MEM_SCK(cfg_mem_sck),
   .CFG_MEM_CS_B(cfg_mem_cs_b),
   .CFG_MEM_IO(cfg_mem_io),
@@ -196,6 +198,11 @@ sc_obc_a1_fpga # (
 //  inout  [15:0] UIO1,
 //  inout  [15:0] UIO2,
   .UIO4(console_tx)
+);
+
+pic pic (
+  .FPGA_CFG_MEM(cfg_mem_sel),
+  .CFG_MEM_SEL(cfg_mem_mon)
 );
 
 uart_model cm3_console (

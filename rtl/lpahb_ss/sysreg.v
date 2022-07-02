@@ -26,13 +26,17 @@ module sysreg # (
   output [31:0] SHRDATA,
   output [1:0] SHRESP,
 
-  // System Register Output
+  // System Register Input/Output
   output SYS_RESET_REQ,
   output CFGITCMEN,
   input [1:0] TRCH_BOOT,
   output [1:0] CLKMODE,
   output CMC_REQ,
-  input CMC_ACK
+  input CMC_ACK,
+  input CFG_MEM_MON,
+  output CFG_MEM_OWNER,
+  output CFG_MEM_REGSEL,
+  input CFG_MEM_BUSY
 );
 
 wire [31:0] REG_WADR;
@@ -100,7 +104,11 @@ sysreg_main # (
   .TRCH_BOOT(TRCH_BOOT),
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
-  .CMC_ACK(CMC_ACK)
+  .CMC_ACK(CMC_ACK),
+  .CFG_MEM_MON(CFG_MEM_MON),
+  .CFG_MEM_OWNER(CFG_MEM_OWNER),
+  .CFG_MEM_REGSEL(CFG_MEM_REGSEL),
+  .CFG_MEM_BUSY(CFG_MEM_BUSY)
 );
 
 endmodule

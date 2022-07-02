@@ -68,6 +68,12 @@ module lpahb_ss # (
   output CFGITCMEN,
   output SYSREG_RST_REQ,
 
+  // Configuration Memory Interface
+  input CFG_MEM_MON,
+  output CFG_MEM_OWNER,
+  output CFG_MEM_REGSEL,
+  input CFG_MEM_BUSY,
+
   // Uart Lite
   output UART_TX,
   input UART_RX,
@@ -281,7 +287,11 @@ sysreg # (
   .TRCH_BOOT(TRCH_BOOT),
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
-  .CMC_ACK(CMC_ACK)
+  .CMC_ACK(CMC_ACK),
+  .CFG_MEM_MON(CFG_MEM_MON),
+  .CFG_MEM_OWNER(CFG_MEM_OWNER),
+  .CFG_MEM_REGSEL(CFG_MEM_REGSEL),
+  .CFG_MEM_BUSY(CFG_MEM_BUSY)
 );
 
 // AHB UART-Lite for Cortex-M3 Console

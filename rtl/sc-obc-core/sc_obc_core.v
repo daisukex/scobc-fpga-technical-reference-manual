@@ -446,6 +446,11 @@ wire lpahb_axim_rlast;
 wire lpahb_axim_rvalid;
 wire lpahb_axim_rready;
 
+// Configuration Memory Interface
+wire cfg_mem_owner;
+wire cfg_mem_regsel;
+wire cfg_mem_busy = 1'b0;
+
 // ARM Cortex-M3 SubSystem
 sc_cm3_ss # (
   .CM3SS_PRIMARY_ISR_NUM(CM3SS_PRIMARY_ISR_NUM),
@@ -1052,6 +1057,12 @@ lpahb_ss # (
   .CFGITCMEN(cfgitcmen),
   .SYSREG_RST_REQ(REG_RST_REQ),
 
+  // Configuration Memory Interface
+  .CFG_MEM_MON(CFG_MEM_MON),
+  .CFG_MEM_OWNER(cfg_mem_owner),
+  .CFG_MEM_REGSEL(cfg_mem_regsel),
+  .CFG_MEM_BUSY(cfg_mem_busy),
+
   // Uart Lite
   .UART_TX(UART_TX),
   .UART_RX(UART_RX),
@@ -1070,7 +1081,7 @@ lpahb_ss # (
 
 assign CFG_DONE = 1'b1;
 
-assign CFG_MEM_SEL = 1'b0;
+assign CFG_MEM_SEL = (!cfg_mem_owner) ? cfg_mem_regsel: 1'b0;
 
 assign ULPI_CS = 1'b0;
 assign ULPI_RESET_B = 1'b1;

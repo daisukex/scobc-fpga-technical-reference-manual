@@ -33,6 +33,8 @@ initial begin
   label    = "Boot System";
   simcount = 0;
   //--------------------------------------------------
+  pic.PIC_CFG_MEM = 0;
+  pic.CFG_MEM_MODE(0);
   @ (posedge CMC_REQ);
   @ (posedge CMC_ACK);
   @ (posedge PLLLOCK);
@@ -72,11 +74,90 @@ initial begin
   repeat (100) @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .expdata(1<<`SR_ITCMEN), .check(1));
 
+  //--------------------------------------------------
+  label    = "Check Configuration Memory Register: CFGMEMCTL";
+  simcount = 3;
+  //--------------------------------------------------
+  display_subcount_text(1, "Check CFGMEMCTL Initial Value", 1);
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SR_CFGBOOTMEM |
+                                                                                0<<`SR_CFGMEMSELMON |
+                                                                                0<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER), .check(1));
+  repeat (10) @(posedge SYS_CLK);
+
+  display_subcount_text(2, "Check PIC CFGMEMSEL=1", 1);
+  pic.PIC_CFG_MEM = 1;
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SR_CFGBOOTMEM |
+                                                                                1<<`SR_CFGMEMSELMON |
+                                                                                0<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER), .check(1));
+  repeat (10) @(posedge SYS_CLK);
+
+  display_subcount_text(3, "Check Configuration Memory Select: FPGA", 1);
+  pic.CFG_MEM_MODE(1);
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SR_CFGBOOTMEM |
+                                                                                0<<`SR_CFGMEMSELMON |
+                                                                                0<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER), .check(1));
+
+  repeat (10) @(posedge SYS_CLK);
+
+  display_subcount_text(4, "Check Configuration Memory Owner: Register", 1);
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL),    .data(0<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER));
+
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SR_CFGBOOTMEM |
+                                                                                0<<`SR_CFGMEMSELMON |
+                                                                                0<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER), .check(1));
+
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL),    .data(1<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER));
+
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SR_CFGBOOTMEM |
+                                                                                1<<`SR_CFGMEMSELMON |
+                                                                                1<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER), .check(1));
+  repeat (10) @(posedge SYS_CLK);
+
+  display_subcount_text(5, "Check Configuration Memory Owner: NOR Flash", 1);
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL),    .data(0<<`SR_CFGMEMSEL |
+                                                                                1<<`SR_CFGMEMOWNER));
+
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SR_CFGBOOTMEM |
+                                                                                0<<`SR_CFGMEMSELMON |
+                                                                                0<<`SR_CFGMEMSEL |
+                                                                                1<<`SR_CFGMEMOWNER), .check(1));
+
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL),    .data(1<<`SR_CFGMEMSEL |
+                                                                                1<<`SR_CFGMEMOWNER));
+
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(0<<`SR_CFGBOOTMEM |
+                                                                                0<<`SR_CFGMEMSELMON |
+                                                                                1<<`SR_CFGMEMSEL |
+                                                                                1<<`SR_CFGMEMOWNER), .check(1));
+  repeat (10) @(posedge SYS_CLK);
+
+  display_subcount_text(1, "Check CFGMEMCTL Initial Value: BOOTMEM=1", 1);
+  pic.PIC_CFG_MEM = 1;
+  pic.CFG_MEM_MODE(0);
+  system_reconfig();
+  skip_sram_init();
+  @ (posedge SYS_RSTB);
+  @ (posedge CMC_REQ);
+  @ (posedge CMC_ACK);
+  @ (posedge PLLLOCK);
+  @ (negedge CMC_REQ);
+  @ (negedge CMC_ACK);
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CFGMEMCTL), .expdata(1<<`SR_CFGBOOTMEM |
+                                                                                1<<`SR_CFGMEMSELMON |
+                                                                                0<<`SR_CFGMEMSEL |
+                                                                                0<<`SR_CFGMEMOWNER), .check(1));
 
   repeat (10) @(posedge SYS_CLK);
   //--------------------------------------------------
   label    = "Check System Register: SYSCLKCTL";
-  simcount = 3;
+  simcount = 4;
   //--------------------------------------------------
   @(posedge SYS_CLK);
   display_subcount_text(1, "Check CLKMODE Initial Value 2'b01", 1);
@@ -126,7 +207,7 @@ initial begin
 
   //--------------------------------------------------
   label    = "Check System Register: SPAD1-SPAD4";
-  simcount = 3;
+  simcount = 5;
   //--------------------------------------------------
   @(posedge SYS_CLK);
   display_subcount_text(1, "Check SPAD1-SPAD4 Initial Value", 1);
