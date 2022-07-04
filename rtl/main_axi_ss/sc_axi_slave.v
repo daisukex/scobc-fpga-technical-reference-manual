@@ -257,17 +257,17 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
           REG_WBTEN     <= {(P_DT_W/8){1'b1}};
         end else begin
           case (r_awsize_lat[r_aw_lat_rflg])
-            0:       REG_WBTEN <= (  {1{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
-            1:       REG_WBTEN <= (  {2{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
-            2:       REG_WBTEN <= (  {4{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
-            3:       REG_WBTEN <= (  {8{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
-            4:       REG_WBTEN <= ( {16{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
-            5:       REG_WBTEN <= ( {32{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
-            6:       REG_WBTEN <= ( {64{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
-            default: REG_WBTEN <= ({128{1'b1}} & S_AXI_WSTRB) << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0];
+            0:       REG_WBTEN <= (  {1{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
+            1:       REG_WBTEN <= (  {2{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
+            2:       REG_WBTEN <= (  {4{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
+            3:       REG_WBTEN <= (  {8{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
+            4:       REG_WBTEN <= ( {16{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
+            5:       REG_WBTEN <= ( {32{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
+            6:       REG_WBTEN <= ( {64{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
+            default: REG_WBTEN <= ({128{1'b1}} << r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]) & S_AXI_WSTRB;
           endcase
         end
-        REG_WDATA     <= S_AXI_WDATA << (8*r_awaddr_lat[r_aw_lat_rflg][p_bank_width-1:0]);
+        REG_WDATA     <= S_AXI_WDATA;
       end else if (w_axi_awen) begin
         r_wstate      <= 1;
         r_wid         <= S_AXI_AWID;
@@ -279,17 +279,17 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
           REG_WBTEN     <= {(P_DT_W/8){1'b1}};
         end else begin
           case (S_AXI_AWSIZE)
-            0:       REG_WBTEN <= (  {1{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
-            1:       REG_WBTEN <= (  {2{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
-            2:       REG_WBTEN <= (  {4{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
-            3:       REG_WBTEN <= (  {8{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
-            4:       REG_WBTEN <= ( {16{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
-            5:       REG_WBTEN <= ( {32{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
-            6:       REG_WBTEN <= ( {64{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
-            default: REG_WBTEN <= ({128{1'b1}} & S_AXI_WSTRB) << S_AXI_AWADDR[p_bank_width-1:0];
+            0:       REG_WBTEN <= (  {1{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
+            1:       REG_WBTEN <= (  {2{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
+            2:       REG_WBTEN <= (  {4{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
+            3:       REG_WBTEN <= (  {8{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
+            4:       REG_WBTEN <= ( {16{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
+            5:       REG_WBTEN <= ( {32{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
+            6:       REG_WBTEN <= ( {64{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
+            default: REG_WBTEN <= ({128{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & S_AXI_WSTRB;
           endcase
         end
-        REG_WDATA     <= S_AXI_WDATA << (8*S_AXI_AWADDR[p_bank_width-1:0]);
+        REG_WDATA     <= S_AXI_WDATA;
       end
     end else if (w_axi_awen & ~S_AXI_WREADY) begin
       r_wstate      <= 1;
@@ -302,17 +302,17 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
         REG_WBTEN     <= {(P_DT_W/8){1'b1}};
       end else begin
         case (S_AXI_AWSIZE)
-          0:       REG_WBTEN <= (  {1{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
-          1:       REG_WBTEN <= (  {2{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
-          2:       REG_WBTEN <= (  {4{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
-          3:       REG_WBTEN <= (  {8{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
-          4:       REG_WBTEN <= ( {16{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
-          5:       REG_WBTEN <= ( {32{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
-          6:       REG_WBTEN <= ( {64{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
-          default: REG_WBTEN <= ({128{1'b1}} & r_wstrb_lat) << S_AXI_AWADDR[p_bank_width-1:0];
+          0:       REG_WBTEN <= (  {1{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
+          1:       REG_WBTEN <= (  {2{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
+          2:       REG_WBTEN <= (  {4{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
+          3:       REG_WBTEN <= (  {8{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
+          4:       REG_WBTEN <= ( {16{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
+          5:       REG_WBTEN <= ( {32{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
+          6:       REG_WBTEN <= ( {64{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
+          default: REG_WBTEN <= ({128{1'b1}} << S_AXI_AWADDR[p_bank_width-1:0]) & r_wstrb_lat;
         endcase
       end
-      REG_WDATA     <= r_wdata_lat << (8*S_AXI_AWADDR[p_bank_width-1:0]);
+      REG_WDATA     <= r_wdata_lat;
     end
   end else if (w_axi_ben) begin
     r_wstate      <= 0;
@@ -339,7 +339,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
     end else if (r_wburst == 2'b01) begin
       REG_WADDR <= REG_WADDR + (1 << p_bank_width);
     end
-    REG_WDATA <= S_AXI_WDATA << (8*REG_WADDR[p_bank_width-1:0]);
+    REG_WDATA <= S_AXI_WDATA;
   end else begin
     REG_WEN       <= 0;
     REG_WADDR     <= 0;
@@ -469,10 +469,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
         S_AXI_RRESP  <= 0;
       end
       for (i=0; i<P_DT_W/8; i=i+1) begin
-        if (i >= REG_RADDR[p_bank_width-1:0])
-          S_AXI_RDATA[(i-REG_RADDR[p_bank_width-1:0])*8 +: 8] <= REG_RDATA[i*8 +: 8] & {8{r_reg_rbten[i]}};
-        else
-          S_AXI_RDATA[((P_DT_W/8-1)-i)*8 +: 8] <= {8{1'b0}};
+        S_AXI_RDATA[i*8 +: 8] <= REG_RDATA[i*8 +: 8] & {8{r_reg_rbten[i]}};
       end
       S_AXI_RLAST  <= ~REG_RWAIT &
                       ((~r_wait_flg &  REG_REN & r_rlen_cnt        >= r_rlen) |
