@@ -12,15 +12,11 @@
 `define  MEMSCRBEN              0
 `define  COLFSRDSTPB            8
 `define  MEMSCRCYC             16
-// ECC 1bit Error Interrupt Register
-`define ECC1ERRINTR      16'h0010
+// HRMEM Interrupt Status Register
+`define HRMINTSTR        16'h0010
 `define  E1ERRINT               0
-// ECC 2bit Error Interrupt Register
-`define ECC2ERRINTR      16'h0014
-`define  E2ERRINT               0
-// ECC Correct Data Discard Register
-`define ECCCDISINTR      16'h0018
-`define  ECDISINT               0
+`define  E2ERRINT               1
+`define  ECDISINT               8
 // HRMEM Interrupt Enable Register
 `define HRMINTENR        16'h001C
 `define  E1ERRINTENB            0

@@ -283,13 +283,13 @@ sc_hrmem_reg # (
   .REG_MEM_SCRB_CYCLE(w_reg_mem_scrb_cycle),             // output [15:0]
   .REG_COL_FSTK_RDSTOP(w_reg_col_fstk_rdstop),           // output
   .REG_ECCERRCNT_CLR(w_reg_eccerrcnt_clr),               // output
-  .REG_RAM_ECC1ERR(w_reg_ram_ecc1err),                   // input [P_MEM_NUM-1:0]
-  .REG_RAM_ECC2ERR(w_reg_ram_ecc2err),                   // input [P_MEM_NUM-1:0]
+  .REG_RAM_ECC1ERR(w_reg_ram_ecc1err),                   // input
+  .REG_RAM_ECC2ERR(w_reg_ram_ecc2err),                   // input
   .REG_RAM_ECC1ERR_AXI(w_reg_ram_ecc1err_axi),           // input [P_MEM_NUM-1:0]
   .REG_RAM_ECC2ERR_AXI(w_reg_ram_ecc2err_axi),           // input [P_MEM_NUM-1:0]
   .REG_RAM_ECC1ERR_ATRD(w_reg_ram_ecc1err_atrd),         // input [P_MEM_NUM-1:0]
   .REG_RAM_ECC2ERR_ATRD(w_reg_ram_ecc2err_atrd),         // input [P_MEM_NUM-1:0]
-  .REG_ECC_COL_DISC(w_reg_ecc_col_disc),                 // input [P_MEM_NUM-1:0]
+  .REG_ECC_COL_DISC(w_reg_ecc_col_disc),                 // input
   .REG_RAM_ECC1ERR_CNT(w_reg_ram_ecc1err_cnt),           // input [15:0]
   .REG_RAM_ECC2ERR_CNT(w_reg_ram_ecc2err_cnt),           // input [15:0]
   .REG_RAM_ECC1ERR_AXI_CNT(w_reg_ram_ecc1err_axi_cnt),   // input [15:0]

@@ -35,13 +35,13 @@ module sc_hrmem_reg # (
   output reg [15:0] REG_MEM_SCRB_CYCLE,
   output REG_COL_FSTK_RDSTOP,
   output reg REG_ECCERRCNT_CLR,
-  input [P_MEM_NUM-1:0] REG_RAM_ECC1ERR,
-  input [P_MEM_NUM-1:0] REG_RAM_ECC2ERR,
+  input REG_RAM_ECC1ERR,
+  input REG_RAM_ECC2ERR,
   input [P_MEM_NUM-1:0] REG_RAM_ECC1ERR_AXI,
   input [P_MEM_NUM-1:0] REG_RAM_ECC2ERR_AXI,
   input [P_MEM_NUM-1:0] REG_RAM_ECC1ERR_ATRD,
   input [P_MEM_NUM-1:0] REG_RAM_ECC2ERR_ATRD,
-  input [P_MEM_NUM-1:0] REG_ECC_COL_DISC,
+  input REG_ECC_COL_DISC,
   input [15:0] REG_RAM_ECC1ERR_CNT,
   input [15:0] REG_RAM_ECC2ERR_CNT,
   input [15:0] REG_RAM_ECC1ERR_AXI_CNT,
@@ -78,9 +78,7 @@ assign w_reg_read  = REG_ACC & !REG_W1R0;
 // Address Decoder
 wire w_hit_ecccolenr;
 wire w_hit_memscrctrlr;
-wire w_hit_ecc1errintr;
-wire w_hit_ecc2errintr;
-wire w_hit_ecccdisintr;
+wire w_hit_hrmintstr;
 wire w_hit_hrmintenr;
 wire w_hit_eccerrcntr;
 wire w_hit_ecdiscntr;
@@ -99,9 +97,7 @@ wire [P_SP_PFB_LINE_NUM-1:0] w_hit_spepfadrsetr;
 wire w_hit_hrmemver;
 assign w_hit_ecccolenr      = ({REG_ADDR[15:2] , 2'b00} == `ECCCOLENR);
 assign w_hit_memscrctrlr    = ({REG_ADDR[15:2] , 2'b00} == `MEMSCRCTRLR);
-assign w_hit_ecc1errintr    = ({REG_ADDR[15:2] , 2'b00} == `ECC1ERRINTR);
-assign w_hit_ecc2errintr    = ({REG_ADDR[15:2] , 2'b00} == `ECC2ERRINTR);
-assign w_hit_ecccdisintr    = ({REG_ADDR[15:2] , 2'b00} == `ECCCDISINTR);
+assign w_hit_hrmintstr      = ({REG_ADDR[15:2] , 2'b00} == `HRMINTSTR);
 assign w_hit_hrmintenr      = ({REG_ADDR[15:2] , 2'b00} == `HRMINTENR);
 assign w_hit_eccerrcntr     = ({REG_ADDR[15:2] , 2'b00} == `ECCERRCNTR);
 assign w_hit_ecdiscntr      = ({REG_ADDR[15:2] , 2'b00} == `ECDISCNTR);
@@ -168,89 +164,44 @@ assign w_rd_memscrctrlr = (w_hit_memscrctrlr & w_reg_read) ?
 
 assign REG_COL_FSTK_RDSTOP = ~w_col_fstk_rdstop_n;
 
-// ECC 1bit Error Interrupt Register
+// HRMEM Interrupt Status Register
 //----------------------------------------------
-reg [P_MEM_NUM-1:0] r_e1errint_sts;
-generate
-  for(gn=0; gn<P_MEM_NUM; gn=gn+1) begin : e1errint_gen
-    always @ (posedge SYSCLK or negedge RESETB) begin
-      if (!RESETB) begin
-        r_e1errint_sts[gn] <= 0;
-      end else begin
-        if (REG_RAM_ECC1ERR[gn])
-          r_e1errint_sts[gn] <= 1'b1;
-        if (w_hit_ecc1errintr & w_reg_write) begin
-          if (((gn >= 24 & gn <= 31 & REG_BYTEEN[3]) |
-               (gn >= 16 & gn <= 23 & REG_BYTEEN[2]) |
-               (gn >=  8 & gn <= 15 & REG_BYTEEN[1]) |
-               (gn >=  0 & gn <=  7 & REG_BYTEEN[0]) ) & REG_WDATA[gn])
-            r_e1errint_sts[gn] <= 0;
-        end
+reg r_ecdisint_sts;
+reg r_e2errint_sts;
+reg r_e1errint_sts;
+always @ (posedge SYSCLK or negedge RESETB) begin
+  if (!RESETB) begin
+    r_ecdisint_sts <= 0;
+    r_e2errint_sts <= 0;
+    r_e1errint_sts <= 0;
+  end else begin
+    if (w_hit_hrmintstr & w_reg_write) begin
+      if (REG_BYTEEN[1]) begin
+        if (REG_WDATA[`ECDISINT])
+          r_ecdisint_sts <= 0;
+      end
+      if (REG_BYTEEN[0]) begin
+        if (REG_WDATA[`E2ERRINT])
+          r_e2errint_sts <= 0;
+        if (REG_WDATA[`E1ERRINT])
+          r_e1errint_sts <= 0;
       end
     end
+    if (REG_ECC_COL_DISC)
+      r_ecdisint_sts <= 1'b1;
+    if (REG_RAM_ECC2ERR)
+      r_e2errint_sts <= 1'b1;
+    if (REG_RAM_ECC1ERR)
+      r_e1errint_sts <= 1'b1;
   end
-endgenerate
+end
 
-wire [31:0] w_rd_ecc1errintr;
-assign w_rd_ecc1errintr = (w_hit_ecc1errintr & w_reg_read) ?
-                          {{32-P_MEM_NUM-`E1ERRINT{1'b0}}, r_e1errint_sts, {`E1ERRINT{1'b0}}} :
-                          32'h0;
-
-// ECC 2bit Error Interrupt Register
-//----------------------------------------------
-reg [P_MEM_NUM-1:0] r_e2errint_sts;
-generate
-  for(gn=0; gn<P_MEM_NUM; gn=gn+1) begin : e2errint_gen
-    always @ (posedge SYSCLK or negedge RESETB) begin
-      if (!RESETB) begin
-        r_e2errint_sts[gn] <= 0;
-      end else begin
-        if (REG_RAM_ECC2ERR[gn])
-          r_e2errint_sts[gn] <= 1'b1;
-        if (w_hit_ecc2errintr & w_reg_write) begin
-          if (((gn >= 24 & gn <= 31 & REG_BYTEEN[3]) |
-               (gn >= 16 & gn <= 23 & REG_BYTEEN[2]) |
-               (gn >=  8 & gn <= 15 & REG_BYTEEN[1]) |
-               (gn >=  0 & gn <=  7 & REG_BYTEEN[0]) ) & REG_WDATA[gn])
-            r_e2errint_sts[gn] <= 0;
-        end
-      end
-    end
-  end
-endgenerate
-
-wire [31:0] w_rd_ecc2errintr;
-assign w_rd_ecc2errintr = (w_hit_ecc2errintr & w_reg_read) ?
-                          {{32-P_MEM_NUM-`E2ERRINT{1'b0}}, r_e2errint_sts, {`E2ERRINT{1'b0}}} :
-                          32'h0;
-
-// ECC Correct Data Discard Register
-//----------------------------------------------
-reg [P_MEM_NUM-1:0] r_ecdisint_sts;
-generate
-  for(gn=0; gn<P_MEM_NUM; gn=gn+1) begin : ecdisint_gen
-    always @ (posedge SYSCLK or negedge RESETB) begin
-      if (!RESETB) begin
-        r_ecdisint_sts[gn] <= 0;
-      end else begin
-        if (REG_ECC_COL_DISC[gn])
-          r_ecdisint_sts[gn] <= 1'b1;
-        if (w_hit_ecccdisintr & w_reg_write) begin
-          if (((gn >= 24 & gn <= 31 & REG_BYTEEN[3]) |
-               (gn >= 16 & gn <= 23 & REG_BYTEEN[2]) |
-               (gn >=  8 & gn <= 15 & REG_BYTEEN[1]) |
-               (gn >=  0 & gn <=  7 & REG_BYTEEN[0]) ) & REG_WDATA[gn])
-            r_ecdisint_sts[gn] <= 0;
-        end
-      end
-    end
-  end
-endgenerate
-
-wire [31:0] w_rd_ecccdisintr;
-assign w_rd_ecccdisintr = (w_hit_ecccdisintr & w_reg_read) ?
-                          {{32-P_MEM_NUM-`ECDISINT{1'b0}}, r_ecdisint_sts, {`ECDISINT{1'b0}}} :
-                          32'h0;
+wire [31:0] w_rd_hrmintstr;
+assign w_rd_hrmintstr = (w_hit_hrmintstr & w_reg_read) ?
+                        {{32-1-`ECDISINT{1'b0}}, r_ecdisint_sts, {`ECDISINT{1'b0}}} |
+                        {{32-1-`E2ERRINT{1'b0}}, r_e2errint_sts, {`E2ERRINT{1'b0}}} |
+                        {{32-1-`E1ERRINT{1'b0}}, r_e1errint_sts, {`E1ERRINT{1'b0}}} :
+                        32'h0;
 
 // HRMEM Interrupt Enable Register
 //----------------------------------------------
@@ -556,17 +507,15 @@ assign w_rd_hrmemver = (w_hit_hrmemver & w_reg_read) ?
 
 // Interrupt
 //----------------------------------------------
-assign HRMEM_INT = (r_ecdisint_enb & |r_ecdisint_sts) |
-                   (r_e2errint_enb & |r_e2errint_sts) |
-                   (r_e1errint_enb & |r_e1errint_sts) ;
+assign HRMEM_INT = (r_ecdisint_enb & r_ecdisint_sts) |
+                   (r_e2errint_enb & r_e2errint_sts) |
+                   (r_e1errint_enb & r_e1errint_sts) ;
 
 // AHB Read Data
 //----------------------------------------------
 assign REG_RDATA = w_rd_ecccolenr |
                    w_rd_memscrctrlr |
-                   w_rd_ecc1errintr |
-                   w_rd_ecc2errintr |
-                   w_rd_ecccdisintr |
+                   w_rd_hrmintstr |
                    w_rd_hrmintenr |
                    w_rd_eccerrcntr |
                    w_rd_ecdiscntr |
