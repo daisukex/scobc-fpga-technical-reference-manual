@@ -17,9 +17,9 @@
 `define  E1ERRINT               0
 `define  E2ERRINT               1
 `define  ECDISINT               8
-`define  AXIE1ERR              16
+`define  BUSRDE1ERR            16
 `define  ATRDE1ERR             17
-`define  AXIE2ERR              20
+`define  BUSRDE2ERR            20
 `define  ATRDE2ERR             21
 // HRMEM Interrupt Enable Register
 `define HRMINTENR        16'h0014
@@ -28,11 +28,11 @@
 `define  ECDISINTENB            8
 // 1Bit ECC Error Count Register
 `define ECC1ERRCNTR      16'h0020
-`define  AXIE1ERRCNT            0
+`define  BUSRDE1ERRCNT          0
 `define  ATRDE1ERRCNT          16
 // 2Bit ECC Error Count Register
 `define ECC2ERRCNTR      16'h0024
-`define  AXIE2ERRCNT            0
+`define  BUSRDE2ERRCNT          0
 `define  ATRDE2ERRCNT          16
 // ECC Correct Data Discard Count Register
 `define ECDISCNTR        16'h0028

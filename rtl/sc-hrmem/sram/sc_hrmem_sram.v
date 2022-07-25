@@ -283,14 +283,14 @@ sc_hrmem_reg # (
   .REG_ECCERRCNT_CLR(w_reg_eccerrcnt_clr),               // output
   .REG_RAM_ECC1ERR(w_reg_ram_ecc1err),                   // input
   .REG_RAM_ECC2ERR(w_reg_ram_ecc2err),                   // input
-  .REG_RAM_ECC1ERR_AXI(w_reg_ram_ecc1err_axi),           // input
-  .REG_RAM_ECC2ERR_AXI(w_reg_ram_ecc2err_axi),           // input
+  .REG_RAM_ECC1ERR_BUSRD(w_reg_ram_ecc1err_axi),         // input
+  .REG_RAM_ECC2ERR_BUSRD(w_reg_ram_ecc2err_axi),         // input
   .REG_RAM_ECC1ERR_ATRD(w_reg_ram_ecc1err_atrd),         // input
   .REG_RAM_ECC2ERR_ATRD(w_reg_ram_ecc2err_atrd),         // input
   .REG_ECCERR_ADR(w_reg_eccerr_adr),                     // input [P_AD_W-1:0]
   .REG_ECC_COL_DISC(w_reg_ecc_col_disc),                 // input
-  .REG_RAM_ECC1ERR_AXI_CNT(w_reg_ram_ecc1err_axi_cnt),   // input [15:0]
-  .REG_RAM_ECC2ERR_AXI_CNT(w_reg_ram_ecc2err_axi_cnt),   // input [15:0]
+  .REG_RAM_ECC1ERR_BUSRD_CNT(w_reg_ram_ecc1err_axi_cnt), // input [15:0]
+  .REG_RAM_ECC2ERR_BUSRD_CNT(w_reg_ram_ecc2err_axi_cnt), // input [15:0]
   .REG_RAM_ECC1ERR_ATRD_CNT(w_reg_ram_ecc1err_atrd_cnt), // input [15:0]
   .REG_RAM_ECC2ERR_ATRD_CNT(w_reg_ram_ecc2err_atrd_cnt), // input [15:0]
   .REG_ECC_COL_DISC_CNT(w_reg_ecc_col_disc_cnt),         // input [15:0]

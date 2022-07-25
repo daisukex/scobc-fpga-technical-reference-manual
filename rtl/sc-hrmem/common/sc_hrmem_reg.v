@@ -36,14 +36,14 @@ module sc_hrmem_reg # (
   output reg REG_ECCERRCNT_CLR,
   input REG_RAM_ECC1ERR,
   input REG_RAM_ECC2ERR,
-  input REG_RAM_ECC1ERR_AXI,
-  input REG_RAM_ECC2ERR_AXI,
+  input REG_RAM_ECC1ERR_BUSRD,
+  input REG_RAM_ECC2ERR_BUSRD,
   input REG_RAM_ECC1ERR_ATRD,
   input REG_RAM_ECC2ERR_ATRD,
   input [P_AD_W-1:0] REG_ECCERR_ADR,
   input REG_ECC_COL_DISC,
-  input [15:0] REG_RAM_ECC1ERR_AXI_CNT,
-  input [15:0] REG_RAM_ECC2ERR_AXI_CNT,
+  input [15:0] REG_RAM_ECC1ERR_BUSRD_CNT,
+  input [15:0] REG_RAM_ECC2ERR_BUSRD_CNT,
   input [15:0] REG_RAM_ECC1ERR_ATRD_CNT,
   input [15:0] REG_RAM_ECC2ERR_ATRD_CNT,
   input [15:0] REG_ECC_COL_DISC_CNT,
@@ -157,21 +157,21 @@ assign REG_COL_FSTK_RDSTOP = ~w_col_fstk_rdstop_n;
 // HRMEM Interrupt Status Register
 //----------------------------------------------
 reg r_atrde2err_sts;
-reg r_axie2err_sts;
+reg r_busrde2err_sts;
 reg r_atrde1err_sts;
-reg r_axie1err_sts;
+reg r_busrde1err_sts;
 reg r_ecdisint_sts;
 reg r_e2errint_sts;
 reg r_e1errint_sts;
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
-    r_atrde2err_sts <= 0;
-    r_axie2err_sts  <= 0;
-    r_atrde1err_sts <= 0;
-    r_axie1err_sts  <= 0;
-    r_ecdisint_sts  <= 0;
-    r_e2errint_sts  <= 0;
-    r_e1errint_sts  <= 0;
+    r_atrde2err_sts  <= 0;
+    r_busrde2err_sts <= 0;
+    r_atrde1err_sts  <= 0;
+    r_busrde1err_sts <= 0;
+    r_ecdisint_sts   <= 0;
+    r_e2errint_sts   <= 0;
+    r_e1errint_sts   <= 0;
   end else begin
     if (w_hit_hrmintstr & w_reg_write) begin
       if (REG_BYTEEN[1]) begin
@@ -180,25 +180,25 @@ always @ (posedge SYSCLK or negedge RESETB) begin
       end
       if (REG_BYTEEN[0]) begin
         if (REG_WDATA[`E2ERRINT]) begin
-          r_atrde2err_sts <= 0;
-          r_axie2err_sts  <= 0;
-          r_e2errint_sts  <= 0;
+          r_atrde2err_sts  <= 0;
+          r_busrde2err_sts <= 0;
+          r_e2errint_sts   <= 0;
         end
         if (REG_WDATA[`E1ERRINT]) begin
-          r_atrde1err_sts <= 0;
-          r_axie1err_sts  <= 0;
-          r_e1errint_sts  <= 0;
+          r_atrde1err_sts  <= 0;
+          r_busrde1err_sts <= 0;
+          r_e1errint_sts   <= 0;
         end
       end
     end
     if (REG_RAM_ECC2ERR_ATRD)
       r_atrde2err_sts <= 1'b1;
-    if (REG_RAM_ECC2ERR_AXI)
-      r_axie2err_sts <= 1'b1;
+    if (REG_RAM_ECC2ERR_BUSRD)
+      r_busrde2err_sts <= 1'b1;
     if (REG_RAM_ECC1ERR_ATRD)
       r_atrde1err_sts <= 1'b1;
-    if (REG_RAM_ECC1ERR_AXI)
-      r_axie1err_sts <= 1'b1;
+    if (REG_RAM_ECC1ERR_BUSRD)
+      r_busrde1err_sts <= 1'b1;
     if (REG_ECC_COL_DISC)
       r_ecdisint_sts <= 1'b1;
     if (REG_RAM_ECC2ERR)
@@ -210,13 +210,13 @@ end
 
 wire [31:0] w_rd_hrmintstr;
 assign w_rd_hrmintstr = (w_hit_hrmintstr & w_reg_read) ?
-                        {{32-1-`ATRDE2ERR{1'b0}}, r_atrde2err_sts, {`ATRDE2ERR{1'b0}}} |
-                        {{32-1-`AXIE2ERR{1'b0}},  r_axie2err_sts,  {`AXIE2ERR{1'b0}}} |
-                        {{32-1-`ATRDE1ERR{1'b0}}, r_atrde1err_sts, {`ATRDE1ERR{1'b0}}} |
-                        {{32-1-`AXIE1ERR{1'b0}},  r_axie1err_sts,  {`AXIE1ERR{1'b0}}} |
-                        {{32-1-`ECDISINT{1'b0}},  r_ecdisint_sts,  {`ECDISINT{1'b0}}} |
-                        {{32-1-`E2ERRINT{1'b0}},  r_e2errint_sts,  {`E2ERRINT{1'b0}}} |
-                        {{32-1-`E1ERRINT{1'b0}},  r_e1errint_sts,  {`E1ERRINT{1'b0}}} :
+                        {{32-1-`ATRDE2ERR{1'b0}},  r_atrde2err_sts,  {`ATRDE2ERR{1'b0}}} |
+                        {{32-1-`BUSRDE2ERR{1'b0}}, r_busrde2err_sts, {`BUSRDE2ERR{1'b0}}} |
+                        {{32-1-`ATRDE1ERR{1'b0}},  r_atrde1err_sts,  {`ATRDE1ERR{1'b0}}} |
+                        {{32-1-`BUSRDE1ERR{1'b0}}, r_busrde1err_sts, {`BUSRDE1ERR{1'b0}}} |
+                        {{32-1-`ECDISINT{1'b0}},   r_ecdisint_sts,   {`ECDISINT{1'b0}}} |
+                        {{32-1-`E2ERRINT{1'b0}},   r_e2errint_sts,   {`E2ERRINT{1'b0}}} |
+                        {{32-1-`E1ERRINT{1'b0}},   r_e1errint_sts,   {`E1ERRINT{1'b0}}} :
                         32'h0;
 
 // HRMEM Interrupt Enable Register
@@ -250,16 +250,16 @@ assign w_rd_hrmintenr = (w_hit_hrmintenr & w_reg_read) ?
 //----------------------------------------------
 wire [31:0] w_rd_ecc1errcntr;
 assign w_rd_ecc1errcntr = (w_hit_ecc1errcntr & w_reg_read) ?
-                          {{32-16-`ATRDE1ERRCNT{1'b0}}, REG_RAM_ECC1ERR_ATRD_CNT, {`ATRDE1ERRCNT{1'b0}}} |
-                          {{32-16-`AXIE1ERRCNT{1'b0}},  REG_RAM_ECC1ERR_AXI_CNT,  {`AXIE1ERRCNT{1'b0}}} :
+                          {{32-16-`ATRDE1ERRCNT{1'b0}},  REG_RAM_ECC1ERR_ATRD_CNT,  {`ATRDE1ERRCNT{1'b0}}} |
+                          {{32-16-`BUSRDE1ERRCNT{1'b0}}, REG_RAM_ECC1ERR_BUSRD_CNT, {`BUSRDE1ERRCNT{1'b0}}} :
                           32'h0;
 
 // 2Bit ECC Error Count Register
 //----------------------------------------------
 wire [31:0] w_rd_ecc2errcntr;
 assign w_rd_ecc2errcntr = (w_hit_ecc2errcntr & w_reg_read) ?
-                          {{32-16-`ATRDE2ERRCNT{1'b0}}, REG_RAM_ECC2ERR_ATRD_CNT, {`ATRDE2ERRCNT{1'b0}}} |
-                          {{32-16-`AXIE2ERRCNT{1'b0}},  REG_RAM_ECC2ERR_AXI_CNT,  {`AXIE2ERRCNT{1'b0}}} :
+                          {{32-16-`ATRDE2ERRCNT{1'b0}},  REG_RAM_ECC2ERR_ATRD_CNT,  {`ATRDE2ERRCNT{1'b0}}} |
+                          {{32-16-`BUSRDE2ERRCNT{1'b0}}, REG_RAM_ECC2ERR_BUSRD_CNT, {`BUSRDE2ERRCNT{1'b0}}} :
                           32'h0;
 
 // ECC Correct Data Discard Count Register
