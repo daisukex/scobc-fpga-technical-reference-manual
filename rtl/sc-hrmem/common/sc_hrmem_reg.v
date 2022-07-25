@@ -8,7 +8,6 @@
 `include "sc_hrmem_reg_map.vh"
 
 module sc_hrmem_reg # (
-  parameter P_MEM_NUM         = 4,
   parameter P_AD_W            = 16,
   parameter P_BANK_W          = 2,
   parameter [15:0] P_MSC_INI  = 0,
@@ -37,10 +36,10 @@ module sc_hrmem_reg # (
   output reg REG_ECCERRCNT_CLR,
   input REG_RAM_ECC1ERR,
   input REG_RAM_ECC2ERR,
-  input [P_MEM_NUM-1:0] REG_RAM_ECC1ERR_AXI,
-  input [P_MEM_NUM-1:0] REG_RAM_ECC2ERR_AXI,
-  input [P_MEM_NUM-1:0] REG_RAM_ECC1ERR_ATRD,
-  input [P_MEM_NUM-1:0] REG_RAM_ECC2ERR_ATRD,
+  input REG_RAM_ECC1ERR_AXI,
+  input REG_RAM_ECC2ERR_AXI,
+  input REG_RAM_ECC1ERR_ATRD,
+  input REG_RAM_ECC2ERR_ATRD,
   input REG_ECC_COL_DISC,
   input [15:0] REG_RAM_ECC1ERR_CNT,
   input [15:0] REG_RAM_ECC2ERR_CNT,
@@ -83,10 +82,6 @@ wire w_hit_hrmintenr;
 wire w_hit_eccerrcntr;
 wire w_hit_ecdiscntr;
 wire w_hit_errcntclrr;
-wire w_hit_axiecc1errr;
-wire w_hit_axiecc2errr;
-wire w_hit_atrdecc1errr;
-wire w_hit_atrdecc2errr;
 wire w_hit_axieccerrcntr;
 wire w_hit_atrdeccerrcntr;
 wire w_hit_eccerrinsr;
@@ -102,10 +97,6 @@ assign w_hit_hrmintenr      = ({REG_ADDR[15:2] , 2'b00} == `HRMINTENR);
 assign w_hit_eccerrcntr     = ({REG_ADDR[15:2] , 2'b00} == `ECCERRCNTR);
 assign w_hit_ecdiscntr      = ({REG_ADDR[15:2] , 2'b00} == `ECDISCNTR);
 assign w_hit_errcntclrr     = ({REG_ADDR[15:2] , 2'b00} == `ERRCNTCLRR);
-assign w_hit_axiecc1errr    = ({REG_ADDR[15:2] , 2'b00} == `AXIECC1ERRR);
-assign w_hit_axiecc2errr    = ({REG_ADDR[15:2] , 2'b00} == `AXIECC2ERRR);
-assign w_hit_atrdecc1errr   = ({REG_ADDR[15:2] , 2'b00} == `ATRDECC1ERRR);
-assign w_hit_atrdecc2errr   = ({REG_ADDR[15:2] , 2'b00} == `ATRDECC2ERRR);
 assign w_hit_axieccerrcntr  = ({REG_ADDR[15:2] , 2'b00} == `AXIECCERRCNTR);
 assign w_hit_atrdeccerrcntr = ({REG_ADDR[15:2] , 2'b00} == `ATRDECCERRCNTR);
 assign w_hit_eccerrinsr     = ({REG_ADDR[15:2] , 2'b00} == `ECCERRINSR);
@@ -166,14 +157,22 @@ assign REG_COL_FSTK_RDSTOP = ~w_col_fstk_rdstop_n;
 
 // HRMEM Interrupt Status Register
 //----------------------------------------------
+reg r_atrde2err_sts;
+reg r_axie2err_sts;
+reg r_atrde1err_sts;
+reg r_axie1err_sts;
 reg r_ecdisint_sts;
 reg r_e2errint_sts;
 reg r_e1errint_sts;
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
-    r_ecdisint_sts <= 0;
-    r_e2errint_sts <= 0;
-    r_e1errint_sts <= 0;
+    r_atrde2err_sts <= 0;
+    r_axie2err_sts  <= 0;
+    r_atrde1err_sts <= 0;
+    r_axie1err_sts  <= 0;
+    r_ecdisint_sts  <= 0;
+    r_e2errint_sts  <= 0;
+    r_e1errint_sts  <= 0;
   end else begin
     if (w_hit_hrmintstr & w_reg_write) begin
       if (REG_BYTEEN[1]) begin
@@ -181,12 +180,26 @@ always @ (posedge SYSCLK or negedge RESETB) begin
           r_ecdisint_sts <= 0;
       end
       if (REG_BYTEEN[0]) begin
-        if (REG_WDATA[`E2ERRINT])
-          r_e2errint_sts <= 0;
-        if (REG_WDATA[`E1ERRINT])
-          r_e1errint_sts <= 0;
+        if (REG_WDATA[`E2ERRINT]) begin
+          r_atrde2err_sts <= 0;
+          r_axie2err_sts  <= 0;
+          r_e2errint_sts  <= 0;
+        end
+        if (REG_WDATA[`E1ERRINT]) begin
+          r_atrde1err_sts <= 0;
+          r_axie1err_sts  <= 0;
+          r_e1errint_sts  <= 0;
+        end
       end
     end
+    if (REG_RAM_ECC2ERR_ATRD)
+      r_atrde2err_sts <= 1'b1;
+    if (REG_RAM_ECC2ERR_AXI)
+      r_axie2err_sts <= 1'b1;
+    if (REG_RAM_ECC1ERR_ATRD)
+      r_atrde1err_sts <= 1'b1;
+    if (REG_RAM_ECC1ERR_AXI)
+      r_axie1err_sts <= 1'b1;
     if (REG_ECC_COL_DISC)
       r_ecdisint_sts <= 1'b1;
     if (REG_RAM_ECC2ERR)
@@ -198,9 +211,13 @@ end
 
 wire [31:0] w_rd_hrmintstr;
 assign w_rd_hrmintstr = (w_hit_hrmintstr & w_reg_read) ?
-                        {{32-1-`ECDISINT{1'b0}}, r_ecdisint_sts, {`ECDISINT{1'b0}}} |
-                        {{32-1-`E2ERRINT{1'b0}}, r_e2errint_sts, {`E2ERRINT{1'b0}}} |
-                        {{32-1-`E1ERRINT{1'b0}}, r_e1errint_sts, {`E1ERRINT{1'b0}}} :
+                        {{32-1-`ATRDE2ERR{1'b0}}, r_atrde2err_sts, {`ATRDE2ERR{1'b0}}} |
+                        {{32-1-`AXIE2ERR{1'b0}},  r_axie2err_sts,  {`AXIE2ERR{1'b0}}} |
+                        {{32-1-`ATRDE1ERR{1'b0}}, r_atrde1err_sts, {`ATRDE1ERR{1'b0}}} |
+                        {{32-1-`AXIE1ERR{1'b0}},  r_axie1err_sts,  {`AXIE1ERR{1'b0}}} |
+                        {{32-1-`ECDISINT{1'b0}},  r_ecdisint_sts,  {`ECDISINT{1'b0}}} |
+                        {{32-1-`E2ERRINT{1'b0}},  r_e2errint_sts,  {`E2ERRINT{1'b0}}} |
+                        {{32-1-`E1ERRINT{1'b0}},  r_e1errint_sts,  {`E1ERRINT{1'b0}}} :
                         32'h0;
 
 // HRMEM Interrupt Enable Register
@@ -258,118 +275,6 @@ always @ (posedge SYSCLK or negedge RESETB) begin
     end
   end
 end
-
-// AXI ECC 1bit Error Status Register
-//----------------------------------------------
-reg [P_MEM_NUM-1:0] r_axie1err_sts;
-generate
-  for(gn=0; gn<P_MEM_NUM; gn=gn+1) begin : axie1err_gen
-    always @ (posedge SYSCLK or negedge RESETB) begin
-      if (!RESETB) begin
-        r_axie1err_sts[gn] <= 0;
-      end else begin
-        if (REG_RAM_ECC1ERR_AXI[gn])
-          r_axie1err_sts[gn] <= 1'b1;
-        if (w_hit_axiecc1errr & w_reg_write) begin
-          if (((gn >= 24 & gn <= 31 & REG_BYTEEN[3]) |
-               (gn >= 16 & gn <= 23 & REG_BYTEEN[2]) |
-               (gn >=  8 & gn <= 15 & REG_BYTEEN[1]) |
-               (gn >=  0 & gn <=  7 & REG_BYTEEN[0]) ) & REG_WDATA[gn])
-            r_axie1err_sts[gn] <= 0;
-        end
-      end
-    end
-  end
-endgenerate
-
-wire [31:0] w_rd_axiecc1errr;
-assign w_rd_axiecc1errr = (w_hit_axiecc1errr & w_reg_read) ?
-                          {{32-P_MEM_NUM-`AXIE1ERR{1'b0}}, r_axie1err_sts, {`AXIE1ERR{1'b0}}} :
-                          32'h0;
-
-// AXI ECC 2bit Error Status Register
-//----------------------------------------------
-reg [P_MEM_NUM-1:0] r_axie2err_sts;
-generate
-  for(gn=0; gn<P_MEM_NUM; gn=gn+1) begin : axie2err_gen
-    always @ (posedge SYSCLK or negedge RESETB) begin
-      if (!RESETB) begin
-        r_axie2err_sts[gn] <= 0;
-      end else begin
-        if (REG_RAM_ECC2ERR_AXI[gn])
-          r_axie2err_sts[gn] <= 1'b1;
-        if (w_hit_axiecc2errr & w_reg_write) begin
-          if (((gn >= 24 & gn <= 31 & REG_BYTEEN[3]) |
-               (gn >= 16 & gn <= 23 & REG_BYTEEN[2]) |
-               (gn >=  8 & gn <= 15 & REG_BYTEEN[1]) |
-               (gn >=  0 & gn <=  7 & REG_BYTEEN[0]) ) & REG_WDATA[gn])
-            r_axie2err_sts[gn] <= 0;
-        end
-      end
-    end
-  end
-endgenerate
-
-wire [31:0] w_rd_axiecc2errr;
-assign w_rd_axiecc2errr = (w_hit_axiecc2errr & w_reg_read) ?
-                          {{32-P_MEM_NUM-`AXIE2ERR{1'b0}}, r_axie2err_sts, {`AXIE2ERR{1'b0}}} :
-                          32'h0;
-
-// ATRD ECC 1bit Error Status Register
-//----------------------------------------------
-reg [P_MEM_NUM-1:0] r_atrde1err_sts;
-generate
-  for(gn=0; gn<P_MEM_NUM; gn=gn+1) begin : atrde1err_gen
-    always @ (posedge SYSCLK or negedge RESETB) begin
-      if (!RESETB) begin
-        r_atrde1err_sts[gn] <= 0;
-      end else begin
-        if (REG_RAM_ECC1ERR_ATRD[gn])
-          r_atrde1err_sts[gn] <= 1'b1;
-        if (w_hit_atrdecc1errr & w_reg_write) begin
-          if (((gn >= 24 & gn <= 31 & REG_BYTEEN[3]) |
-               (gn >= 16 & gn <= 23 & REG_BYTEEN[2]) |
-               (gn >=  8 & gn <= 15 & REG_BYTEEN[1]) |
-               (gn >=  0 & gn <=  7 & REG_BYTEEN[0]) ) & REG_WDATA[gn])
-            r_atrde1err_sts[gn] <= 0;
-        end
-      end
-    end
-  end
-endgenerate
-
-wire [31:0] w_rd_atrdecc1errr;
-assign w_rd_atrdecc1errr = (w_hit_atrdecc1errr & w_reg_read) ?
-                           {{32-P_MEM_NUM-`ATRDE1ERR{1'b0}}, r_atrde1err_sts, {`ATRDE1ERR{1'b0}}} :
-                           32'h0;
-
-// ATRD ECC 2bit Error Status Register
-//----------------------------------------------
-reg [P_MEM_NUM-1:0] r_atrde2err_sts;
-generate
-  for(gn=0; gn<P_MEM_NUM; gn=gn+1) begin : atrde2err_gen
-    always @ (posedge SYSCLK or negedge RESETB) begin
-      if (!RESETB) begin
-        r_atrde2err_sts[gn] <= 0;
-      end else begin
-        if (REG_RAM_ECC2ERR_ATRD[gn])
-          r_atrde2err_sts[gn] <= 1'b1;
-        if (w_hit_atrdecc2errr & w_reg_write) begin
-          if (((gn >= 24 & gn <= 31 & REG_BYTEEN[3]) |
-               (gn >= 16 & gn <= 23 & REG_BYTEEN[2]) |
-               (gn >=  8 & gn <= 15 & REG_BYTEEN[1]) |
-               (gn >=  0 & gn <=  7 & REG_BYTEEN[0]) ) & REG_WDATA[gn])
-            r_atrde2err_sts[gn] <= 0;
-        end
-      end
-    end
-  end
-endgenerate
-
-wire [31:0] w_rd_atrdecc2errr;
-assign w_rd_atrdecc2errr = (w_hit_atrdecc2errr & w_reg_read) ?
-                           {{32-P_MEM_NUM-`ATRDE2ERR{1'b0}}, r_atrde2err_sts, {`ATRDE2ERR{1'b0}}} :
-                           32'h0;
 
 // AXI ECC Error Count Register
 //----------------------------------------------
@@ -520,10 +425,6 @@ assign REG_RDATA = w_rd_ecccolenr |
                    w_rd_hrmintenr |
                    w_rd_eccerrcntr |
                    w_rd_ecdiscntr |
-                   w_rd_axiecc1errr |
-                   w_rd_axiecc2errr |
-                   w_rd_atrdecc1errr |
-                   w_rd_atrdecc2errr |
                    w_rd_axieccerrcntr |
                    w_rd_atrdeccerrcntr |
                    w_rd_eccerrinsr |
