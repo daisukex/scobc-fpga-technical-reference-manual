@@ -214,8 +214,9 @@ always @ (posedge SYSCLK or negedge RESETB) begin
     r_e2errint_enb <= 0;
     r_e1errint_enb <= 0;
   end else if (w_hit_hrmintenr & w_reg_write) begin
-    if (REG_BYTEEN[0]) begin
+    if (REG_BYTEEN[1])
       r_ecdisint_enb <= REG_WDATA[`ECDISINTENB];
+    if (REG_BYTEEN[0]) begin
       r_e2errint_enb <= REG_WDATA[`E2ERRINTENB];
       r_e1errint_enb <= REG_WDATA[`E1ERRINTENB];
     end

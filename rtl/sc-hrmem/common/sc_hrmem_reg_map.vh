@@ -18,10 +18,10 @@
 `define  E2ERRINT               1
 `define  ECDISINT               8
 // HRMEM Interrupt Enable Register
-`define HRMINTENR        16'h001C
+`define HRMINTENR        16'h0014
 `define  E1ERRINTENB            0
 `define  E2ERRINTENB            1
-`define  ECDISINTENB            2
+`define  ECDISINTENB            8
 // ECC Error Count Register
 `define ECCERRCNTR       16'h0020
 `define  E1ERRCNT               0
