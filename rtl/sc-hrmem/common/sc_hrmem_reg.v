@@ -76,7 +76,7 @@ assign w_reg_write = REG_ACC &  REG_W1R0;
 assign w_reg_read  = REG_ACC & !REG_W1R0;
 
 // Address Decoder
-wire w_hit_eccenr;
+wire w_hit_ecccolenr;
 wire w_hit_memscrbenr;
 wire w_hit_memscrctrlr;
 wire w_hit_ecc1errintr;
@@ -98,7 +98,7 @@ wire w_hit_spepfenr;
 wire w_hit_pfbufflushr;
 wire [P_SP_PFB_LINE_NUM-1:0] w_hit_spepfadrsetr;
 wire w_hit_hrmemver;
-assign w_hit_eccenr         = ({REG_ADDR[15:2] , 2'b00} == `ECCENR);
+assign w_hit_ecccolenr      = ({REG_ADDR[15:2] , 2'b00} == `ECCCOLENR);
 assign w_hit_memscrbenr     = ({REG_ADDR[15:2] , 2'b00} == `MEMSCRBENR);
 assign w_hit_memscrctrlr    = ({REG_ADDR[15:2] , 2'b00} == `MEMSCRCTRLR);
 assign w_hit_ecc1errintr    = ({REG_ADDR[15:2] , 2'b00} == `ECC1ERRINTR);
@@ -125,21 +125,21 @@ generate
 endgenerate
 assign w_hit_hrmemver       = ({REG_ADDR[15:2] , 2'b00} == `HRMEMVER);
 
-// ECC Enable Register
+// ECC Error Collect Enable Register
 //----------------------------------------------
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
     REG_ECC_COL_EN <= 1'b1;
-  end else if (w_hit_eccenr & w_reg_write) begin
+  end else if (w_hit_ecccolenr & w_reg_write) begin
     if (REG_BYTEEN[0])
       REG_ECC_COL_EN <= REG_WDATA[`ECCCOLEN];
   end
 end
 
-wire [31:0] w_rd_eccenr;
-assign w_rd_eccenr = (w_hit_eccenr & w_reg_read) ?
-                     {{32-1-`ECCCOLEN{1'b0}}, REG_ECC_COL_EN, {`ECCCOLEN{1'b0}}} :
-                     32'h0;
+wire [31:0] w_rd_ecccolenr;
+assign w_rd_ecccolenr = (w_hit_ecccolenr & w_reg_read) ?
+                        {{32-1-`ECCCOLEN{1'b0}}, REG_ECC_COL_EN, {`ECCCOLEN{1'b0}}} :
+                        32'h0;
 
 // Memory Scrubing Enable Register
 //----------------------------------------------
@@ -576,7 +576,7 @@ assign HRMEM_INT = (r_ecdisint_enb & |r_ecdisint_sts) |
 
 // AHB Read Data
 //----------------------------------------------
-assign REG_RDATA = w_rd_eccenr |
+assign REG_RDATA = w_rd_ecccolenr |
                    w_rd_memscrbenr |
                    w_rd_memscrctrlr |
                    w_rd_ecc1errintr |

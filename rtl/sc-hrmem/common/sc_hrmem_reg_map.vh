@@ -4,8 +4,8 @@
 //-----------------------------------------------
 // Copyright © 2022 Space Cubics, LLC.
 //-----------------------------------------------
-// ECC Enable Register
-`define ECCENR           16'h0000
+// ECC Error Collect Enable Register
+`define ECCCOLENR        16'h0000
 `define  ECCCOLEN               0
 // Memory Scrubing Enable Register
 `define MEMSCRBENR       16'h0004

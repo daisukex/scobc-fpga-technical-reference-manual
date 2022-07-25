@@ -226,9 +226,9 @@ initial begin
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCERRCNTR), .expdata(0), .check(1));
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECDISCNTR), .expdata(0), .check(1));
   display_subcount_text(2, "Check ECC Enable Register", 1);
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCENR), .expdata(1<<`ECCCOLEN), .check(1));
-  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`ECCENR), .data(0<<`ECCCOLEN));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCENR), .expdata(0<<`ECCCOLEN), .check(1));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .expdata(1<<`ECCCOLEN), .check(1));
+  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .data(0<<`ECCCOLEN));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .expdata(0<<`ECCCOLEN), .check(1));
   display_subcount_text(3, "Check Memory Scrubing Enable Register", 1);
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRBENR), .expdata(0<<`MEMSCRBEN), .check(1));
   write_transaction(.master(2), .addr(`HRMEMREG_BASE+`MEMSCRBENR), .data(1<<`MEMSCRBEN));
