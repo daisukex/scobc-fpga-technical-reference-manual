@@ -7,13 +7,11 @@
 // ECC Error Collect Enable Register
 `define ECCCOLENR        16'h0000
 `define  ECCCOLEN               0
-// Memory Scrubing Enable Register
-`define MEMSCRBENR       16'h0004
-`define  MEMSCRBEN              0
 // Memory Scrubing Control Register
 `define MEMSCRCTRLR      16'h0008
-`define  MEMSCRCYC              0
-`define  COLFSRDSTPB           16
+`define  MEMSCRBEN              0
+`define  COLFSRDSTPB            8
+`define  MEMSCRCYC             16
 // ECC 1bit Error Interrupt Register
 `define ECC1ERRINTR      16'h0010
 `define  E1ERRINT               0

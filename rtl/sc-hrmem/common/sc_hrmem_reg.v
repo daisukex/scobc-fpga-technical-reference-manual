@@ -77,7 +77,6 @@ assign w_reg_read  = REG_ACC & !REG_W1R0;
 
 // Address Decoder
 wire w_hit_ecccolenr;
-wire w_hit_memscrbenr;
 wire w_hit_memscrctrlr;
 wire w_hit_ecc1errintr;
 wire w_hit_ecc2errintr;
@@ -99,7 +98,6 @@ wire w_hit_pfbufflushr;
 wire [P_SP_PFB_LINE_NUM-1:0] w_hit_spepfadrsetr;
 wire w_hit_hrmemver;
 assign w_hit_ecccolenr      = ({REG_ADDR[15:2] , 2'b00} == `ECCCOLENR);
-assign w_hit_memscrbenr     = ({REG_ADDR[15:2] , 2'b00} == `MEMSCRBENR);
 assign w_hit_memscrctrlr    = ({REG_ADDR[15:2] , 2'b00} == `MEMSCRCTRLR);
 assign w_hit_ecc1errintr    = ({REG_ADDR[15:2] , 2'b00} == `ECC1ERRINTR);
 assign w_hit_ecc2errintr    = ({REG_ADDR[15:2] , 2'b00} == `ECC2ERRINTR);
@@ -141,22 +139,6 @@ assign w_rd_ecccolenr = (w_hit_ecccolenr & w_reg_read) ?
                         {{32-1-`ECCCOLEN{1'b0}}, REG_ECC_COL_EN, {`ECCCOLEN{1'b0}}} :
                         32'h0;
 
-// Memory Scrubing Enable Register
-//----------------------------------------------
-always @ (posedge SYSCLK or negedge RESETB) begin
-  if (!RESETB) begin
-    REG_MEM_SCRB_EN <= 0;
-  end else if (w_hit_memscrbenr & w_reg_write) begin
-    if (REG_BYTEEN[0])
-      REG_MEM_SCRB_EN <= REG_WDATA[`MEMSCRBEN];
-  end
-end
-
-wire [31:0] w_rd_memscrbenr;
-assign w_rd_memscrbenr = (w_hit_memscrbenr & w_reg_read) ?
-                         {{32-1-`MEMSCRBEN{1'b0}}, REG_MEM_SCRB_EN, {`MEMSCRBEN{1'b0}}} :
-                         32'h0;
-
 // Memory Scrubing Control Register
 //----------------------------------------------
 reg w_col_fstk_rdstop_n;
@@ -164,20 +146,24 @@ always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
     w_col_fstk_rdstop_n <= 0;
     REG_MEM_SCRB_CYCLE  <= P_MSC_INI;
+    REG_MEM_SCRB_EN     <= 0;
   end else if (w_hit_memscrctrlr & w_reg_write) begin
-    if (REG_BYTEEN[2])
-      w_col_fstk_rdstop_n      <= REG_WDATA[`COLFSRDSTPB];
-    if (REG_BYTEEN[1])
+    if (REG_BYTEEN[3])
       REG_MEM_SCRB_CYCLE[15:8] <= REG_WDATA[`MEMSCRCYC+8 +: 8];
-    if (REG_BYTEEN[0])
+    if (REG_BYTEEN[2])
       REG_MEM_SCRB_CYCLE[7:0]  <= REG_WDATA[`MEMSCRCYC +: 8];
+    if (REG_BYTEEN[1])
+      w_col_fstk_rdstop_n      <= REG_WDATA[`COLFSRDSTPB];
+    if (REG_BYTEEN[0])
+      REG_MEM_SCRB_EN          <= REG_WDATA[`MEMSCRBEN];
   end
 end
 
 wire [31:0] w_rd_memscrctrlr;
 assign w_rd_memscrctrlr = (w_hit_memscrctrlr & w_reg_read) ?
+                          {{32-16-`MEMSCRCYC{1'b0}},   REG_MEM_SCRB_CYCLE,  {`MEMSCRCYC{1'b0}}} |
                           {{32- 1-`COLFSRDSTPB{1'b0}}, w_col_fstk_rdstop_n, {`COLFSRDSTPB{1'b0}}} |
-                          {{32-16-`MEMSCRCYC{1'b0}},   REG_MEM_SCRB_CYCLE,  {`MEMSCRCYC{1'b0}}} :
+                          {{32- 1-`MEMSCRBEN{1'b0}},   REG_MEM_SCRB_EN,     {`MEMSCRBEN{1'b0}}} :
                           32'h0;
 
 assign REG_COL_FSTK_RDSTOP = ~w_col_fstk_rdstop_n;
@@ -577,7 +563,6 @@ assign HRMEM_INT = (r_ecdisint_enb & |r_ecdisint_sts) |
 // AHB Read Data
 //----------------------------------------------
 assign REG_RDATA = w_rd_ecccolenr |
-                   w_rd_memscrbenr |
                    w_rd_memscrctrlr |
                    w_rd_ecc1errintr |
                    w_rd_ecc2errintr |
