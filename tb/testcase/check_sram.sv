@@ -223,6 +223,7 @@ initial begin
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`HRMINTSTR), .expdata(0), .check(1));
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECC1ERRCNTR), .expdata(0), .check(1));
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECDISCNTR), .expdata(0), .check(1));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCERRADMR), .expdata(0), .check(1));
   display_subcount_text(2, "Check ECC Enable Register", 1);
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .expdata(1<<`ECCCOLEN), .check(1));
   write_transaction(.master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .data(0<<`ECCCOLEN));

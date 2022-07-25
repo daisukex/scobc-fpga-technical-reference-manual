@@ -69,6 +69,7 @@ module sc_hrmem_unit_sram_wrap # (
   output                      RAM_ECC2ERR_AXI,
   output                      RAM_ECC1ERR_ATRD,
   output                      RAM_ECC2ERR_ATRD,
+  output     [P_AXI_AD_W-1:0] RAM_ECCERR_ADR,
   output                      ECC_COL_DISC,
   output reg [15:0]           RAM_ECC1ERR_AXI_CNT,
   output reg [15:0]           RAM_ECC2ERR_AXI_CNT,
@@ -177,8 +178,11 @@ sc_hrmem_unit_sram_ctrl # (
   .RAM_ECC2ERR_AXI(RAM_ECC2ERR_AXI),                // output
   .RAM_ECC1ERR_ATRD(RAM_ECC1ERR_ATRD),              // output
   .RAM_ECC2ERR_ATRD(RAM_ECC2ERR_ATRD),              // output
+  .RAM_ECCERR_ADR(RAM_ECCERR_ADR[P_AXI_AD_W-1:2]),  // output [P_AD_W-1:0]
   .ECC_COL_DISC(ECC_COL_DISC)                       // output
 );
+
+assign RAM_ECCERR_ADR[1:0] = 2'b00;
 
 // Unit RAM Read Enable Retiming
 always @ (posedge RAM_CLK or negedge RESET_N) begin

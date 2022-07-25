@@ -58,6 +58,7 @@ module sc_hrmem_unit_sram_ctrl # (
   output                RAM_ECC2ERR_AXI,
   output                RAM_ECC1ERR_ATRD,
   output                RAM_ECC2ERR_ATRD,
+  output [P_AD_W-1:0]   RAM_ECCERR_ADR,
   output                ECC_COL_DISC
 );
 
@@ -134,6 +135,7 @@ sc_hrmem_sram_ecc_ctrl # (
   .RAM_ECC2ERR_AXI(RAM_ECC2ERR_AXI),       // output
   .RAM_ECC1ERR_ATRD(RAM_ECC1ERR_ATRD),     // output
   .RAM_ECC2ERR_ATRD(RAM_ECC2ERR_ATRD),     // output
+  .RAM_ECCERR_ADR(RAM_ECCERR_ADR),         // output [P_AD_W-1:0]
   .ECC_COL_DISC(ECC_COL_DISC)              // output
 );
 

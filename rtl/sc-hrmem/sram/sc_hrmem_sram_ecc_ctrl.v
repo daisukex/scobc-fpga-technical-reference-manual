@@ -56,6 +56,7 @@ module sc_hrmem_sram_ecc_ctrl # (
   output reg              RAM_ECC2ERR_AXI,
   output reg              RAM_ECC1ERR_ATRD,
   output reg              RAM_ECC2ERR_ATRD,
+  output reg [P_AD_W-1:0] RAM_ECCERR_ADR,
   output reg              ECC_COL_DISC
 );
 
@@ -334,6 +335,7 @@ always @ (posedge CLK or negedge RESET_N) begin
     RAM_ECC2ERR_AXI  <= 0;
     RAM_ECC1ERR_ATRD <= 0;
     RAM_ECC2ERR_ATRD <= 0;
+    RAM_ECCERR_ADR   <= 0;
   end else begin
     RAM_ECC1ERR      <= ram_ren_2p & INT_ECC1ERR;
     RAM_ECC2ERR      <= ram_ren_2p & INT_ECC2ERR;
@@ -341,6 +343,8 @@ always @ (posedge CLK or negedge RESET_N) begin
     RAM_ECC2ERR_AXI  <= ram_rd_axi_2p  & INT_ECC2ERR;
     RAM_ECC1ERR_ATRD <= ram_rd_atrd_2p & INT_ECC1ERR;
     RAM_ECC2ERR_ATRD <= ram_rd_atrd_2p & INT_ECC2ERR;
+    if (ram_ren_2p & (INT_ECC1ERR | INT_ECC2ERR))
+      RAM_ECCERR_ADR   <= ECCERR_ADR;
   end
 end
 

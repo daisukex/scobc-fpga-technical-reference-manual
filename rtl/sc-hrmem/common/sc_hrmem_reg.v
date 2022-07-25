@@ -40,6 +40,7 @@ module sc_hrmem_reg # (
   input REG_RAM_ECC2ERR_AXI,
   input REG_RAM_ECC1ERR_ATRD,
   input REG_RAM_ECC2ERR_ATRD,
+  input [P_AD_W-1:0] REG_ECCERR_ADR,
   input REG_ECC_COL_DISC,
   input [15:0] REG_RAM_ECC1ERR_AXI_CNT,
   input [15:0] REG_RAM_ECC2ERR_AXI_CNT,
@@ -81,6 +82,7 @@ wire w_hit_ecc1errcntr;
 wire w_hit_ecc2errcntr;
 wire w_hit_ecdiscntr;
 wire w_hit_errcntclrr;
+wire w_hit_eccerradmr;
 wire w_hit_eccerrinsr;
 wire w_hit_pfemdctlr;
 wire w_hit_spepfenr;
@@ -95,6 +97,7 @@ assign w_hit_ecc1errcntr    = ({REG_ADDR[15:2] , 2'b00} == `ECC1ERRCNTR);
 assign w_hit_ecc2errcntr    = ({REG_ADDR[15:2] , 2'b00} == `ECC2ERRCNTR);
 assign w_hit_ecdiscntr      = ({REG_ADDR[15:2] , 2'b00} == `ECDISCNTR);
 assign w_hit_errcntclrr     = ({REG_ADDR[15:2] , 2'b00} == `ERRCNTCLRR);
+assign w_hit_eccerradmr     = ({REG_ADDR[15:2] , 2'b00} == `ECCERRADMR);
 assign w_hit_eccerrinsr     = ({REG_ADDR[15:2] , 2'b00} == `ECCERRINSR);
 assign w_hit_pfemdctlr      = ({REG_ADDR[15:2] , 2'b00} == `PFEMDCTLR);
 assign w_hit_spepfenr       = ({REG_ADDR[15:2] , 2'b00} == `SPEPFENR);
@@ -280,6 +283,13 @@ always @ (posedge SYSCLK or negedge RESETB) begin
   end
 end
 
+// ECC Error Address Monitor Register
+//----------------------------------------------
+wire [31:0] w_rd_eccerradmr;
+assign w_rd_eccerradmr = (w_hit_eccerradmr & w_reg_read) ?
+                         {{32-P_AD_W-`ECCERRADR{1'b0}}, REG_ECCERR_ADR, {`ECCERRADR{1'b0}}} :
+                         32'h0;
+
 // ECC Error Occurrence factor Insert Register
 //----------------------------------------------
 always @ (posedge SYSCLK or negedge RESETB) begin
@@ -414,6 +424,7 @@ assign REG_RDATA = w_rd_ecccolenr |
                    w_rd_ecc1errcntr |
                    w_rd_ecc2errcntr |
                    w_rd_ecdiscntr |
+                   w_rd_eccerradmr |
                    w_rd_eccerrinsr |
                    w_rd_pfemdctlr |
                    w_rd_spepfenr |

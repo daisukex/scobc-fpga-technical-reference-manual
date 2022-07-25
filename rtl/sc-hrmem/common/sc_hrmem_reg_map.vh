@@ -40,6 +40,9 @@
 // Error Count Clear Register
 `define ERRCNTCLRR       16'h002C
 `define  ECNTCLR                0
+// ECC Error Address Monitor Register
+`define ECCERRADMR       16'h0030
+`define  ECCERRADR              0
 // ECC Error Occurrence factor Insert Register
 `define ECCERRINSR       16'h0060
 `define  E1ERRINS               0
