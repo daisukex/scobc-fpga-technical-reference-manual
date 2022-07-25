@@ -107,7 +107,7 @@ parameter P_MEM_NUM = 1;
 parameter P_BUS_AD_W = 22;
 parameter P_MEM_AD_W = 20; // SRAM Depth(1Unit): 1M
 parameter P_DT_W = 32;
-parameter [15:0] P_MSC_INI = 16'h1;
+parameter [15:0] P_MSC_INI = 16'h06FF;
 
 parameter P_BANK_W = (P_DT_W == (2 << 4)) ? 2 :
                      (P_DT_W == (2 << 5)) ? 3 :
