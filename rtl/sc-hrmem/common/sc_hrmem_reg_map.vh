@@ -26,24 +26,20 @@
 `define  E1ERRINTENB            0
 `define  E2ERRINTENB            1
 `define  ECDISINTENB            8
-// ECC Error Count Register
-`define ECCERRCNTR       16'h0020
-`define  E1ERRCNT               0
-`define  E2ERRCNT              16
+// 1Bit ECC Error Count Register
+`define ECC1ERRCNTR      16'h0020
+`define  AXIE1ERRCNT            0
+`define  ATRDE1ERRCNT          16
+// 2Bit ECC Error Count Register
+`define ECC2ERRCNTR      16'h0024
+`define  AXIE2ERRCNT            0
+`define  ATRDE2ERRCNT          16
 // ECC Correct Data Discard Count Register
-`define ECDISCNTR        16'h0024
+`define ECDISCNTR        16'h0028
 `define  ECDISCNT               0
 // Error Count Clear Register
-`define ERRCNTCLRR       16'h0028
+`define ERRCNTCLRR       16'h002C
 `define  ECNTCLR                0
-// AXI ECC Error Count Register
-`define AXIECCERRCNTR    16'h0050
-`define  AXIE1ERRCNT            0
-`define  AXIE2ERRCNT           16
-// ATRD ECC Error Count Register
-`define ATRDECCERRCNTR   16'h0054
-`define  ATRDE1ERRCNT           0
-`define  ATRDE2ERRCNT          16
 // ECC Error Occurrence factor Insert Register
 `define ECCERRINSR       16'h0060
 `define  E1ERRINS               0

@@ -140,8 +140,6 @@ wire w_reg_ram_ecc2err_axi;
 wire w_reg_ram_ecc1err_atrd;
 wire w_reg_ram_ecc2err_atrd;
 wire w_reg_ecc_col_disc;
-wire [15:0] w_reg_ram_ecc1err_cnt;
-wire [15:0] w_reg_ram_ecc2err_cnt;
 wire [15:0] w_reg_ram_ecc1err_axi_cnt;
 wire [15:0] w_reg_ram_ecc2err_axi_cnt;
 wire [15:0] w_reg_ram_ecc1err_atrd_cnt;
@@ -289,8 +287,6 @@ sc_hrmem_reg # (
   .REG_RAM_ECC1ERR_ATRD(w_reg_ram_ecc1err_atrd),         // input
   .REG_RAM_ECC2ERR_ATRD(w_reg_ram_ecc2err_atrd),         // input
   .REG_ECC_COL_DISC(w_reg_ecc_col_disc),                 // input
-  .REG_RAM_ECC1ERR_CNT(w_reg_ram_ecc1err_cnt),           // input [15:0]
-  .REG_RAM_ECC2ERR_CNT(w_reg_ram_ecc2err_cnt),           // input [15:0]
   .REG_RAM_ECC1ERR_AXI_CNT(w_reg_ram_ecc1err_axi_cnt),   // input [15:0]
   .REG_RAM_ECC2ERR_AXI_CNT(w_reg_ram_ecc2err_axi_cnt),   // input [15:0]
   .REG_RAM_ECC1ERR_ATRD_CNT(w_reg_ram_ecc1err_atrd_cnt), // input [15:0]
@@ -623,8 +619,6 @@ sc_hrmem_unit_sram_wrap # (
   .RAM_ECC1ERR_ATRD(w_reg_ram_ecc1err_atrd),         // output
   .RAM_ECC2ERR_ATRD(w_reg_ram_ecc2err_atrd),         // output
   .ECC_COL_DISC(w_reg_ecc_col_disc),                 // output
-  .RAM_ECC1ERR_CNT(w_reg_ram_ecc1err_cnt),           // output [15:0]
-  .RAM_ECC2ERR_CNT(w_reg_ram_ecc2err_cnt),           // output [15:0]
   .RAM_ECC1ERR_AXI_CNT(w_reg_ram_ecc1err_axi_cnt),   // output [15:0]
   .RAM_ECC2ERR_AXI_CNT(w_reg_ram_ecc2err_axi_cnt),   // output [15:0]
   .RAM_ECC1ERR_ATRD_CNT(w_reg_ram_ecc1err_atrd_cnt), // output [15:0]

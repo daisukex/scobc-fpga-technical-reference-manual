@@ -41,8 +41,6 @@ module sc_hrmem_reg # (
   input REG_RAM_ECC1ERR_ATRD,
   input REG_RAM_ECC2ERR_ATRD,
   input REG_ECC_COL_DISC,
-  input [15:0] REG_RAM_ECC1ERR_CNT,
-  input [15:0] REG_RAM_ECC2ERR_CNT,
   input [15:0] REG_RAM_ECC1ERR_AXI_CNT,
   input [15:0] REG_RAM_ECC2ERR_AXI_CNT,
   input [15:0] REG_RAM_ECC1ERR_ATRD_CNT,
@@ -79,11 +77,10 @@ wire w_hit_ecccolenr;
 wire w_hit_memscrctrlr;
 wire w_hit_hrmintstr;
 wire w_hit_hrmintenr;
-wire w_hit_eccerrcntr;
+wire w_hit_ecc1errcntr;
+wire w_hit_ecc2errcntr;
 wire w_hit_ecdiscntr;
 wire w_hit_errcntclrr;
-wire w_hit_axieccerrcntr;
-wire w_hit_atrdeccerrcntr;
 wire w_hit_eccerrinsr;
 wire w_hit_pfemdctlr;
 wire w_hit_spepfenr;
@@ -94,11 +91,10 @@ assign w_hit_ecccolenr      = ({REG_ADDR[15:2] , 2'b00} == `ECCCOLENR);
 assign w_hit_memscrctrlr    = ({REG_ADDR[15:2] , 2'b00} == `MEMSCRCTRLR);
 assign w_hit_hrmintstr      = ({REG_ADDR[15:2] , 2'b00} == `HRMINTSTR);
 assign w_hit_hrmintenr      = ({REG_ADDR[15:2] , 2'b00} == `HRMINTENR);
-assign w_hit_eccerrcntr     = ({REG_ADDR[15:2] , 2'b00} == `ECCERRCNTR);
+assign w_hit_ecc1errcntr    = ({REG_ADDR[15:2] , 2'b00} == `ECC1ERRCNTR);
+assign w_hit_ecc2errcntr    = ({REG_ADDR[15:2] , 2'b00} == `ECC2ERRCNTR);
 assign w_hit_ecdiscntr      = ({REG_ADDR[15:2] , 2'b00} == `ECDISCNTR);
 assign w_hit_errcntclrr     = ({REG_ADDR[15:2] , 2'b00} == `ERRCNTCLRR);
-assign w_hit_axieccerrcntr  = ({REG_ADDR[15:2] , 2'b00} == `AXIECCERRCNTR);
-assign w_hit_atrdeccerrcntr = ({REG_ADDR[15:2] , 2'b00} == `ATRDECCERRCNTR);
 assign w_hit_eccerrinsr     = ({REG_ADDR[15:2] , 2'b00} == `ECCERRINSR);
 assign w_hit_pfemdctlr      = ({REG_ADDR[15:2] , 2'b00} == `PFEMDCTLR);
 assign w_hit_spepfenr       = ({REG_ADDR[15:2] , 2'b00} == `SPEPFENR);
@@ -247,13 +243,21 @@ assign w_rd_hrmintenr = (w_hit_hrmintenr & w_reg_read) ?
                         {{32-1-`E1ERRINTENB{1'b0}}, r_e1errint_enb, {`E1ERRINTENB{1'b0}}} :
                         32'h0;
 
-// ECC Error Count Register
+// 1Bit ECC Error Count Register
 //----------------------------------------------
-wire [31:0] w_rd_eccerrcntr;
-assign w_rd_eccerrcntr = (w_hit_eccerrcntr & w_reg_read) ?
-                         {{32-16-`E2ERRCNT{1'b0}}, REG_RAM_ECC2ERR_CNT, {`E2ERRCNT{1'b0}}} |
-                         {{32-16-`E1ERRCNT{1'b0}}, REG_RAM_ECC1ERR_CNT, {`E1ERRCNT{1'b0}}} :
-                         32'h0;
+wire [31:0] w_rd_ecc1errcntr;
+assign w_rd_ecc1errcntr = (w_hit_ecc1errcntr & w_reg_read) ?
+                          {{32-16-`ATRDE1ERRCNT{1'b0}}, REG_RAM_ECC1ERR_ATRD_CNT, {`ATRDE1ERRCNT{1'b0}}} |
+                          {{32-16-`AXIE1ERRCNT{1'b0}},  REG_RAM_ECC1ERR_AXI_CNT,  {`AXIE1ERRCNT{1'b0}}} :
+                          32'h0;
+
+// 2Bit ECC Error Count Register
+//----------------------------------------------
+wire [31:0] w_rd_ecc2errcntr;
+assign w_rd_ecc2errcntr = (w_hit_ecc2errcntr & w_reg_read) ?
+                          {{32-16-`ATRDE2ERRCNT{1'b0}}, REG_RAM_ECC2ERR_ATRD_CNT, {`ATRDE2ERRCNT{1'b0}}} |
+                          {{32-16-`AXIE2ERRCNT{1'b0}},  REG_RAM_ECC2ERR_AXI_CNT,  {`AXIE2ERRCNT{1'b0}}} :
+                          32'h0;
 
 // ECC Correct Data Discard Count Register
 //----------------------------------------------
@@ -275,22 +279,6 @@ always @ (posedge SYSCLK or negedge RESETB) begin
     end
   end
 end
-
-// AXI ECC Error Count Register
-//----------------------------------------------
-wire [31:0] w_rd_axieccerrcntr;
-assign w_rd_axieccerrcntr = (w_hit_axieccerrcntr & w_reg_read) ?
-                            {{32-16-`AXIE2ERRCNT{1'b0}}, REG_RAM_ECC2ERR_AXI_CNT, {`AXIE2ERRCNT{1'b0}}} |
-                            {{32-16-`AXIE1ERRCNT{1'b0}}, REG_RAM_ECC1ERR_AXI_CNT, {`AXIE1ERRCNT{1'b0}}} :
-                            32'h0;
-
-// ATRD ECC Error Count Register
-//----------------------------------------------
-wire [31:0] w_rd_atrdeccerrcntr;
-assign w_rd_atrdeccerrcntr = (w_hit_atrdeccerrcntr & w_reg_read) ?
-                             {{32-16-`ATRDE2ERRCNT{1'b0}}, REG_RAM_ECC2ERR_ATRD_CNT, {`ATRDE2ERRCNT{1'b0}}} |
-                             {{32-16-`ATRDE1ERRCNT{1'b0}}, REG_RAM_ECC1ERR_ATRD_CNT, {`ATRDE1ERRCNT{1'b0}}} :
-                             32'h0;
 
 // ECC Error Occurrence factor Insert Register
 //----------------------------------------------
@@ -423,10 +411,9 @@ assign REG_RDATA = w_rd_ecccolenr |
                    w_rd_memscrctrlr |
                    w_rd_hrmintstr |
                    w_rd_hrmintenr |
-                   w_rd_eccerrcntr |
+                   w_rd_ecc1errcntr |
+                   w_rd_ecc2errcntr |
                    w_rd_ecdiscntr |
-                   w_rd_axieccerrcntr |
-                   w_rd_atrdeccerrcntr |
                    w_rd_eccerrinsr |
                    w_rd_pfemdctlr |
                    w_rd_spepfenr |
