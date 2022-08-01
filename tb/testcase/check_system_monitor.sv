@@ -31,7 +31,7 @@ end
 
 assign testcase_name = "Check System Monitor";
 initial begin
-  timeout_ms = 100;
+  timeout_ms = 10;
   skip_sram_init();
   @ (posedge SYS_RSTB);
 
@@ -51,13 +51,13 @@ initial begin
   simcount = 1;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  force dut.obc_core.lpahb.system_monitor.sysmon_reg.SWDOG_LOWCUP_VALUE = 24'h0D4C0;
+  force dut.obc_core.lpahb.system_monitor.sysmon_reg.SWDOG_LOWCUP_VALUE = 24'h01546;
   repeat (10) @(posedge SYS_CLK);
 
   @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h03A97F<<`SM_WDOG_SIVAL), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h005DBF<<`SM_WDOG_SIVAL));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h005DBF<<`SM_WDOG_SIVAL), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h00095F<<`SM_WDOG_SIVAL));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h00095F<<`SM_WDOG_SIVAL), .check(1));
   repeat (10) @(posedge SYS_CLK);
 
   //--------------------------------------------------
@@ -67,7 +67,7 @@ initial begin
   clear_toggle_counter;
   i = 1;
   repeat (20) begin
-    #(100_000_000);
+    #(10_000_000);
     display_subcount_text(i, "Watchdog Wait", 1);
     i = i + 1;
   end
@@ -102,12 +102,12 @@ initial begin
   repeat (20) begin
     display_subcount_text(i, "Software Watchdog Kick", 1);
     write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'h5A5A <<`SM_WDOG_WSR));
-    #(100_000_000);
+    #(10_000_000);
     i = i + 1;
 
     display_subcount_text(i, "Software Watchdog Kick", 1);
     write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'hA5A5 <<`SM_WDOG_WSR));
-    #(100_000_000);
+    #(10_000_000);
     i = i + 1;
   end
 
@@ -129,13 +129,13 @@ initial begin
   simcount = 11;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  force dut.obc_core.lpahb.system_monitor.sysmon_reg.SWDOG_LOWCUP_VALUE = 24'h0D4C0;
+  force dut.obc_core.lpahb.system_monitor.sysmon_reg.SWDOG_LOWCUP_VALUE = 24'h01546;
   repeat (10) @(posedge SYS_CLK);
 
   @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h03A97F<<`SM_WDOG_SIVAL), .check(1));
-  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h005DBF<<`SM_WDOG_SIVAL));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h005DBF<<`SM_WDOG_SIVAL), .check(1));
+  write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL),    .data(20'h00095F<<`SM_WDOG_SIVAL));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_SIVAL), .expdata(20'h00095F<<`SM_WDOG_SIVAL), .check(1));
   repeat (10) @(posedge SYS_CLK);
 
   //--------------------------------------------------
@@ -164,12 +164,12 @@ initial begin
   repeat (20) begin
     display_subcount_text(i, "Software Watchdog Kick", 1);
     write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'h5A5A <<`SM_WDOG_WSR));
-    #(100_000_000);
+    #(10_000_000);
     i = i + 1;
 
     display_subcount_text(i, "Software Watchdog Kick", 1);
     write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_WSR),     .data(16'hA5A5 <<`SM_WDOG_WSR));
-    #(100_000_000);
+    #(10_000_000);
     i = i + 1;
   end
 
@@ -187,7 +187,7 @@ initial begin
   clear_toggle_counter;
   i = 1;
   repeat (20) begin
-    #(100_000_000);
+    #(10_000_000);
     display_subcount_text(i, "Watchdog Wait", 0);
     i = i + 1;
   end
@@ -215,7 +215,7 @@ initial begin
   clear_toggle_counter;
   i = 1;
   repeat (20) begin
-    #(100_000_000);
+    #(10_000_000);
     display_subcount_text(i, "Watchdog Wait", 0);
     i = i + 1;
   end
