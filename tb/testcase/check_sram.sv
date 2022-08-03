@@ -229,11 +229,12 @@ initial begin
   write_transaction(.master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .data(0<<`ECCCOLEN));
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .expdata(0<<`ECCCOLEN), .check(1));
   display_subcount_text(3, "Check Memory Scrubing Control Register", 1);
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata(16'h06FF<<`MEMSCRCYC), .check(1));
-  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .data((1<<`MEMSCRBEN) |
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((1<<`MEMSCRBEN) |
+                                                                             (16'h06FF<<`MEMSCRCYC)), .check(1));
+  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .data((0<<`MEMSCRBEN) |
                                                                           (1<<`COLFSRDSTPB) |
                                                                           (16'hF900<<`MEMSCRCYC)));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((1<<`MEMSCRBEN) |
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((0<<`MEMSCRBEN) |
                                                                              (1<<`COLFSRDSTPB) |
                                                                              (16'hF900<<`MEMSCRCYC)), .check(1));
 
