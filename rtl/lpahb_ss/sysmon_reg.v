@@ -58,6 +58,7 @@ assign REG_RWAT  = xadc_rcycle_latch & ~xadc_dvalid;
 // ----------------------------------------
 wire [2:0] swdog_time;
 reg [2:0] swdog_time_d;
+wire [15:0] rd_wsr;
 always @ (*) begin
   swdog_time_d = swdog_time;
   if (WADR == `SYSMON_WDOG_CTRL) begin
@@ -66,7 +67,7 @@ always @ (*) begin
   end
 end
 sclib_tmr_ff # (.DW(3), .SRVAL(SW_WDOC_TIME_INIT)) swdog_time_reg       (.D(swdog_time_d),       .CLK(HCLK), .SRB(HRESETN), .Q(swdog_time));
-wire [31:0] rd_wdogctrl = 32'h0000_0000 | (swdog_time << `SM_SW_WDOG_TIME);
+wire [31:0] rd_wdogctrl = 32'h0000_0000 | (swdog_time << `SM_SW_WDOG_TIME | (rd_wsr << `SM_WDOG_WSR));
 
 // Watchdog Expire after Reset
 // ----------------------------------------
@@ -92,6 +93,7 @@ reg swdog_reload;
 reg wdog_wsr_phase;
 reg swdog_reload_pulse;
 reg [SWDOG_RELOAD_WIDTH-1:0] swdog_reload_shift;
+assign rd_wsr = (wdog_wsr_phase) ? 16'hA5A5: 16'h5A5A;
 always @ (posedge HCLK) begin
   if (!HRESETN) begin
     swdog_reload <= 1'b0;

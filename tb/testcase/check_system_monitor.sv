@@ -65,9 +65,11 @@ initial begin
   simcount = 2;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h7 <<`SM_SW_WDOG_TIME), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h7 <<`SM_SW_WDOG_TIME |
+                                                                                 16'h5A5A << `SM_WDOG_WSR), .check(1));
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(3'h0 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME |
+                                                                                 16'h5A5A << `SM_WDOG_WSR), .check(1));
   repeat (20) @ (posedge SYS_CLK);
   i=1;
   repeat (20) begin
@@ -116,22 +118,28 @@ initial begin
   simcount = 12;
   //--------------------------------------------------
   @(posedge SYS_CLK);
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h7 <<`SM_SW_WDOG_TIME), .check(1));
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h7 <<`SM_SW_WDOG_TIME |
+                                                                                 16'h5A5A << `SM_WDOG_WSR), .check(1));
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(3'h0 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME), .check(1));
-
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME |
+                                                                                 16'h5A5A << `SM_WDOG_WSR), .check(1));
   repeat (20) @ (posedge SYS_CLK);
   i=1;
   repeat (20) begin
     display_subcount_text(i, "Software Watchdog Kick", 1);
     write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),  .data(3'h0     <<`SM_SW_WDOG_TIME |
                                                                                  16'h5A5A <<`SM_WDOG_WSR));
+
+    read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME |
+                                                                                   16'hA5A5 << `SM_WDOG_WSR), .check(1));
     #(10_000_000);
     i = i + 1;
 
     display_subcount_text(i, "Software Watchdog Kick", 1);
     write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),  .data(3'h0     <<`SM_SW_WDOG_TIME |
                                                                                  16'hA5A5 <<`SM_WDOG_WSR));
+    read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME |
+                                                                                   16'h5A5A << `SM_WDOG_WSR), .check(1));
     #(10_000_000);
     i = i + 1;
   end
@@ -165,8 +173,8 @@ initial begin
 
   @(posedge SYS_CLK);
   write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL),    .data(3'h0 <<`SM_SW_WDOG_TIME));
-  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME), .check(1));
-
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_WDOG_CTRL), .expdata(3'h0 <<`SM_SW_WDOG_TIME |
+                                                                                   16'h5A5A << `SM_WDOG_WSR), .check(1));
   clear_toggle_counter;
   i = 1;
   repeat (20) begin
