@@ -17,6 +17,10 @@
 `define  SR_CFGMEMSELMON              5
 `define  SR_CFGMEMSEL                 4
 `define  SR_CFGMEMOWNER               0
+// Power Cycle Register
+`define SYSREG_PWRCYCLE        16'h0020
+`define  SR_PWECYCLEPKC              16
+`define  SR_PWECYCLEREQ               0
 // Scratch Pad 1 Register
 `define SYSREG_SPAD1           16'h00F0
 `define  SR_SPAD1                     0

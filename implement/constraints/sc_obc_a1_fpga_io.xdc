@@ -146,6 +146,7 @@ set_property [get_ports FPGA_BOOT0]           -dict { PACKAGE_PIN AD26 IOSTANDAR
 set_property [get_ports FPGA_BOOT1]           -dict { PACKAGE_PIN AD25 IOSTANDARD LVCMOS33 }
 set_property [get_ports FPGA_WATCHDOG]        -dict { PACKAGE_PIN AE25 IOSTANDARD LVCMOS33 }
 set_property [get_ports FPGA_RESERVE]         -dict { PACKAGE_PIN AC16 IOSTANDARD LVCMOS33 }
+set_property [get_ports FPGA_PWR_CYCLE_REQ]   -dict { PACKAGE_PIN AE18 IOSTANDARD LVCMOS33 };
 
 # ULPI Interface
 set_property [get_ports ULPI_CS]              -dict { PACKAGE_PIN AB1  IOSTANDARD LVCMOS33 }

@@ -35,7 +35,8 @@ module sysreg_main # (
   input CFG_MEM_MON,
   output CFG_MEM_OWNER,
   output CFG_MEM_REGSEL,
-  input CFG_MEM_BUSY
+  input CFG_MEM_BUSY,
+  output reg PWR_CYCLE_REQ
 );
 
 integer n, b;
@@ -153,6 +154,22 @@ wire [31:0] rd_cfgmemctl  = 32'h0000_0000 | (cfgmem_bootmem << `SR_CFGBOOTMEM) |
                                             (CFG_MEM_REGSEL << `SR_CFGMEMSEL) |
                                             (CFG_MEM_OWNER << `SR_CFGMEMOWNER);
 
+// Power Cycle Register
+//----------------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    PWR_CYCLE_REQ <= 1'b0;
+  end
+  else begin
+    if (WRAD == `SYSREG_PWRCYCLE &
+        REG_WENB[3:2] & REG_WDAT[`SR_PWECYCLEPKC +:16] == 16'h5A5A) begin
+      if (REG_WENB[0] & REG_WDAT[`SR_PWECYCLEREQ])
+        PWR_CYCLE_REQ <= 1'b1;
+    end
+  end
+end
+wire [31:0] rd_pwrcycle = 32'h0000_0000 | (PWR_CYCLE_REQ << `SR_PWECYCLEREQ);
+
 // Scratch Pad Register
 //----------------------------------------------
 (* dont_touch = "yes" *) reg [31:0] spad1 [0:3];
@@ -217,6 +234,7 @@ always @ (posedge HCLK) begin
     if      (RDAD == `SYSREG_CODEMSEL)  REG_RDAT <= rd_codemsel;
     else if (RDAD == `SYSREG_SYSCLKCTL) REG_RDAT <= rd_sysclkctl;
     else if (RDAD == `SYSREG_CFGMEMCTL) REG_RDAT <= rd_cfgmemctl;
+    else if (RDAD == `SYSREG_PWRCYCLE)  REG_RDAT <= rd_pwrcycle;
     else if (RDAD == `SYSREG_SPAD1)     REG_RDAT <= rd_spad1;
     else if (RDAD == `SYSREG_SPAD2)     REG_RDAT <= rd_spad2;
     else if (RDAD == `SYSREG_SPAD3)     REG_RDAT <= rd_spad3;

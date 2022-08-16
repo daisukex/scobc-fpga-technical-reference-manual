@@ -57,6 +57,7 @@ module sc_obc_core # (
   input [1:0] FPGA_BOOT,
   output FPGA_WATCHDOG,
   inout FPGA_RESERVE,
+  output FPGA_PWR_CYCLE_REQ,
 
   // UDL Master Interface
   // ------------------------------
@@ -1011,6 +1012,7 @@ lpahb_ss # (
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
   .CMC_ACK(CMC_ACK),
+  .PWR_CYCLE_REQ(FPGA_PWR_CYCLE_REQ),
 
   // AXI Write Address Channel
   .AWID(lpahb_axim_awid),

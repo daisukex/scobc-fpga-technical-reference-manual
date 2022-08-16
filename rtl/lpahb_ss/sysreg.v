@@ -36,7 +36,8 @@ module sysreg # (
   input CFG_MEM_MON,
   output CFG_MEM_OWNER,
   output CFG_MEM_REGSEL,
-  input CFG_MEM_BUSY
+  input CFG_MEM_BUSY,
+  output PWR_CYCLE_REQ
 );
 
 wire [31:0] REG_WADR;
@@ -108,7 +109,8 @@ sysreg_main # (
   .CFG_MEM_MON(CFG_MEM_MON),
   .CFG_MEM_OWNER(CFG_MEM_OWNER),
   .CFG_MEM_REGSEL(CFG_MEM_REGSEL),
-  .CFG_MEM_BUSY(CFG_MEM_BUSY)
+  .CFG_MEM_BUSY(CFG_MEM_BUSY),
+  .PWR_CYCLE_REQ(PWR_CYCLE_REQ)
 );
 
 endmodule
