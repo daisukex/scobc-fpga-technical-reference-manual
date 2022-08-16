@@ -15,7 +15,6 @@ set_property [get_ports SYSCLK1_EN]           -dict { PACKAGE_PIN V26  IOSTANDAR
 set_property [get_ports SYSCLK2]              -dict { PACKAGE_PIN U21  IOSTANDARD LVCMOS33 };
 set_property [get_ports SYSCLK2_EN]           -dict { PACKAGE_PIN W26  IOSTANDARD LVCMOS33 };
 set_property [get_ports CDRST_B]              -dict { PACKAGE_PIN AF18 IOSTANDARD LVCMOS33 };
-set_property [get_ports CFG_DONE]             -dict { PACKAGE_PIN AE18 IOSTANDARD LVCMOS33 };
 
 # Debug Interface
 set_property [get_ports CM3_NTRST]            -dict { PACKAGE_PIN U24  IOSTANDARD LVCMOS33 };

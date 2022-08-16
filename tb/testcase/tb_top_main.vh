@@ -115,7 +115,6 @@ sc_obc_a1_fpga # (
   .SYSCLK2(sysclk2),
   .SYSCLK2_EN(sysclk2en),
   .CDRST_B(1'b1),
-  .CFG_DONE(/*open*/),
 
   // Debug Interface
   .CM3_NTRST(console_rx),
