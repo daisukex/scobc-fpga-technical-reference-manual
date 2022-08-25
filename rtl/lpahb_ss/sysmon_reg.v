@@ -58,16 +58,22 @@ assign REG_RWAT  = xadc_rcycle_latch & ~xadc_dvalid;
 // ----------------------------------------
 wire [2:0] swdog_time;
 reg [2:0] swdog_time_d;
+wire wdog_sw_reset;
+reg wdog_sw_reset_d;
 wire [15:0] rd_wsr;
 always @ (*) begin
   swdog_time_d = swdog_time;
+  wdog_sw_reset_d = wdog_sw_reset;
   if (WADR == `SYSMON_WDOG_CTRL) begin
     if (chk_enbit(3, `SM_SW_WDOG_TIME, REG_WENB))
       swdog_time_d = REG_WDAT[`SM_SW_WDOG_TIME +:3];
+    if (chk_enbit(1, `SM_SW_WDOG_MODE, REG_WENB))
+      wdog_sw_reset_d = REG_WDAT[`SM_SW_WDOG_MODE];
   end
 end
 sclib_tmr_ff # (.DW(3), .SRVAL(SW_WDOC_TIME_INIT)) swdog_time_reg       (.D(swdog_time_d),       .CLK(HCLK), .SRB(HRESETN), .Q(swdog_time));
-wire [31:0] rd_wdogctrl = 32'h0000_0000 | (swdog_time << `SM_SW_WDOG_TIME | (rd_wsr << `SM_WDOG_WSR));
+sclib_tmr_ff # (.DW(1), .SRVAL(1'b0))              wdog_sw_reset_reg    (.D(wdog_sw_reset_d),    .CLK(HCLK), .SRB(HRESETN), .Q(wdog_sw_reset));
+wire [31:0] rd_wdogctrl = 32'h0000_0000 | ((wdog_sw_reset << `SM_SW_WDOG_MODE) | (swdog_time << `SM_SW_WDOG_TIME) | (rd_wsr << `SM_WDOG_WSR));
 
 // Watchdog Expire after Reset
 // ----------------------------------------
@@ -82,7 +88,7 @@ always @ (posedge HCLK) begin
 end
 always @ (*) begin
   wdog_expire_hclk = WDOG_RST_REQ;
-  if (|sync_wdog_expire[3:1])
+  if (wdog_sw_reset & |sync_wdog_expire[3:1])
     wdog_expire_hclk = 1'b1;
 end
 sclib_tmr_ff # (.DW(1), .SRVAL(1'b0)) wdog_reset_req_reg (.D(wdog_expire_hclk), .CLK(HCLK), .SRB(HRESETN), .Q(WDOG_RST_REQ));
