@@ -25,7 +25,6 @@ module sc_obc_a1_fpga # (
   input  SYSCLK2,
   output SYSCLK2_EN,
   input  CDRST_B,
-  output CFG_DONE,
 
   // Debug Interface
   input  CM3_NTRST,
@@ -93,6 +92,7 @@ module sc_obc_a1_fpga # (
   input  FPGA_BOOT1,
   output FPGA_WATCHDOG,
   inout  FPGA_RESERVE,
+  output FPGA_PWR_CYCLE_REQ,
 
   // ULPI Interface
   output ULPI_CS,
@@ -300,6 +300,7 @@ sc_obc_core # (
   .CLKMODE(clkmode),
   .CMC_REQ(cmc_req),
   .CMC_ACK(cmc_ack),
+
   // Logic Initilize Control Signals
   // ------------------------------
   .INIT_REQ(init_req),
@@ -317,10 +318,10 @@ sc_obc_core # (
   // TRCH/Board System Interface
   // ------------------------------
   .CDRST_B(CDRST_B),
-  .CFG_DONE(CFG_DONE),
   .FPGA_BOOT({FPGA_BOOT1,FPGA_BOOT0}),
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
   .FPGA_RESERVE(FPGA_RESERVE),
+  .FPGA_PWR_CYCLE_REQ(FPGA_PWR_CYCLE_REQ),
 
   // UDL Master Interface
   // ------------------------------

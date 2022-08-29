@@ -226,9 +226,39 @@ initial begin
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD2), .expdata(32'h0706_0504), .check(1));
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD3), .expdata(32'h0B0A_0908), .check(1));
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD4), .expdata(32'h0F0E_0D0C), .check(1));
-
-
   repeat (100) @ (posedge SYS_CLK);
+
+  //--------------------------------------------------
+  label    = "Power Cycle Register";
+  simcount = 6;
+  //--------------------------------------------------
+  @(posedge SYS_CLK);
+  display_subcount_text(1, "Check Power Cycle Request Initial Value", 1);
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .expdata(32'h0000_0000), .check(1));
+  pic.CHECK_PWR_CYCLE_REQ(0);
+
+
+  display_subcount_text(1, "Check Power Cycle Request write '1', Keycode is incorrect", 1);
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .data(16'hA5A5<<`SR_PWECYCLEPKC | 1<<`SR_PWECYCLEREQ));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .expdata(0<<`SR_PWECYCLEREQ), .check(1));
+  pic.CHECK_PWR_CYCLE_REQ(0);
+
+  display_subcount_text(1, "Check Power Cycle Request write '1', Keycode is correct", 1);
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .data(16'h5A5A<<`SR_PWECYCLEPKC | 1<<`SR_PWECYCLEREQ));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .expdata(1<<`SR_PWECYCLEREQ), .check(1));
+  pic.CHECK_PWR_CYCLE_REQ(1);
+
+
+  display_subcount_text(1, "Check Power Cycle Request write '0', Keycode is incorrect", 1);
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .data(16'hA5A5<<`SR_PWECYCLEPKC | 0<<`SR_PWECYCLEREQ));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .expdata(1<<`SR_PWECYCLEREQ), .check(1));
+  pic.CHECK_PWR_CYCLE_REQ(1);
+
+  display_subcount_text(1, "Check Power Cycle Request write '0', Keycode is correct", 1);
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .data(16'h5A5A<<`SR_PWECYCLEPKC | 0<<`SR_PWECYCLEREQ));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .expdata(1<<`SR_PWECYCLEREQ), .check(1));
+  pic.CHECK_PWR_CYCLE_REQ(1);
+
   simfinish(0);
 end
 

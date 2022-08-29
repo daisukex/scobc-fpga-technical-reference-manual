@@ -23,6 +23,7 @@ module lpahb_ss # (
   output [1:0] CLKMODE,
   output CMC_REQ,
   input CMC_ACK,
+  output PWR_CYCLE_REQ,
 
   // AXI Write Address Channel
   input [LPAHB_AXI_ID_WIDTH-1:0] AWID,
@@ -291,7 +292,8 @@ sysreg # (
   .CFG_MEM_MON(CFG_MEM_MON),
   .CFG_MEM_OWNER(CFG_MEM_OWNER),
   .CFG_MEM_REGSEL(CFG_MEM_REGSEL),
-  .CFG_MEM_BUSY(CFG_MEM_BUSY)
+  .CFG_MEM_BUSY(CFG_MEM_BUSY),
+  .PWR_CYCLE_REQ(PWR_CYCLE_REQ)
 );
 
 // AHB UART-Lite for Cortex-M3 Console

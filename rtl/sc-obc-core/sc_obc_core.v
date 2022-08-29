@@ -54,10 +54,10 @@ module sc_obc_core # (
   // TRCH/Board System Interface
   // ------------------------------
   input CDRST_B,
-  output CFG_DONE,
   input [1:0] FPGA_BOOT,
   output FPGA_WATCHDOG,
   inout FPGA_RESERVE,
+  output FPGA_PWR_CYCLE_REQ,
 
   // UDL Master Interface
   // ------------------------------
@@ -1012,6 +1012,7 @@ lpahb_ss # (
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
   .CMC_ACK(CMC_ACK),
+  .PWR_CYCLE_REQ(FPGA_PWR_CYCLE_REQ),
 
   // AXI Write Address Channel
   .AWID(lpahb_axim_awid),
@@ -1078,8 +1079,6 @@ lpahb_ss # (
   // Watchdog Signal
   .FPGA_WATCHDOG(FPGA_WATCHDOG)
 );
-
-assign CFG_DONE = 1'b1;
 
 assign CFG_MEM_SEL = (!cfg_mem_owner) ? cfg_mem_regsel: 1'b0;
 

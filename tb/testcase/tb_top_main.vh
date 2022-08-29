@@ -47,6 +47,7 @@ wire cfg_mem_sel;
 wire cfg_mem_mon;
 reg [1:0] FPGA_BOOT = 2'b01;
 wire FPGA_WATCHDOG;
+wire pwr_cycle_req;
 
 wire (pull1, pull0) cm3_tms_swdio = 1'b0;
 wire console_tx;
@@ -115,7 +116,6 @@ sc_obc_a1_fpga # (
   .SYSCLK2(sysclk2),
   .SYSCLK2_EN(sysclk2en),
   .CDRST_B(1'b1),
-  .CFG_DONE(/*open*/),
 
   // Debug Interface
   .CM3_NTRST(console_rx),
@@ -183,6 +183,7 @@ sc_obc_a1_fpga # (
   .FPGA_BOOT1(FPGA_BOOT[1]),
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
   .FPGA_RESERVE(/*open*/),
+  .FPGA_PWR_CYCLE_REQ(pwr_cycle_req),
 
   // ULPI Interface
   .ULPI_CS(ulpi_cs),
@@ -202,6 +203,7 @@ sc_obc_a1_fpga # (
 
 pic pic (
   .FPGA_CFG_MEM(cfg_mem_sel),
+  .FPGA_PWR_CYCLE_REQ(pwr_cycle_req),
   .CFG_MEM_SEL(cfg_mem_mon)
 );
 
