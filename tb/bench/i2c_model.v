@@ -126,6 +126,7 @@ reg transdir = 0;
 reg [9:0] adr_lat = 0;
 reg adr10b_1st = 0;
 reg transdir_lat = 0;
+reg devadr_ng = 0;
 
 task SET_DEVADR;
   input set_adr_10b_en;
@@ -314,9 +315,9 @@ initial begin
       @ (negedge I2C_SCL or posedge stop_detect);
       if (~I2C_SCL) begin
         #(rclk_delay_time);
-        txnack = 0;
         test = 4;
         if ((pcount == 1) | restart_detect) begin
+          txnack = 0;
           if ((adr_10b_en &
                ((restart_detect & (i2c_rxdata[7:1] != {5'b11110, adr_lat[9:8]})) |
                 (pcount == 1 & ((~adr10b_1st & (i2c_rxdata[7:3] != 5'b11110)) |
@@ -328,9 +329,9 @@ initial begin
             i2c_dat = 1'b0;
           end
         end else begin
-          i2c_dat = txhandshake;
           if (txhandshake)
             txnack = 1'b1;
+          i2c_dat = txnack;
         end
         i2c_oen = 1'b1;
         @ (negedge I2C_SCL);
@@ -370,6 +371,7 @@ initial begin
     pcount       = 1;
     data_num     = 0;
     transdir     = 0;
+    devadr_ng    = 0;
 
     @ (posedge start_detect);
     while (~i2c_complete) begin
@@ -384,13 +386,17 @@ initial begin
           data_num = 0;
           transdir = i2c_rxdata[0];
           if (adr_10b_en) begin
-            if (i2c_rxdata[7:1] != {5'b11110, adr_lat[9:8]})
+            if (i2c_rxdata[7:1] != {5'b11110, adr_lat[9:8]}) begin
               $display($time, " | %m Receive 1st Address Not Match | R/nW: %b | TX: NACK", i2c_rxdata[0]);
+              devadr_ng = 1;
+            end
             else
               $display($time, " | %m Receive Device Address: 0x%h | R/nW: %b | TX: ACK", adr_lat, i2c_rxdata[0]);
           end else begin
-            if (i2c_rxdata[7:1] != dev_adr[6:0])
+            if (i2c_rxdata[7:1] != dev_adr[6:0]) begin
               $display($time, " | %m Receive Device Address: 0x%h | R/nW: %b | TX: NACK", i2c_rxdata[7:1], i2c_rxdata[0]);
+              devadr_ng = 1;
+            end
             else
               $display($time, " | %m Receive Device Address: 0x%h | R/nW: %b | TX: ACK", i2c_rxdata[7:1], i2c_rxdata[0]);
           end
@@ -407,13 +413,16 @@ initial begin
                     adr_lat[9:8] = i2c_rxdata[2:1];
                   end else begin
                     $display($time, " | %m Receive 1st Address Not Match | R/nW: %b | TX: NACK", transdir_lat);
+                    devadr_ng = 1;
                   end
                 end else begin
                   // Device Address : 2
                   transdir = transdir_lat;
                   adr_lat[7:0] = i2c_rxdata;
-                  if (adr_lat != dev_adr)
+                  if (adr_lat != dev_adr) begin
                     $display($time, " | %m Receive Device Address: 0x%h | R/nW: %b | TX: NACK", adr_lat, transdir_lat);
+                    devadr_ng = 1;
+                  end
                   else
                     $display($time, " | %m Receive Device Address: 0x%h | R/nW: %b | TX: ACK", adr_lat, transdir_lat);
                   adr10b_1st = 0;
@@ -423,26 +432,30 @@ initial begin
               end else begin
                 // Device Address
                 transdir = i2c_rxdata[0];
-                if (i2c_rxdata[7:1] != dev_adr[6:0])
+                if (i2c_rxdata[7:1] != dev_adr[6:0]) begin
                   $display($time, " | %m Receive Device Address: 0x%h | R/nW: %b | TX: NACK", i2c_rxdata[7:1], i2c_rxdata[0]);
+                  devadr_ng = 1;
+                end
                 else
                   $display($time, " | %m Receive Device Address: 0x%h | R/nW: %b | TX: ACK", i2c_rxdata[7:1], i2c_rxdata[0]);
                 pcount = 2;
               end
             end
             2: begin
-              // Read/Write
-              if (~transdir) begin
-                $display($time, " | %m WDATA:%h (WR_Bytes: %d)",i2c_rxdata, data_num);
-                if (rx_exp_on & (i2c_rxdata !== i2c_rxdata_exp[data_num])) begin
-                  $display($time, " | %m RX WriteData Error!!!!!! | EXP: %h", i2c_rxdata_exp[data_num]);
-                  if (fctrl) begin
-                    repeat(1000) @ (posedge SYS_CLK);
-                    $finish();
+              if (~devadr_ng) begin
+                // Read/Write
+                if (~transdir) begin
+                  $display($time, " | %m WDATA:%h (WR_Bytes: %d)",i2c_rxdata, data_num);
+                  if (rx_exp_on & (i2c_rxdata !== i2c_rxdata_exp[data_num])) begin
+                    $display($time, " | %m RX WriteData Error!!!!!! | EXP: %h", i2c_rxdata_exp[data_num]);
+                    if (fctrl) begin
+                      repeat(1000) @ (posedge SYS_CLK);
+                      $finish();
+                    end
                   end
                 end
+                data_num = data_num + 1;
               end
-              data_num = data_num + 1;
             end
           endcase
         end
