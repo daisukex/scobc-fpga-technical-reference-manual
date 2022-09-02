@@ -382,6 +382,7 @@ system_monitor system_monitor (
   .REF_CLK(REF_CLK),
   .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
   .SYSMON_HW_INT(SYSMON_HW_ISR),
+  .SYSMON_BHM_INT(/*open*/),
 
   // AHB Interface
   .HSEL(shsel[AHB_SYSMON_CH]),
@@ -397,7 +398,15 @@ system_monitor system_monitor (
   .HRESP(shresp[2*AHB_SYSMON_CH +:2]),
 
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
-  .WDOG_RST_REQ(wdog_rst_req)
+  .WDOG_RST_REQ(wdog_rst_req),
+
+  .CVM_DATA_REQ_TRG(1'b0),
+  .TEMP_DATA_REQ_TRG(1'b0),
+  .CVM_CRITICAL_B(1'b1),
+  .CVM_WARNING_B(1'b1),
+  .TEMP_ALERT_B(1'b1),
+  .INTERNAL_I2C_SCL(/*open*/),
+  .INTERNAL_I2C_SDA(/*open*/)
 );
 
 // General Purpose Timer

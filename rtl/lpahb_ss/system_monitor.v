@@ -5,13 +5,16 @@
 // Copyright © 2022 Space Cubics, LLC.
 //-----------------------------------------------
 
-module system_monitor (
+module system_monitor # (
+  `include "sc_sysmon_bhm_init_param.vh"
+) (
   // System Interface
   input HCLK,
   input HRESETN,
   input REF_CLK,
   input SYS_RSTB_SYNC_REFCLK,
   output SYSMON_HW_INT,
+  output SYSMON_BHM_INT,
 
   // AHB Interface
   input HSEL,
@@ -27,7 +30,16 @@ module system_monitor (
   output [1:0] HRESP,
 
   output FPGA_WATCHDOG,
-  output WDOG_RST_REQ
+  output WDOG_RST_REQ,
+
+  // Board Health Monitor
+  input CVM_DATA_REQ_TRG,
+  input TEMP_DATA_REQ_TRG,
+  input CVM_CRITICAL_B,
+  input CVM_WARNING_B,
+  input TEMP_ALERT_B,
+  inout INTERNAL_I2C_SCL,
+  inout INTERNAL_I2C_SDA
 );
 
 wire [31:0] REG_WADR;
@@ -46,6 +58,29 @@ wire [15:0] XADC_DI;
 wire [15:0] XADC_DO;
 wire [7:0] XADC_ALARM;
 wire XADC_OVER_TEMP;
+wire BHM_INIT_REQ;
+wire [4:0] BHM_INIT_EN;
+wire [4:0] BHM_MONI_EN;
+wire [4:0] BHM_MONI_EN_OFF;
+wire BHM_TEMP_ALERT;
+wire BHM_CVM_WARN;
+wire BHM_CVM_CRIT;
+wire [5:0] BHM_I2C_ERR;
+wire BHM_SW_ACC_END;
+wire BHM_INIT_ACC_END;
+wire [11:0] BHM_CVM_UPD;
+wire [16*12-1:0] BHM_CVM_DAT;
+wire [2:0] BHM_TEMP_UPD;
+wire [16*3-1:0] BHM_TEMP_DAT;
+wire BHM_SW_REQ;
+wire [2:0] BHM_SW_DEVSEL;
+wire [7:0] BHM_SW_DEVADR;
+wire BHM_SW_RWSEL;
+wire [15:0] BHM_SW_WRDATA;
+wire [15:0] BHM_SW_RDDATA;
+wire [15:0] BHM_CLKPSC;
+wire [7:0] BHM_I2CACC_CNT;
+wire [5:0] BHM_BUSY;
 
 wire [4:0] SEM_CURRENT_STATUS;
 wire [4:0] SEM_PREVIOUS_STATUS;
@@ -93,12 +128,15 @@ sc_ahbip_slave # (
   .REG_RERR(1'b0)
 );
 
-sysmon_reg sysmon_reg (
+sysmon_reg # (
+  .INIT_I2CPSC(SC_SYSMON_BHM_INIT_I2CPSC)
+) sysmon_reg (
   .HCLK(HCLK),
   .HRESETN(HRESETN),
   .REF_CLK(REF_CLK),
   .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
   .SYSMON_HW_INT(SYSMON_HW_INT),
+  .SYSMON_BHM_INT(SYSMON_BHM_INT),
 
   // Register Interface
   .REG_WADR(REG_WADR),
@@ -131,7 +169,31 @@ sysmon_reg sysmon_reg (
   .ECORRECT_DETECT(ECORRECT_DETECT),
   .INJECT_REQ(INJECT_REQ),
   .INJECT_ACK(INJECT_ACK),
-  .INJECT_ADDRESS(INJECT_ADDRESS)
+  .INJECT_ADDRESS(INJECT_ADDRESS),
+
+  .BHM_INIT_REQ(BHM_INIT_REQ),
+  .BHM_INIT_EN(BHM_INIT_EN),
+  .BHM_MONI_EN(BHM_MONI_EN),
+  .BHM_MONI_EN_OFF(BHM_MONI_EN_OFF),
+  .BHM_TEMP_ALERT(BHM_TEMP_ALERT),
+  .BHM_CVM_WARN(BHM_CVM_WARN),
+  .BHM_CVM_CRIT(BHM_CVM_CRIT),
+  .BHM_I2C_ERR(BHM_I2C_ERR),
+  .BHM_SW_ACC_END(BHM_SW_ACC_END),
+  .BHM_INIT_ACC_END(BHM_INIT_ACC_END),
+  .BHM_CVM_UPD(BHM_CVM_UPD),
+  .BHM_CVM_DAT(BHM_CVM_DAT),
+  .BHM_TEMP_UPD(BHM_TEMP_UPD),
+  .BHM_TEMP_DAT(BHM_TEMP_DAT),
+  .BHM_SW_REQ(BHM_SW_REQ),
+  .BHM_SW_DEVSEL(BHM_SW_DEVSEL),
+  .BHM_SW_DEVADR(BHM_SW_DEVADR),
+  .BHM_SW_RWSEL(BHM_SW_RWSEL),
+  .BHM_SW_WRDATA(BHM_SW_WRDATA),
+  .BHM_SW_RDDATA(BHM_SW_RDDATA),
+  .BHM_CLKPSC(BHM_CLKPSC),
+  .BHM_I2CACC_CNT(BHM_I2CACC_CNT),
+  .BHM_BUSY(BHM_BUSY)
 );
 
 xadc_ctrl xadc_ctrl (
@@ -163,6 +225,53 @@ sem_controller sem_controller (
   .INJECT_REQ(INJECT_REQ),
   .INJECT_ACK(INJECT_ACK),
   .INJECT_ADDRESS(INJECT_ADDRESS)
+);
+
+sysmon_bhm # (
+  .SC_SYSMON_BHM_INITSET_NUM(SC_SYSMON_BHM_INITSET_NUM),
+  .SC_SYSMON_BHM_INITSET_VAL(SC_SYSMON_BHM_INITSET_VAL)
+) sysmon_bhm (
+  // System Interface
+  .HCLK(HCLK),
+  .HRESETN(HRESETN),
+
+  // Register Interface
+  .BHM_INIT_REQ(BHM_INIT_REQ),
+  .BHM_INIT_EN(BHM_INIT_EN),
+  .BHM_MONI_EN(BHM_MONI_EN),
+  .BHM_MONI_EN_OFF(BHM_MONI_EN_OFF),
+  .BHM_TEMP_ALERT(BHM_TEMP_ALERT),
+  .BHM_CVM_WARN(BHM_CVM_WARN),
+  .BHM_CVM_CRIT(BHM_CVM_CRIT),
+  .BHM_I2C_ERR(BHM_I2C_ERR),
+  .BHM_SW_ACC_END(BHM_SW_ACC_END),
+  .BHM_INIT_ACC_END(BHM_INIT_ACC_END),
+  .BHM_CVM_UPD(BHM_CVM_UPD),
+  .BHM_CVM_DAT(BHM_CVM_DAT),
+  .BHM_TEMP_UPD(BHM_TEMP_UPD),
+  .BHM_TEMP_DAT(BHM_TEMP_DAT),
+  .BHM_SW_REQ(BHM_SW_REQ),
+  .BHM_SW_DEVSEL(BHM_SW_DEVSEL),
+  .BHM_SW_DEVADR(BHM_SW_DEVADR),
+  .BHM_SW_RWSEL(BHM_SW_RWSEL),
+  .BHM_SW_WRDATA(BHM_SW_WRDATA),
+  .BHM_SW_RDDATA(BHM_SW_RDDATA),
+  .BHM_CLKPSC(BHM_CLKPSC),
+  .BHM_I2CACC_CNT(BHM_I2CACC_CNT),
+  .BHM_BUSY(BHM_BUSY),
+
+  // Hardware Scheduler Interface
+  .CVM_DATA_REQ_TRG(CVM_DATA_REQ_TRG),
+  .TEMP_DATA_REQ_TRG(TEMP_DATA_REQ_TRG),
+
+  // Device Interface
+  .CVM_CRITICAL_B(CVM_CRITICAL_B),
+  .CVM_WARNING_B(CVM_WARNING_B),
+  .TEMP_ALERT_B(TEMP_ALERT_B),
+
+  // I2C Interface
+  .INTERNAL_I2C_SCL(INTERNAL_I2C_SCL),
+  .INTERNAL_I2C_SDA(INTERNAL_I2C_SDA)
 );
 
 endmodule

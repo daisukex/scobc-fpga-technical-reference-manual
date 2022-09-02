@@ -8,12 +8,15 @@
 
 `include "system_monitor_map.vh"
 
-module sysmon_reg (
+module sysmon_reg # (
+  parameter [15:0] INIT_I2CPSC = 16'h00EF
+) (
   input HCLK,
   input HRESETN,
   input REF_CLK,
   input SYS_RSTB_SYNC_REFCLK,
   output SYSMON_HW_INT,
+  output SYSMON_BHM_INT,
 
   // Register Interface
   input [31:0] REG_WADR,
@@ -48,7 +51,32 @@ module sysmon_reg (
   input ECORRECT_DETECT,
   output reg INJECT_REQ,
   input INJECT_ACK,
-  output reg [39:0] INJECT_ADDRESS
+  output reg [39:0] INJECT_ADDRESS,
+
+  // Board Health Monitor Interace
+  output reg BHM_INIT_REQ,
+  output reg [4:0] BHM_INIT_EN,
+  output reg [4:0] BHM_MONI_EN,
+  input [4:0] BHM_MONI_EN_OFF,
+  input BHM_TEMP_ALERT,
+  input BHM_CVM_WARN,
+  input BHM_CVM_CRIT,
+  input [5:0] BHM_I2C_ERR,
+  input BHM_SW_ACC_END,
+  input BHM_INIT_ACC_END,
+  input [11:0] BHM_CVM_UPD,
+  input [16*12-1:0] BHM_CVM_DAT,
+  input [2:0] BHM_TEMP_UPD,
+  input [16*3-1:0] BHM_TEMP_DAT,
+  output reg BHM_SW_REQ,
+  output reg [2:0] BHM_SW_DEVSEL,
+  output reg [7:0] BHM_SW_DEVADR,
+  output reg BHM_SW_RWSEL,
+  output reg [15:0] BHM_SW_WRDATA,
+  input [15:0] BHM_SW_RDDATA,
+  output reg [15:0] BHM_CLKPSC,
+  output reg [7:0] BHM_I2CACC_CNT,
+  input [5:0] BHM_BUSY
 );
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
@@ -424,6 +452,545 @@ always @ (posedge HCLK) begin
   end
 end
 
+// Board Health Initialization Access Control Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    BHM_INIT_REQ <= 0;
+    BHM_INIT_EN  <= 5'h1F;
+  end
+  else begin
+    if (WADR == `SYSMON_BHM_INICTLR) begin
+      if (REG_WENB[2] & REG_WDAT[`SYSMON_BHM_INITREQ])
+        BHM_INIT_REQ <= 1'b1;
+      if (REG_WENB[0])
+        BHM_INIT_EN  <= REG_WDAT[`SYSMON_BHM_INITEN +: 5];
+    end
+    if (BHM_INIT_ACC_END)
+      BHM_INIT_REQ <= 0;
+  end
+end
+
+wire [31:0] rd_bhminictlr = 32'h0000_0000 | (BHM_INIT_REQ << `SYSMON_BHM_INITREQ)
+                                          | (BHM_INIT_EN  << `SYSMON_BHM_INITEN);
+
+// Board Health Monitoring Access Control Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    BHM_MONI_EN <= 0;
+  else begin
+    if (WADR == `SYSMON_BHM_MONCTLR & REG_WENB[0])
+      BHM_MONI_EN <= REG_WDAT[`SYSMON_BHM_MONIEN +: 5];
+    for (bt=0; bt<5; bt=bt+1) begin
+      if (BHM_MONI_EN_OFF[bt])
+        BHM_MONI_EN[bt] <= 1'b0;
+    end
+  end
+end
+
+wire [31:0] rd_bhmmonctlr = 32'h0000_0000 | (BHM_MONI_EN << `SYSMON_BHM_MONIEN);
+
+// Board Health Interrupt Status Register
+// ----------------------------------------
+reg int_bhm_temp_alert;
+reg int_bhm_cvm_warn;
+reg int_bhm_cvm_crit;
+reg [5:0] int_bhm_i2c_err;
+reg int_bhm_sw_acc_end;
+reg int_bhm_init_acc_end;
+
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    int_bhm_temp_alert   <= 0;
+    int_bhm_cvm_warn     <= 0;
+    int_bhm_cvm_crit     <= 0;
+    int_bhm_i2c_err      <= 0;
+    int_bhm_sw_acc_end   <= 0;
+    int_bhm_init_acc_end <= 0;
+  end
+  else begin
+    if (WADR == `SYSMON_BHM_ISR) begin
+      if (REG_WENB[2]) begin
+        if (REG_WDAT[`SYSMON_BHM_TEMPALERT])
+          int_bhm_temp_alert <= 0;
+        if (REG_WDAT[`SYSMON_BHM_CVMWARN])
+          int_bhm_cvm_warn <= 0;
+        if (REG_WDAT[`SYSMON_BHM_CVMCRIT])
+          int_bhm_cvm_crit <= 0;
+      end
+      if (REG_WENB[1]) begin
+        for (bt=0; bt<6; bt=bt+1) begin
+          if (REG_WDAT[`SYSMON_BHM_I2CERR+bt])
+            int_bhm_i2c_err[bt] <= 0;
+        end
+      end
+      if (REG_WENB[0]) begin
+        if (REG_WDAT[`SYSMON_BHM_SWACCEND])
+          int_bhm_sw_acc_end <= 0;
+        if (REG_WDAT[`SYSMON_BHM_INITACCEND])
+          int_bhm_init_acc_end <= 0;
+      end
+    end
+    if (BHM_TEMP_ALERT)
+      int_bhm_temp_alert <= 1'b1;
+    if (BHM_CVM_WARN)
+      int_bhm_cvm_warn <= 1'b1;
+    if (BHM_CVM_CRIT)
+      int_bhm_cvm_crit <= 1'b1;
+    for (bt=0; bt<6; bt=bt+1) begin
+      if (BHM_I2C_ERR[bt])
+        int_bhm_i2c_err[bt] <= 1'b1;
+    end
+    if (BHM_SW_ACC_END)
+      int_bhm_sw_acc_end <= 1'b1;
+    if (BHM_INIT_ACC_END)
+      int_bhm_init_acc_end <= 1'b1;
+  end
+end
+
+wire [31:0] rd_bhmisr = 32'h0000_0000 | (int_bhm_temp_alert   << `SYSMON_BHM_TEMPALERT)
+                                      | (int_bhm_cvm_warn     << `SYSMON_BHM_CVMWARN)
+                                      | (int_bhm_cvm_crit     << `SYSMON_BHM_CVMCRIT)
+                                      | (int_bhm_i2c_err      << `SYSMON_BHM_I2CERR)
+                                      | (int_bhm_sw_acc_end   << `SYSMON_BHM_SWACCEND)
+                                      | (int_bhm_init_acc_end << `SYSMON_BHM_INITACCEND);
+
+// Board Health Interrupt Enable Register
+// ----------------------------------------
+reg enb_bhm_temp_alert;
+reg enb_bhm_cvm_warn;
+reg enb_bhm_cvm_crit;
+reg [5:0] enb_bhm_i2c_err;
+reg enb_bhm_sw_acc_end;
+reg enb_bhm_init_acc_end;
+
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    enb_bhm_temp_alert   <= 0;
+    enb_bhm_cvm_warn     <= 0;
+    enb_bhm_cvm_crit     <= 0;
+    enb_bhm_i2c_err      <= 0;
+    enb_bhm_sw_acc_end   <= 0;
+    enb_bhm_init_acc_end <= 0;
+  end
+  else if (WADR == `SYSMON_BHM_IER) begin
+    if (REG_WENB[2]) begin
+      enb_bhm_temp_alert   <= REG_WDAT[`SYSMON_BHM_TEMPALERTENB];
+      enb_bhm_cvm_warn     <= REG_WDAT[`SYSMON_BHM_CVMWARNENB];
+      enb_bhm_cvm_crit     <= REG_WDAT[`SYSMON_BHM_CVMCRITENB];
+    end
+    if (REG_WENB[1]) begin
+      enb_bhm_i2c_err      <= REG_WDAT[`SYSMON_BHM_I2CERRENB +: 6];
+    end
+    if (REG_WENB[0]) begin
+      enb_bhm_sw_acc_end   <= REG_WDAT[`SYSMON_BHM_SWACCENDENB];
+      enb_bhm_init_acc_end <= REG_WDAT[`SYSMON_BHM_INITACCENDENB];
+    end
+  end
+end
+
+wire [31:0] rd_bhmier = 32'h0000_0000 | (enb_bhm_temp_alert   << `SYSMON_BHM_TEMPALERTENB)
+                                      | (enb_bhm_cvm_warn     << `SYSMON_BHM_CVMWARNENB)
+                                      | (enb_bhm_cvm_crit     << `SYSMON_BHM_CVMCRITENB)
+                                      | (enb_bhm_i2c_err      << `SYSMON_BHM_I2CERRENB)
+                                      | (enb_bhm_sw_acc_end   << `SYSMON_BHM_SWACCENDENB)
+                                      | (enb_bhm_init_acc_end << `SYSMON_BHM_INITACCENDENB);
+
+// Interrupt Signal
+// ----------------------------------------
+assign SYSMON_BHM_INT = (enb_bhm_temp_alert   & int_bhm_temp_alert) |
+                        (enb_bhm_cvm_warn     & int_bhm_cvm_warn) |
+                        (enb_bhm_cvm_crit     & int_bhm_cvm_crit) |
+                        |(enb_bhm_i2c_err      & int_bhm_i2c_err) |
+                        (enb_bhm_sw_acc_end   & int_bhm_sw_acc_end) |
+                        (enb_bhm_init_acc_end & int_bhm_init_acc_end);
+
+// Board Health VDD_1V0 Shunt Voltage Monitor Register
+// ----------------------------------------
+reg bhm_1v0sntv_nupd;
+reg [15:0] bhm_1v0sntv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_1v0sntv_nupd    <= 1'b1;
+    bhm_1v0sntv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[0]) begin
+    bhm_1v0sntv_nupd    <= 0;
+    bhm_1v0sntv_dat_lat <= BHM_CVM_DAT[16*0 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_1V0SNTVR & REG_RENB)
+    bhm_1v0sntv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm1v0sntvr = 32'h0000_0000 | (bhm_1v0sntv_nupd    << `SYSMON_BHM_1V0SNTV_NUPD)
+                                           | (bhm_1v0sntv_dat_lat << `SYSMON_BHM_1V0SNTV);
+
+// Board Health VDD_1V0 Bus Voltage Monitor Register
+// ----------------------------------------
+reg bhm_1v0busv_nupd;
+reg [15:0] bhm_1v0busv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_1v0busv_nupd    <= 1'b1;
+    bhm_1v0busv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[1]) begin
+    bhm_1v0busv_nupd    <= 0;
+    bhm_1v0busv_dat_lat <= BHM_CVM_DAT[16*1 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_1V0BUSVR & REG_RENB)
+    bhm_1v0busv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm1v0busvr = 32'h0000_0000 | (bhm_1v0busv_nupd    << `SYSMON_BHM_1V0BUSV_NUPD)
+                                           | (bhm_1v0busv_dat_lat << `SYSMON_BHM_1V0BUSV);
+
+// Board Health VDD_1V8 Shunt Voltage Monitor Register
+// ----------------------------------------
+reg bhm_1v8sntv_nupd;
+reg [15:0] bhm_1v8sntv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_1v8sntv_nupd    <= 1'b1;
+    bhm_1v8sntv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[2]) begin
+    bhm_1v8sntv_nupd    <= 0;
+    bhm_1v8sntv_dat_lat <= BHM_CVM_DAT[16*2 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_1V8SNTVR & REG_RENB)
+    bhm_1v8sntv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm1v8sntvr = 32'h0000_0000 | (bhm_1v8sntv_nupd    << `SYSMON_BHM_1V8SNTV_NUPD)
+                                           | (bhm_1v8sntv_dat_lat << `SYSMON_BHM_1V8SNTV);
+
+// Board Health VDD_1V8 Bus Voltage Monitor Register
+// ----------------------------------------
+reg bhm_1v8busv_nupd;
+reg [15:0] bhm_1v8busv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_1v8busv_nupd    <= 1'b1;
+    bhm_1v8busv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[3]) begin
+    bhm_1v8busv_nupd    <= 0;
+    bhm_1v8busv_dat_lat <= BHM_CVM_DAT[16*3 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_1V8BUSVR & REG_RENB)
+    bhm_1v8busv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm1v8busvr = 32'h0000_0000 | (bhm_1v8busv_nupd    << `SYSMON_BHM_1V8BUSV_NUPD)
+                                           | (bhm_1v8busv_dat_lat << `SYSMON_BHM_1V8BUSV);
+
+// Board Health VDD_3V3 Shunt Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3sntv_nupd;
+reg [15:0] bhm_3v3sntv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3sntv_nupd    <= 1'b1;
+    bhm_3v3sntv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[4]) begin
+    bhm_3v3sntv_nupd    <= 0;
+    bhm_3v3sntv_dat_lat <= BHM_CVM_DAT[16*4 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3SNTVR & REG_RENB)
+    bhm_3v3sntv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3sntvr = 32'h0000_0000 | (bhm_3v3sntv_nupd    << `SYSMON_BHM_3V3SNTV_NUPD)
+                                           | (bhm_3v3sntv_dat_lat << `SYSMON_BHM_3V3SNTV);
+
+// Board Health VDD_3V3 Bus Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3busv_nupd;
+reg [15:0] bhm_3v3busv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3busv_nupd    <= 1'b1;
+    bhm_3v3busv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[5]) begin
+    bhm_3v3busv_nupd    <= 0;
+    bhm_3v3busv_dat_lat <= BHM_CVM_DAT[16*5 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3BUSVR & REG_RENB)
+    bhm_3v3busv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3busvr = 32'h0000_0000 | (bhm_3v3busv_nupd    << `SYSMON_BHM_3V3BUSV_NUPD)
+                                           | (bhm_3v3busv_dat_lat << `SYSMON_BHM_3V3BUSV);
+
+// Board Health VDD_3V3_SYS_A Shunt Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3sysasntv_nupd;
+reg [15:0] bhm_3v3sysasntv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3sysasntv_nupd    <= 1'b1;
+    bhm_3v3sysasntv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[6]) begin
+    bhm_3v3sysasntv_nupd    <= 0;
+    bhm_3v3sysasntv_dat_lat <= BHM_CVM_DAT[16*6 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3SYSASNTVR & REG_RENB)
+    bhm_3v3sysasntv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3sysasntvr = 32'h0000_0000 | (bhm_3v3sysasntv_nupd    << `SYSMON_BHM_3V3SYSASNTV_NUPD)
+                                               | (bhm_3v3sysasntv_dat_lat << `SYSMON_BHM_3V3SYSASNTV);
+
+// Board Health VDD_3V3_SYS_A Bus Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3sysabusv_nupd;
+reg [15:0] bhm_3v3sysabusv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3sysabusv_nupd    <= 1'b1;
+    bhm_3v3sysabusv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[7]) begin
+    bhm_3v3sysabusv_nupd    <= 0;
+    bhm_3v3sysabusv_dat_lat <= BHM_CVM_DAT[16*7 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3SYSABUSVR & REG_RENB)
+    bhm_3v3sysabusv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3sysabusvr = 32'h0000_0000 | (bhm_3v3sysabusv_nupd    << `SYSMON_BHM_3V3SYSABUSV_NUPD)
+                                               | (bhm_3v3sysabusv_dat_lat << `SYSMON_BHM_3V3SYSABUSV);
+
+// Board Health VDD_3V3_SYS_B Shunt Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3sysbsntv_nupd;
+reg [15:0] bhm_3v3sysbsntv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3sysbsntv_nupd    <= 1'b1;
+    bhm_3v3sysbsntv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[8]) begin
+    bhm_3v3sysbsntv_nupd    <= 0;
+    bhm_3v3sysbsntv_dat_lat <= BHM_CVM_DAT[16*8 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3SYSBSNTVR & REG_RENB)
+    bhm_3v3sysbsntv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3sysbsntvr = 32'h0000_0000 | (bhm_3v3sysbsntv_nupd    << `SYSMON_BHM_3V3SYSBSNTV_NUPD)
+                                               | (bhm_3v3sysbsntv_dat_lat << `SYSMON_BHM_3V3SYSBSNTV);
+
+// Board Health VDD_3V3_SYS_B Bus Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3sysbbusv_nupd;
+reg [15:0] bhm_3v3sysbbusv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3sysbbusv_nupd    <= 1'b1;
+    bhm_3v3sysbbusv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[9]) begin
+    bhm_3v3sysbbusv_nupd    <= 0;
+    bhm_3v3sysbbusv_dat_lat <= BHM_CVM_DAT[16*9 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3SYSBBUSVR & REG_RENB)
+    bhm_3v3sysbbusv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3sysbbusvr = 32'h0000_0000 | (bhm_3v3sysbbusv_nupd    << `SYSMON_BHM_3V3SYSBBUSV_NUPD)
+                                               | (bhm_3v3sysbbusv_dat_lat << `SYSMON_BHM_3V3SYSBBUSV);
+
+// Board Health VDD_3V3_IO Shunt Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3iosntv_nupd;
+reg [15:0] bhm_3v3iosntv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3iosntv_nupd    <= 1'b1;
+    bhm_3v3iosntv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[10]) begin
+    bhm_3v3iosntv_nupd    <= 0;
+    bhm_3v3iosntv_dat_lat <= BHM_CVM_DAT[16*10 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3IOSNTVR & REG_RENB)
+    bhm_3v3iosntv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3iosntvr = 32'h0000_0000 | (bhm_3v3iosntv_nupd    << `SYSMON_BHM_3V3IOSNTV_NUPD)
+                                             | (bhm_3v3iosntv_dat_lat << `SYSMON_BHM_3V3IOSNTV);
+
+// Board Health VDD_3V3_IO Bus Voltage Monitor Register
+// ----------------------------------------
+reg bhm_3v3iobusv_nupd;
+reg [15:0] bhm_3v3iobusv_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_3v3iobusv_nupd    <= 1'b1;
+    bhm_3v3iobusv_dat_lat <= 0;
+  end
+  else if (BHM_CVM_UPD[11]) begin
+    bhm_3v3iobusv_nupd    <= 0;
+    bhm_3v3iobusv_dat_lat <= BHM_CVM_DAT[16*11 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_3V3IOBUSVR & REG_RENB)
+    bhm_3v3iobusv_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhm3v3iobusvr = 32'h0000_0000 | (bhm_3v3iobusv_nupd    << `SYSMON_BHM_3V3IOBUSV_NUPD)
+                                             | (bhm_3v3iobusv_dat_lat << `SYSMON_BHM_3V3IOBUSV);
+
+// Board Health Temperature1 Monitor Register
+// ----------------------------------------
+reg bhm_temp1_nupd;
+reg [15:0] bhm_temp1_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_temp1_nupd    <= 1'b1;
+    bhm_temp1_dat_lat <= 0;
+  end
+  else if (BHM_TEMP_UPD[0]) begin
+    bhm_temp1_nupd    <= 0;
+    bhm_temp1_dat_lat <= BHM_TEMP_DAT[16*0 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_TEMP1R & REG_RENB)
+    bhm_temp1_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhmtemp1r = 32'h0000_0000 | (bhm_temp1_nupd    << `SYSMON_BHM_TEMP1_NUPD)
+                                         | (bhm_temp1_dat_lat << `SYSMON_BHM_TEMP1);
+
+// Board Health Temperature2 Monitor Register
+// ----------------------------------------
+reg bhm_temp2_nupd;
+reg [15:0] bhm_temp2_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_temp2_nupd    <= 1'b1;
+    bhm_temp2_dat_lat <= 0;
+  end
+  else if (BHM_TEMP_UPD[1]) begin
+    bhm_temp2_nupd    <= 0;
+    bhm_temp2_dat_lat <= BHM_TEMP_DAT[16*1 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_TEMP2R & REG_RENB)
+    bhm_temp2_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhmtemp2r = 32'h0000_0000 | (bhm_temp2_nupd    << `SYSMON_BHM_TEMP2_NUPD)
+                                         | (bhm_temp2_dat_lat << `SYSMON_BHM_TEMP2);
+
+// Board Health Temperature3 Monitor Register
+// ----------------------------------------
+reg bhm_temp3_nupd;
+reg [15:0] bhm_temp3_dat_lat;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    bhm_temp3_nupd    <= 1'b1;
+    bhm_temp3_dat_lat <= 0;
+  end
+  else if (BHM_TEMP_UPD[2]) begin
+    bhm_temp3_nupd    <= 0;
+    bhm_temp3_dat_lat <= BHM_TEMP_DAT[16*2 +: 16];
+  end
+  else if (RADR == `SYSMON_BHM_TEMP3R & REG_RENB)
+    bhm_temp3_nupd <= 1'b1;
+end
+
+wire [31:0] rd_bhmtemp3r = 32'h0000_0000 | (bhm_temp3_nupd    << `SYSMON_BHM_TEMP3_NUPD)
+                                         | (bhm_temp3_dat_lat << `SYSMON_BHM_TEMP3);
+
+// Board Health Software Access Control Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    BHM_SW_REQ    <= 0;
+    BHM_SW_DEVSEL <= 0;
+    BHM_SW_DEVADR <= 0;
+    BHM_SW_RWSEL  <= 0;
+  end
+  else begin
+    if (WADR == `SYSMON_BHM_SWCTLR) begin
+      if (REG_WENB[3] & REG_WDAT[`SYSMON_BHM_SWACCREQ])
+        BHM_SW_REQ    <= 1'b1;
+      if (REG_WENB[2])
+        BHM_SW_DEVSEL <= REG_WDAT[`SYSMON_BHM_SWDEVSEL +: 3];
+      if (REG_WENB[1])
+        BHM_SW_DEVADR <= REG_WDAT[`SYSMON_BHM_SWREGADR +: 8];
+      if (REG_WENB[0])
+        BHM_SW_RWSEL  <= REG_WDAT[`SYSMON_BHM_SWRWSEL];
+    end
+    if (BHM_SW_ACC_END)
+      BHM_SW_REQ <= 0;
+  end
+end
+
+wire [31:0] rd_bhmswctlr = 32'h0000_0000 | (BHM_SW_REQ    << `SYSMON_BHM_SWACCREQ)
+                                         | (BHM_SW_DEVSEL << `SYSMON_BHM_SWDEVSEL)
+                                         | (BHM_SW_DEVADR << `SYSMON_BHM_SWREGADR)
+                                         | (BHM_SW_RWSEL  << `SYSMON_BHM_SWRWSEL);
+
+// Board Health Software Access Write Data Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    BHM_SW_WRDATA <= 0;
+  else begin
+    if (WADR == `SYSMON_BHM_SWWDTR) begin
+      for (bt=0; bt<2; bt=bt+1) begin
+        if (REG_WENB[bt])
+          BHM_SW_WRDATA[8*bt +: 8] <= REG_WDAT[`SYSMON_BHM_SWWRDATA+8*bt +: 8];
+      end
+    end
+  end
+end
+
+wire [31:0] rd_bhmswwdtr = 32'h0000_0000 | (BHM_SW_WRDATA << `SYSMON_BHM_SWWRDATA);
+
+// Board Health Software Access Read Data Register
+// ----------------------------------------
+wire [31:0] rd_bhmswrdtr = 32'h0000_0000 | (BHM_SW_RDDATA << `SYSMON_BHM_SWRDDATA);
+
+// Board Health I2C Prescale Setting Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    BHM_CLKPSC <= INIT_I2CPSC;
+  else begin
+    if (WADR == `SYSMON_BHM_I2CPSCR) begin
+      for (bt=0; bt<2; bt=bt+1) begin
+        if (REG_WENB[bt])
+          BHM_CLKPSC[8*bt +: 8] <= REG_WDAT[`SYSMON_BHM_CLKPSC+8*bt +: 8];
+      end
+    end
+  end
+end
+
+wire [31:0] rd_bhmi2cpscr = 32'h0000_0000 | (BHM_CLKPSC << `SYSMON_BHM_CLKPSC);
+
+// Board Health I2C Access Count Setting Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    BHM_I2CACC_CNT <= 8'h02;
+  else begin
+    if (WADR == `SYSMON_BHM_I2CACCCNTR & REG_WENB[0])
+      BHM_I2CACC_CNT <= REG_WDAT[`SYSMON_BHM_I2CACCCNT +: 8];
+  end
+end
+
+wire [31:0] rd_bhmi2cacccntr = 32'h0000_0000 | (BHM_I2CACC_CNT << `SYSMON_BHM_I2CACCCNT);
+
+// Board Health Access Status Register
+// ----------------------------------------
+wire [31:0] rd_bhmasr = 32'h0000_0000 | (BHM_BUSY << `SYSMON_BHM_BUSY);
+
 // Register Read
 // ----------------------------------------
 always @ (posedge HCLK) begin
@@ -438,6 +1005,31 @@ always @ (posedge HCLK) begin
     else if (RADR == `SYSMON_SEM_ECCOUNT)REG_RDAT <= rd_sem_ccount;
     else if (RADR == `SYSMON_SEM_HTIMEOUT)REG_RDAT <= rd_sem_htimeout;
     else if (xadc_valid)                 REG_RDAT <= {16'h0000, XADC_DO};
+    else if (RADR == `SYSMON_BHM_INICTLR) REG_RDAT <= rd_bhminictlr;
+    else if (RADR == `SYSMON_BHM_MONCTLR) REG_RDAT <= rd_bhmmonctlr;
+    else if (RADR == `SYSMON_BHM_ISR) REG_RDAT <= rd_bhmisr;
+    else if (RADR == `SYSMON_BHM_IER) REG_RDAT <= rd_bhmier;
+    else if (RADR == `SYSMON_BHM_1V0SNTVR) REG_RDAT <= rd_bhm1v0sntvr;
+    else if (RADR == `SYSMON_BHM_1V0BUSVR) REG_RDAT <= rd_bhm1v0busvr;
+    else if (RADR == `SYSMON_BHM_1V8SNTVR) REG_RDAT <= rd_bhm1v8sntvr;
+    else if (RADR == `SYSMON_BHM_1V8BUSVR) REG_RDAT <= rd_bhm1v8busvr;
+    else if (RADR == `SYSMON_BHM_3V3SNTVR) REG_RDAT <= rd_bhm3v3sntvr;
+    else if (RADR == `SYSMON_BHM_3V3BUSVR) REG_RDAT <= rd_bhm3v3busvr;
+    else if (RADR == `SYSMON_BHM_3V3SYSASNTVR) REG_RDAT <= rd_bhm3v3sysasntvr;
+    else if (RADR == `SYSMON_BHM_3V3SYSABUSVR) REG_RDAT <= rd_bhm3v3sysabusvr;
+    else if (RADR == `SYSMON_BHM_3V3SYSBSNTVR) REG_RDAT <= rd_bhm3v3sysbsntvr;
+    else if (RADR == `SYSMON_BHM_3V3SYSBBUSVR) REG_RDAT <= rd_bhm3v3sysbbusvr;
+    else if (RADR == `SYSMON_BHM_3V3IOSNTVR) REG_RDAT <= rd_bhm3v3iosntvr;
+    else if (RADR == `SYSMON_BHM_3V3IOBUSVR) REG_RDAT <= rd_bhm3v3iobusvr;
+    else if (RADR == `SYSMON_BHM_TEMP1R) REG_RDAT <= rd_bhmtemp1r;
+    else if (RADR == `SYSMON_BHM_TEMP2R) REG_RDAT <= rd_bhmtemp2r;
+    else if (RADR == `SYSMON_BHM_TEMP3R) REG_RDAT <= rd_bhmtemp3r;
+    else if (RADR == `SYSMON_BHM_SWCTLR) REG_RDAT <= rd_bhmswctlr;
+    else if (RADR == `SYSMON_BHM_SWWDTR) REG_RDAT <= rd_bhmswwdtr;
+    else if (RADR == `SYSMON_BHM_SWRDTR) REG_RDAT <= rd_bhmswrdtr;
+    else if (RADR == `SYSMON_BHM_I2CPSCR) REG_RDAT <= rd_bhmi2cpscr;
+    else if (RADR == `SYSMON_BHM_I2CACCCNTR) REG_RDAT <= rd_bhmi2cacccntr;
+    else if (RADR == `SYSMON_BHM_ASR) REG_RDAT <= rd_bhmasr;
     else                                 REG_RDAT <= 32'h0000_00000;
   end
 end
