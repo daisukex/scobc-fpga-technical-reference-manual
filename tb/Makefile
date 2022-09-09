@@ -121,7 +121,7 @@ simulation: elaborate
 		$(SIM) --log $(LOG_DIR)/$(TESTCASE).log -R tb_top
     endif
 
-glbl.v:
+glbl.sdb:
 	$(CP) $(XIL_ROOT)/data/verilog/src/glbl.v $(TB_DIR)
 	$(VLOG) --log $(LOG_DIR)/glbl_compile.log $(TB_DIR)/glbl.v
 
