@@ -169,7 +169,6 @@ initial begin
   simcount = 13;
   //--------------------------------------------------
   @ (posedge dut.obc_core.lpahb.system_monitor.sysmon_reg.wdog_expire);
-                                                                                   16'h5A5A << `SM_WDOG_WSR), .check(1));
   clear_toggle_counter;
   repeat(20) #(10_000_000);
   if (fpga_toggle_counter != 0) begin
