@@ -34,7 +34,7 @@ module sc_hrmem_axi_sram_ctrl_vsahb # (
   input                       S_AXI_WVALID,
   output reg                  S_AXI_WREADY,
   output reg [P_AXI_ID_W-1:0] S_AXI_BID,
-  output     [1:0]            S_AXI_BRESP,
+  output reg [1:0]            S_AXI_BRESP,
   output reg                  S_AXI_BVALID,
   input                       S_AXI_BREADY,
   input      [P_AXI_ID_W-1:0] S_AXI_ARID,
@@ -117,6 +117,7 @@ reg [P_AXI_AD_W-1:0] r_awaddr_lat;
 reg [7:0]            r_awlen_lat;
 reg [2:0]            r_awsize_lat;
 reg [1:0]            r_awburst_lat;
+reg                  r_awlock_lat;
 reg [P_DT_W-1:0]     r_wdata_lat;
 reg [P_DT_W/8-1:0]   r_wstrb_lat;
 
@@ -137,6 +138,7 @@ reg [P_AXI_AD_W-1:0] r_araddr_lat;
 reg [7:0]            r_arlen_lat;
 reg [2:0]            r_arsize_lat;
 reg [1:0]            r_arburst_lat;
+reg                  r_arlock_lat;
 reg [2:0]            r_arprot_lat;
 
 wire                 w_rd_wait_start;
@@ -147,6 +149,7 @@ reg [P_DT_W-1:0]     r_ram_rdata_rbten;
 reg                  r_pre_arready;
 reg                  r_pre_rvalid;
 reg [P_AXI_ID_W-1:0] r_pre_rid;
+reg [1:0]            r_pre_rresp;
 reg [P_DT_W-1:0]     r_pre_rdata;
 reg                  r_pre_rlast;
 reg [7:0]            r_ren_cnt;
@@ -179,6 +182,16 @@ reg [P_DT_W/8-1:0]   r_rbten_lat;
 reg                  r_pf_val_lat;
 reg [P_DT_W-1:0]     r_pf_data_lat;
 reg                  r_pre_val_lat;
+
+reg [2**P_AXI_ID_W-1:0] r_exmon_valid;
+reg [P_AXI_AD_W-1:0]    r_exmon_adr [0:2**P_AXI_ID_W-1];
+reg [7:0]               r_exmon_len [0:2**P_AXI_ID_W-1];
+reg [2:0]               r_exmon_size [0:2**P_AXI_ID_W-1];
+reg [1:0]               r_exmon_burst [0:2**P_AXI_ID_W-1];
+reg [P_AXI_AD_W-1:0]    r_exmon_minadr [0:2**P_AXI_ID_W-1];
+reg [P_AXI_AD_W-1:0]    r_exmon_maxadr [0:2**P_AXI_ID_W-1];
+wire                    w_exacc_ok;
+reg                     r_exacc_ok_lat;
 
 integer i;
 genvar gn;
@@ -246,6 +259,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
     r_awlen_lat   <= 0;
     r_awsize_lat  <= 0;
     r_awburst_lat <= 0;
+    r_awlock_lat  <= 0;
     r_wdata_lat   <= 0;
     r_wstrb_lat   <= 0;
   end else begin
@@ -256,6 +270,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
       r_awlen_lat   <= S_AXI_AWLEN;
       r_awsize_lat  <= S_AXI_AWSIZE;
       r_awburst_lat <= S_AXI_AWBURST;
+      r_awlock_lat  <= S_AXI_AWLOCK;
     end
     if (w_axi_wen) begin
       r_wdata_lat <= S_AXI_WDATA;
@@ -263,8 +278,6 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
     end
   end
 end
-
-assign S_AXI_BRESP = 2'b00;
 
 assign w_wr_wait_flg = ((P_H_PRIO == 0) & OTHER_WR_ACC_START) |
                        SELF_RD_ACC_START | OTHER_RD_ACC_START |
@@ -300,6 +313,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
     S_AXI_WREADY      <= 0;
     S_AXI_BVALID      <= 0;
     S_AXI_BID         <= 0;
+    S_AXI_BRESP       <= 0;
     r_comp_wdata_wait <= 0;
     RAM_WEN           <= 0;
     RAM_WADR          <= 0;
@@ -314,6 +328,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
       S_AXI_WREADY      <= 0;
       S_AXI_BVALID      <= 0;
       S_AXI_BID         <= 0;
+      S_AXI_BRESP       <= 0;
       r_comp_wdata_wait <= 0;
       RAM_WEN           <= 0;
       RAM_WADR          <= 0;
@@ -329,6 +344,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
           S_AXI_WREADY      <= 1'b1;
           S_AXI_BVALID      <= 0;
           S_AXI_BID         <= 0;
+          S_AXI_BRESP       <= 0;
           r_comp_wdata_wait <= 0;
           RAM_WEN           <= 0;
           RAM_WADR          <= 0;
@@ -344,7 +360,8 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
                 r_comp_wdata_wait <= 1'b1;
               r_wr_state   <= P_WR_WAIT;
             end else begin
-              RAM_WEN   <= 1'b1;
+              if (~S_AXI_AWLOCK | w_exacc_ok)
+                RAM_WEN   <= 1'b1;
               RAM_WADR  <= S_AXI_AWADDR;
               RAM_WDATA <= S_AXI_WDATA;
               if ((1 << S_AXI_AWSIZE) > (P_DT_W/8)) begin
@@ -366,6 +383,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
                 if (&S_AXI_WSTRB)
                   S_AXI_BVALID <= 1'b1;
                 S_AXI_BID    <= S_AXI_AWID;
+                S_AXI_BRESP  <= {1'b0, S_AXI_AWLOCK & w_exacc_ok};
                 r_wr_state   <= P_WR_RSP;
               end else begin
                 r_wr_state   <= P_WR_DAT;
@@ -388,7 +406,8 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
             if (w_wr_wait_start) begin
               r_wr_state <= P_WR_WAIT;
             end else begin
-              RAM_WEN   <= 1'b1;
+              if (~S_AXI_AWLOCK | w_exacc_ok)
+                RAM_WEN   <= 1'b1;
               RAM_WADR  <= S_AXI_AWADDR;
               RAM_WDATA <= r_wdata_lat;
               if ((1 << S_AXI_AWSIZE) > (P_DT_W/8)) begin
@@ -413,6 +432,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
                 if (&r_wstrb_lat)
                   S_AXI_BVALID <= 1'b1;
                 S_AXI_BID         <= S_AXI_AWID;
+                S_AXI_BRESP       <= {1'b0, S_AXI_AWLOCK & w_exacc_ok};
                 r_wr_state        <= P_WR_RSP;
               end
             end
@@ -427,7 +447,8 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
                 r_comp_wdata_wait <= 1'b1;
               r_wr_state   <= P_WR_WAIT;
             end else begin
-              RAM_WEN   <= 1'b1;
+              if (~r_awlock_lat | r_exacc_ok_lat)
+                RAM_WEN   <= 1'b1;
               RAM_WDATA <= S_AXI_WDATA;
               if ((1 << r_awsize_lat) > (P_DT_W/8)) begin
                 RAM_WBTEN <= {(P_DT_W/8){1'b1}} & S_AXI_WSTRB;
@@ -466,6 +487,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
                 if (&S_AXI_WSTRB)
                   S_AXI_BVALID <= 1'b1;
                 S_AXI_BID    <= r_awid_lat;
+                S_AXI_BRESP  <= {1'b0, r_awlock_lat & r_exacc_ok_lat};
                 r_wr_state   <= P_WR_RSP;
               end
             end
@@ -489,9 +511,11 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
               if (&r_wstrb_lat)
                 S_AXI_BVALID <= 1'b1;
               S_AXI_BID         <= r_awid_lat;
+              S_AXI_BRESP       <= {1'b0, r_awlock_lat & r_exacc_ok_lat};
               r_wr_state        <= P_WR_RSP;
             end
-            RAM_WEN   <= 1'b1;
+            if (~r_awlock_lat | r_exacc_ok_lat)
+              RAM_WEN   <= 1'b1;
             RAM_WADR  <= r_awaddr_lat;
             RAM_WDATA <= r_wdata_lat;
             if ((1 << r_awsize_lat) > (P_DT_W/8)) begin
@@ -524,6 +548,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
             S_AXI_WREADY  <= 1'b1;
             S_AXI_BVALID  <= 0;
             S_AXI_BID     <= 0;
+            S_AXI_BRESP   <= 0;
             r_wr_state    <= P_WR_IDLE;
           end
         end
@@ -532,6 +557,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
           S_AXI_WREADY      <= 1'b1;
           S_AXI_BVALID      <= 0;
           S_AXI_BID         <= 0;
+          S_AXI_BRESP       <= 0;
           r_comp_wdata_wait <= 0;
           RAM_WEN           <= 0;
           RAM_WADR          <= 0;
@@ -579,6 +605,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
     r_arlen_lat   <= 0;
     r_arsize_lat  <= 0;
     r_arburst_lat <= 0;
+    r_arlock_lat  <= 0;
     r_arprot_lat  <= 0;
   end else begin
     if (w_axi_aren) begin
@@ -587,12 +614,11 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
       r_arlen_lat   <= S_AXI_ARLEN;
       r_arsize_lat  <= S_AXI_ARSIZE;
       r_arburst_lat <= S_AXI_ARBURST;
+      r_arlock_lat  <= S_AXI_ARLOCK;
       r_arprot_lat  <= S_AXI_ARPROT;
     end
   end
 end
-
-assign S_AXI_RRESP = 2'b00;
 
 assign w_rd_wait_start = SELF_RD_ACC_START &
                          (((P_H_PRIO == 0) & OTHER_RD_ACC_START) |
@@ -632,6 +658,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
     r_pre_arready <= 0;
     r_pre_rvalid  <= 0;
     r_pre_rid     <= 0;
+    r_pre_rresp   <= 0;
     r_pre_rdata   <= 0;
     r_pre_rlast   <= 0;
     r_ren_cnt     <= 0;
@@ -641,6 +668,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
       r_pre_arready <= 0;
       r_pre_rvalid  <= 0;
       r_pre_rid     <= 0;
+      r_pre_rresp   <= 0;
       r_pre_rdata   <= 0;
       r_pre_rlast   <= 0;
       r_ren_cnt     <= 0;
@@ -651,6 +679,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
           r_pre_arready <= 1'b1;
           r_pre_rvalid  <= 0;
           r_pre_rid     <= 0;
+          r_pre_rresp   <= 0;
           r_pre_rdata   <= 0;
           r_pre_rlast   <= 0;
           r_ren_cnt     <= 0;
@@ -676,6 +705,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
           if (w_axi_ren & S_AXI_RLAST) begin
             r_pre_arready <= 1'b1;
             r_pre_rid     <= 0;
+            r_pre_rresp   <= 0;
             r_pre_rdata   <= 0;
             r_pre_rlast   <= 0;
             r_ren_cnt     <= 0;
@@ -684,6 +714,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
             if ((RAM_RDT_VAL & ~w_rdff_write) | (w_rdff_val & S_AXI_RREADY)) begin
               r_pre_rvalid <= 1'b1;
               r_pre_rid    <= r_arid_lat;
+              r_pre_rresp  <= {1'b0, r_arlock_lat};
               if (w_rdff_val) begin
                 r_pre_rdata <= r_ram_rdata_ff[r_rdff_r_pntr];
               end else begin
@@ -706,6 +737,7 @@ always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
           r_pre_arready <= 1'b1;
           r_pre_rvalid  <= 0;
           r_pre_rid     <= 0;
+          r_pre_rresp   <= 0;
           r_pre_rdata   <= 0;
           r_pre_rlast   <= 0;
           r_ren_cnt     <= 0;
@@ -995,6 +1027,79 @@ assign S_AXI_RID    = (PF_RD_VAL | r_pf_val_lat) ? r_arid_lat:
 assign S_AXI_RDATA  = (PF_RD_VAL)    ? r_ram_rdata_rbten:
                       (r_pf_val_lat) ? r_pf_data_lat:
                                        r_pre_rdata;
+assign S_AXI_RRESP  = (PF_RD_VAL | r_pf_val_lat) ? {1'b0, r_arlock_lat}:
+                                                   r_pre_rresp;
 assign S_AXI_RLAST  = PF_RD_VAL | r_pf_val_lat | r_pre_rlast;
+
+////////////////////////////////
+// Exclusive Access Monitor   //
+////////////////////////////////
+always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
+  if (!S_AXI_ARESETN) begin
+    for (i=0; i<2**P_AXI_ID_W; i=i+1) begin
+      r_exmon_valid[i]  <= 0;
+      r_exmon_adr[i]    <= 0;
+      r_exmon_len[i]    <= 0;
+      r_exmon_size[i]   <= 0;
+      r_exmon_burst[i]  <= 0;
+      r_exmon_minadr[i] <= 0;
+      r_exmon_maxadr[i] <= 0;
+    end
+  end
+  else begin
+    if (w_exacc_ok)
+      r_exmon_valid[S_AXI_AWID] <= 0;
+    else if (RAM_WEN) begin
+      for (i=0; i<2**P_AXI_ID_W; i=i+1) begin
+        if ((((r_awsize_lat == 3'h0) & (RAM_WADR >= r_exmon_minadr[i])) |
+             ((r_awsize_lat == 3'h1) & (RAM_WADR[P_AXI_AD_W-1:1] >= r_exmon_minadr[i][P_AXI_AD_W-1:1])) |
+             ((r_awsize_lat >= 3'h2) & (RAM_WADR[P_AXI_AD_W-1:2] >= r_exmon_minadr[i][P_AXI_AD_W-1:2])) ) &
+            (RAM_WADR <= r_exmon_maxadr[i]))
+          r_exmon_valid[i] <= 0;
+      end
+    end
+    if (w_axi_aren & S_AXI_ARLOCK) begin
+      r_exmon_valid[S_AXI_ARID]  <= 1'b1;
+      r_exmon_adr[S_AXI_ARID]    <= S_AXI_ARADDR;
+      r_exmon_len[S_AXI_ARID]    <= S_AXI_ARLEN;
+      r_exmon_size[S_AXI_ARID]   <= S_AXI_ARSIZE;
+      r_exmon_burst[S_AXI_ARID]  <= S_AXI_ARBURST;
+      r_exmon_minadr[S_AXI_ARID] <= S_AXI_ARADDR;
+      if (S_AXI_ARSIZE == 3'h0)
+        r_exmon_maxadr[S_AXI_ARID] <= S_AXI_ARADDR;
+      else if (S_AXI_ARSIZE == 3'h1)
+        r_exmon_maxadr[S_AXI_ARID] <= {S_AXI_ARADDR[P_AXI_AD_W-1:1], 1'b1};
+      else
+        r_exmon_maxadr[S_AXI_ARID] <= {S_AXI_ARADDR[P_AXI_AD_W-1:2], 2'b11};
+    end
+    else if (RAM_REN & r_arlock_lat) begin
+      if (r_exmon_minadr[r_arid_lat] > RAM_RADR)
+        r_exmon_minadr[r_arid_lat] <= RAM_RADR;
+      if (r_exmon_maxadr[r_arid_lat] < RAM_RADR) begin
+        if (r_arsize_lat == 3'h0)
+          r_exmon_maxadr[r_arid_lat] <= RAM_RADR;
+        else if (r_arsize_lat == 3'h1)
+          r_exmon_maxadr[r_arid_lat] <= {RAM_RADR[P_AXI_AD_W-1:1], 1'b1};
+        else
+          r_exmon_maxadr[r_arid_lat] <= {RAM_RADR[P_AXI_AD_W-1:2], 2'b11};
+      end
+    end
+  end
+end
+
+assign w_exacc_ok = w_axi_awen & S_AXI_AWLOCK & r_exmon_valid[S_AXI_AWID] &
+                    (S_AXI_AWADDR == r_exmon_adr[S_AXI_AWID]) &
+                    (S_AXI_AWLEN == r_exmon_len[S_AXI_AWID]) &
+                    (S_AXI_AWSIZE == r_exmon_size[S_AXI_AWID]) &
+                    (S_AXI_AWBURST == r_exmon_burst[S_AXI_AWID]);
+
+always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
+  if (!S_AXI_ARESETN)
+    r_exacc_ok_lat <= 0;
+  else if (w_exacc_ok)
+    r_exacc_ok_lat <= 1'b1;
+  else if (w_axi_ben)
+    r_exacc_ok_lat <= 0;
+end
 
 endmodule

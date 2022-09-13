@@ -107,7 +107,7 @@ parameter P_MEM_NUM = 1;
 parameter P_BUS_AD_W = 22;
 parameter P_MEM_AD_W = 20; // SRAM Depth(1Unit): 1M
 parameter P_DT_W = 32;
-parameter [15:0] P_MSC_INI = 16'h1;
+parameter [15:0] P_MSC_INI = 16'h06FF;
 
 parameter P_BANK_W = (P_DT_W == (2 << 4)) ? 2 :
                      (P_DT_W == (2 << 5)) ? 3 :
@@ -139,9 +139,8 @@ wire w_reg_ram_ecc1err_axi;
 wire w_reg_ram_ecc2err_axi;
 wire w_reg_ram_ecc1err_atrd;
 wire w_reg_ram_ecc2err_atrd;
+wire [P_BUS_AD_W-1:0] w_reg_eccerr_adr;
 wire w_reg_ecc_col_disc;
-wire [15:0] w_reg_ram_ecc1err_cnt;
-wire [15:0] w_reg_ram_ecc2err_cnt;
 wire [15:0] w_reg_ram_ecc1err_axi_cnt;
 wire [15:0] w_reg_ram_ecc2err_axi_cnt;
 wire [15:0] w_reg_ram_ecc1err_atrd_cnt;
@@ -256,7 +255,6 @@ sc_ahb_slave ahb_slave (
 
 // HRMEM Register
 sc_hrmem_reg # (
-  .P_MEM_NUM(P_MEM_NUM),
   .P_AD_W(P_BUS_AD_W),
   .P_BANK_W(P_BANK_W),
   .P_MSC_INI(P_MSC_INI),
@@ -283,17 +281,16 @@ sc_hrmem_reg # (
   .REG_MEM_SCRB_CYCLE(w_reg_mem_scrb_cycle),             // output [15:0]
   .REG_COL_FSTK_RDSTOP(w_reg_col_fstk_rdstop),           // output
   .REG_ECCERRCNT_CLR(w_reg_eccerrcnt_clr),               // output
-  .REG_RAM_ECC1ERR(w_reg_ram_ecc1err),                   // input [P_MEM_NUM-1:0]
-  .REG_RAM_ECC2ERR(w_reg_ram_ecc2err),                   // input [P_MEM_NUM-1:0]
-  .REG_RAM_ECC1ERR_AXI(w_reg_ram_ecc1err_axi),           // input [P_MEM_NUM-1:0]
-  .REG_RAM_ECC2ERR_AXI(w_reg_ram_ecc2err_axi),           // input [P_MEM_NUM-1:0]
-  .REG_RAM_ECC1ERR_ATRD(w_reg_ram_ecc1err_atrd),         // input [P_MEM_NUM-1:0]
-  .REG_RAM_ECC2ERR_ATRD(w_reg_ram_ecc2err_atrd),         // input [P_MEM_NUM-1:0]
-  .REG_ECC_COL_DISC(w_reg_ecc_col_disc),                 // input [P_MEM_NUM-1:0]
-  .REG_RAM_ECC1ERR_CNT(w_reg_ram_ecc1err_cnt),           // input [15:0]
-  .REG_RAM_ECC2ERR_CNT(w_reg_ram_ecc2err_cnt),           // input [15:0]
-  .REG_RAM_ECC1ERR_AXI_CNT(w_reg_ram_ecc1err_axi_cnt),   // input [15:0]
-  .REG_RAM_ECC2ERR_AXI_CNT(w_reg_ram_ecc2err_axi_cnt),   // input [15:0]
+  .REG_RAM_ECC1ERR(w_reg_ram_ecc1err),                   // input
+  .REG_RAM_ECC2ERR(w_reg_ram_ecc2err),                   // input
+  .REG_RAM_ECC1ERR_BUSRD(w_reg_ram_ecc1err_axi),         // input
+  .REG_RAM_ECC2ERR_BUSRD(w_reg_ram_ecc2err_axi),         // input
+  .REG_RAM_ECC1ERR_ATRD(w_reg_ram_ecc1err_atrd),         // input
+  .REG_RAM_ECC2ERR_ATRD(w_reg_ram_ecc2err_atrd),         // input
+  .REG_ECCERR_ADR(w_reg_eccerr_adr),                     // input [P_AD_W-1:0]
+  .REG_ECC_COL_DISC(w_reg_ecc_col_disc),                 // input
+  .REG_RAM_ECC1ERR_BUSRD_CNT(w_reg_ram_ecc1err_axi_cnt), // input [15:0]
+  .REG_RAM_ECC2ERR_BUSRD_CNT(w_reg_ram_ecc2err_axi_cnt), // input [15:0]
   .REG_RAM_ECC1ERR_ATRD_CNT(w_reg_ram_ecc1err_atrd_cnt), // input [15:0]
   .REG_RAM_ECC2ERR_ATRD_CNT(w_reg_ram_ecc2err_atrd_cnt), // input [15:0]
   .REG_ECC_COL_DISC_CNT(w_reg_ecc_col_disc_cnt),         // input [15:0]
@@ -623,9 +620,8 @@ sc_hrmem_unit_sram_wrap # (
   .RAM_ECC2ERR_AXI(w_reg_ram_ecc2err_axi),           // output
   .RAM_ECC1ERR_ATRD(w_reg_ram_ecc1err_atrd),         // output
   .RAM_ECC2ERR_ATRD(w_reg_ram_ecc2err_atrd),         // output
+  .RAM_ECCERR_ADR(w_reg_eccerr_adr),                 // output [P_AXI_AD_W-1:0]
   .ECC_COL_DISC(w_reg_ecc_col_disc),                 // output
-  .RAM_ECC1ERR_CNT(w_reg_ram_ecc1err_cnt),           // output [15:0]
-  .RAM_ECC2ERR_CNT(w_reg_ram_ecc2err_cnt),           // output [15:0]
   .RAM_ECC1ERR_AXI_CNT(w_reg_ram_ecc1err_axi_cnt),   // output [15:0]
   .RAM_ECC2ERR_AXI_CNT(w_reg_ram_ecc2err_axi_cnt),   // output [15:0]
   .RAM_ECC1ERR_ATRD_CNT(w_reg_ram_ecc1err_atrd_cnt), // output [15:0]

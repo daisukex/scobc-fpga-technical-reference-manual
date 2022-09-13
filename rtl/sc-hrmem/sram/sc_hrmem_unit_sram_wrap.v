@@ -69,9 +69,8 @@ module sc_hrmem_unit_sram_wrap # (
   output                      RAM_ECC2ERR_AXI,
   output                      RAM_ECC1ERR_ATRD,
   output                      RAM_ECC2ERR_ATRD,
+  output     [P_AXI_AD_W-1:0] RAM_ECCERR_ADR,
   output                      ECC_COL_DISC,
-  output reg [15:0]           RAM_ECC1ERR_CNT,
-  output reg [15:0]           RAM_ECC2ERR_CNT,
   output reg [15:0]           RAM_ECC1ERR_AXI_CNT,
   output reg [15:0]           RAM_ECC2ERR_AXI_CNT,
   output reg [15:0]           RAM_ECC1ERR_ATRD_CNT,
@@ -179,8 +178,11 @@ sc_hrmem_unit_sram_ctrl # (
   .RAM_ECC2ERR_AXI(RAM_ECC2ERR_AXI),                // output
   .RAM_ECC1ERR_ATRD(RAM_ECC1ERR_ATRD),              // output
   .RAM_ECC2ERR_ATRD(RAM_ECC2ERR_ATRD),              // output
+  .RAM_ECCERR_ADR(RAM_ECCERR_ADR[P_AXI_AD_W-1:2]),  // output [P_AD_W-1:0]
   .ECC_COL_DISC(ECC_COL_DISC)                       // output
 );
+
+assign RAM_ECCERR_ADR[1:0] = 2'b00;
 
 // Unit RAM Read Enable Retiming
 always @ (posedge RAM_CLK or negedge RESET_N) begin
@@ -205,8 +207,6 @@ assign SYS_RAM_RDATA  = w_ram_rdata;
 always @ (posedge RAM_CLK or negedge RESET_N) begin
   if (!RESET_N) begin
     r_eccerrcnt_clr_1p   <= 0;
-    RAM_ECC1ERR_CNT      <= 0;
-    RAM_ECC2ERR_CNT      <= 0;
     RAM_ECC1ERR_AXI_CNT  <= 0;
     RAM_ECC2ERR_AXI_CNT  <= 0;
     RAM_ECC1ERR_ATRD_CNT <= 0;
@@ -215,18 +215,12 @@ always @ (posedge RAM_CLK or negedge RESET_N) begin
   end else begin
     r_eccerrcnt_clr_1p <= ECCERRCNT_CLR;
     if (ECCERRCNT_CLR & ~r_eccerrcnt_clr_1p) begin
-      RAM_ECC1ERR_CNT      <= 0;
-      RAM_ECC2ERR_CNT      <= 0;
       RAM_ECC1ERR_AXI_CNT  <= 0;
       RAM_ECC2ERR_AXI_CNT  <= 0;
       RAM_ECC1ERR_ATRD_CNT <= 0;
       RAM_ECC2ERR_ATRD_CNT <= 0;
       ECC_COL_DISC_CNT     <= 0;
     end else begin
-      if ((~&RAM_ECC1ERR_CNT) & RAM_ECC1ERR)
-        RAM_ECC1ERR_CNT      <= RAM_ECC1ERR_CNT + 1;
-      if ((~&RAM_ECC2ERR_CNT) & RAM_ECC2ERR)
-        RAM_ECC2ERR_CNT      <= RAM_ECC2ERR_CNT + 1;
       if ((~&RAM_ECC1ERR_AXI_CNT) & RAM_ECC1ERR_AXI)
         RAM_ECC1ERR_AXI_CNT  <= RAM_ECC1ERR_AXI_CNT + 1;
       if ((~&RAM_ECC2ERR_AXI_CNT) & RAM_ECC2ERR_AXI)

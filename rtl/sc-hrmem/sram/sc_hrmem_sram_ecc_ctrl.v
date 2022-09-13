@@ -56,6 +56,7 @@ module sc_hrmem_sram_ecc_ctrl # (
   output reg              RAM_ECC2ERR_AXI,
   output reg              RAM_ECC1ERR_ATRD,
   output reg              RAM_ECC2ERR_ATRD,
+  output reg [P_AD_W-1:0] RAM_ECCERR_ADR,
   output reg              ECC_COL_DISC
 );
 
@@ -63,6 +64,7 @@ parameter P_SFIFO_AD_W = 4; // Stock FIFO Address WIDTH
 parameter [P_SFIFO_AD_W-1:0] P_SFIFO_AMF_CAP = 5; // Remaining Stock FIFO capacity when Allmost Full
 
 reg [1:0] axi_wen_retim;
+reg [P_AD_W-1:0] axi_wadr_retim;
 reg axi_ren_retim;
 reg cor_val_retim;
 reg ram_ren_1p;
@@ -75,6 +77,7 @@ reg r_mem_atrd_trg;
 reg r_mem_atrd_val_1p;
 
 wire w_hprio_acc;
+wire w_col_mask;
 wire w_write_conf;
 wire w_sfifo_wr_val;
 wire w_sfifo_rd_val;
@@ -101,6 +104,7 @@ reg pre_cor_val;
 always @ (posedge CLK or negedge RESET_N) begin
   if (!RESET_N) begin
     axi_wen_retim  <= 0;
+    axi_wadr_retim <= 0;
     axi_ren_retim  <= 0;
     cor_val_retim  <= 0;
     ram_ren_1p     <= 0;
@@ -111,6 +115,7 @@ always @ (posedge CLK or negedge RESET_N) begin
     ram_rd_atrd_2p <= 0;
   end else begin
     axi_wen_retim  <= {axi_wen_retim[0], AXI_WEN};
+    axi_wadr_retim <= AXI_WADR;
     axi_ren_retim  <= AXI_REN;
     cor_val_retim  <= MEM_COR_VAL;
     ram_ren_1p     <= RAM_REN;
@@ -158,7 +163,8 @@ always @ (posedge CLK or negedge RESET_N) begin
 end
 
 assign w_hprio_acc    = AXI_WEN | axi_wen_retim[0] | AXI_REN | axi_ren_retim | MEM_COR_VAL;
-assign w_write_conf   = ram_ren_2p & INT_ECC1ERR & w_hprio_acc;
+assign w_col_mask     = axi_wen_retim[0] & (ECCERR_ADR == axi_wadr_retim);
+assign w_write_conf   = ram_ren_2p & INT_ECC1ERR & w_hprio_acc & ~w_col_mask;
 assign w_sfifo_wr_val = w_write_conf & (~r_sfifo_full | w_sfifo_rd_val);
 assign w_sfifo_rd_val = ~((ram_ren_2p & INT_ECC1ERR) | w_hprio_acc) &
                         (r_sfifo_wp != r_sfifo_rp | r_sfifo_full);
@@ -234,7 +240,7 @@ generate
       end else if ((w_sfifo_wr_val | (pre_cor_val & (AXI_WEN | AXI_REN)) |
                     r_cor_val_lat | MEM_COR_VAL_CXL) & r_sfifo_wp == gn) begin
         r_sfifo_val[gn] <= 1;
-      end else if (AXI_WEN & r_sfifo_adr[gn] == AXI_WADR) begin
+      end else if (axi_wen_retim[0] & r_sfifo_adr[gn] == axi_wadr_retim) begin
         r_sfifo_val[gn] <= 0;
       end
     end
@@ -334,6 +340,7 @@ always @ (posedge CLK or negedge RESET_N) begin
     RAM_ECC2ERR_AXI  <= 0;
     RAM_ECC1ERR_ATRD <= 0;
     RAM_ECC2ERR_ATRD <= 0;
+    RAM_ECCERR_ADR   <= 0;
   end else begin
     RAM_ECC1ERR      <= ram_ren_2p & INT_ECC1ERR;
     RAM_ECC2ERR      <= ram_ren_2p & INT_ECC2ERR;
@@ -341,6 +348,8 @@ always @ (posedge CLK or negedge RESET_N) begin
     RAM_ECC2ERR_AXI  <= ram_rd_axi_2p  & INT_ECC2ERR;
     RAM_ECC1ERR_ATRD <= ram_rd_atrd_2p & INT_ECC1ERR;
     RAM_ECC2ERR_ATRD <= ram_rd_atrd_2p & INT_ECC2ERR;
+    if (ram_ren_2p & (INT_ECC1ERR | INT_ECC2ERR))
+      RAM_ECCERR_ADR   <= ECCERR_ADR;
   end
 end
 

@@ -4,60 +4,45 @@
 //-----------------------------------------------
 // Copyright © 2022 Space Cubics, LLC.
 //-----------------------------------------------
-// ECC Enable Register
-`define ECCENR           16'h0000
+// ECC Error Collect Enable Register
+`define ECCCOLENR        16'h0000
 `define  ECCCOLEN               0
-// Memory Scrubing Enable Register
-`define MEMSCRBENR       16'h0004
-`define  MEMSCRBEN              0
 // Memory Scrubing Control Register
 `define MEMSCRCTRLR      16'h0008
-`define  MEMSCRCYC              0
-`define  COLFSRDSTPB           16
-// ECC 1bit Error Interrupt Register
-`define ECC1ERRINTR      16'h0010
+`define  MEMSCRBEN              0
+`define  COLFSRDSTPB            8
+`define  MEMSCRCYC             16
+// HRMEM Interrupt Status Register
+`define HRMINTSTR        16'h0010
 `define  E1ERRINT               0
-// ECC 2bit Error Interrupt Register
-`define ECC2ERRINTR      16'h0014
-`define  E2ERRINT               0
-// ECC Correct Data Discard Register
-`define ECCCDISINTR      16'h0018
-`define  ECDISINT               0
+`define  E2ERRINT               1
+`define  ECDISINT               8
+`define  BUSRDE1ERR            16
+`define  ATRDE1ERR             17
+`define  BUSRDE2ERR            20
+`define  ATRDE2ERR             21
 // HRMEM Interrupt Enable Register
-`define HRMINTENR        16'h001C
+`define HRMINTENR        16'h0014
 `define  E1ERRINTENB            0
 `define  E2ERRINTENB            1
-`define  ECDISINTENB            2
-// ECC Error Count Register
-`define ECCERRCNTR       16'h0020
-`define  E1ERRCNT               0
-`define  E2ERRCNT              16
+`define  ECDISINTENB            8
+// 1Bit ECC Error Count Register
+`define ECC1ERRCNTR      16'h0020
+`define  BUSRDE1ERRCNT          0
+`define  ATRDE1ERRCNT          16
+// 2Bit ECC Error Count Register
+`define ECC2ERRCNTR      16'h0024
+`define  BUSRDE2ERRCNT          0
+`define  ATRDE2ERRCNT          16
 // ECC Correct Data Discard Count Register
-`define ECDISCNTR        16'h0024
+`define ECDISCNTR        16'h0028
 `define  ECDISCNT               0
 // Error Count Clear Register
-`define ERRCNTCLRR       16'h0028
+`define ERRCNTCLRR       16'h002C
 `define  ECNTCLR                0
-// AXI ECC 1bit Error Status Register
-`define AXIECC1ERRR      16'h0040
-`define  AXIE1ERR               0
-// AXI ECC 2bit Error Status Register
-`define AXIECC2ERRR      16'h0044
-`define  AXIE2ERR               0
-// ATRD ECC 1bit Error Status Register
-`define ATRDECC1ERRR     16'h0048
-`define  ATRDE1ERR              0
-// ATRD ECC 2bit Error Status Register
-`define ATRDECC2ERRR     16'h004C
-`define  ATRDE2ERR              0
-// AXI ECC Error Count Register
-`define AXIECCERRCNTR    16'h0050
-`define  AXIE1ERRCNT            0
-`define  AXIE2ERRCNT           16
-// ATRD ECC Error Count Register
-`define ATRDECCERRCNTR   16'h0054
-`define  ATRDE1ERRCNT           0
-`define  ATRDE2ERRCNT          16
+// ECC Error Address Monitor Register
+`define ECCERRADMR       16'h0030
+`define  ECCERRADR              0
 // ECC Error Occurrence factor Insert Register
 `define ECCERRINSR       16'h0060
 `define  E1ERRINS               0

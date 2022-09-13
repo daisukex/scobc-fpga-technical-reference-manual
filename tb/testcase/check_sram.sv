@@ -220,25 +220,23 @@ initial begin
   //--------------------------------------------------
   @(posedge SYS_CLK);
   display_subcount_text(1, "Check Status Register", 1);
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECC1ERRINTR), .expdata(0), .check(1));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECC2ERRINTR), .expdata(0), .check(1));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCCDISINTR), .expdata(0), .check(1));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCERRCNTR), .expdata(0), .check(1));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`HRMINTSTR), .expdata(0), .check(1));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECC1ERRCNTR), .expdata(0), .check(1));
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECDISCNTR), .expdata(0), .check(1));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCERRADMR), .expdata(0), .check(1));
   display_subcount_text(2, "Check ECC Enable Register", 1);
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCENR), .expdata(1<<`ECCCOLEN), .check(1));
-  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`ECCENR), .data(0<<`ECCCOLEN));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCENR), .expdata(0<<`ECCCOLEN), .check(1));
-  display_subcount_text(3, "Check Memory Scrubing Enable Register", 1);
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRBENR), .expdata(0<<`MEMSCRBEN), .check(1));
-  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`MEMSCRBENR), .data(1<<`MEMSCRBEN));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRBENR), .expdata(1<<`MEMSCRBEN), .check(1));
-  display_subcount_text(4, "Check Memory Scrubing Control Register", 1);
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata(1<<`MEMSCRCYC), .check(1));
-  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .data((1<<`COLFSRDSTPB) |
-                                                                          (16'hFFFE<<`MEMSCRCYC)));
-  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((1<<`COLFSRDSTPB) |
-                                                                             (16'hFFFE<<`MEMSCRCYC)), .check(1));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .expdata(1<<`ECCCOLEN), .check(1));
+  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .data(0<<`ECCCOLEN));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`ECCCOLENR), .expdata(0<<`ECCCOLEN), .check(1));
+  display_subcount_text(3, "Check Memory Scrubing Control Register", 1);
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((1<<`MEMSCRBEN) |
+                                                                             (16'h06FF<<`MEMSCRCYC)), .check(1));
+  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .data((0<<`MEMSCRBEN) |
+                                                                          (1<<`COLFSRDSTPB) |
+                                                                          (16'hF900<<`MEMSCRCYC)));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((0<<`MEMSCRBEN) |
+                                                                             (1<<`COLFSRDSTPB) |
+                                                                             (16'hF900<<`MEMSCRCYC)), .check(1));
 
   repeat (100) @ (posedge SYS_CLK);
   simfinish(0);
