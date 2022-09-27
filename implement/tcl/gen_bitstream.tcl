@@ -7,6 +7,7 @@
 
 source tcl/set_environment.tcl
 source tcl/set_device.tcl
+source tcl/write_mmi.tcl
 
 # check argument
 if {${argc} < 2} {
@@ -32,6 +33,8 @@ link_design -name ${topmodule} -part ${xil_part} -top ${topmodule}
 
 # Read xdc file
 read_xdc ${xdcd}/${topmodule}_bit.xdc
+
+write_mmi obc_core/cm3_ss/itcm/mem_reg ${bitd}/itcm.mmi ${xil_part}
 
 # Write bitstream
 write_bitstream -force ${bitd}/${topmodule}.bit
