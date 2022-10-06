@@ -13,6 +13,7 @@ module sysmon_reg (
   input HRESETN,
   input REF_CLK,
   input SYS_RSTB_SYNC_REFCLK,
+  output SYSMON_HW_INT,
 
   // Register Interface
   input [31:0] REG_WADR,
@@ -34,7 +35,20 @@ module sysmon_reg (
   output XADC_DWE,
   input XADC_DRDY,
   output [15:0] XADC_DI,
-  input [15:0] XADC_DO
+  input [15:0] XADC_DO,
+
+  // SEM Controller
+  input [4:0] SEM_CURRENT_STATUS,
+  input [4:0] SEM_PREVIOUS_STATUS,
+  input SEM_STATUS_CHANGE,
+  output reg [7:0] HEARTBEAT_TIMEOUT,
+  input HEARTBEAT_TIMEOUT_DETECT,
+  input HALTED_DETECT,
+  input UNCORRECT_DETECT,
+  input ECORRECT_DETECT,
+  output reg INJECT_REQ,
+  input INJECT_ACK,
+  output reg [39:0] INJECT_ADDRESS
 );
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
@@ -200,6 +214,181 @@ always @ (posedge REF_CLK) begin
   end
 end
 
+// System Monitor Interrupt
+// ----------------------------------------
+reg [2:0] sync_heartbeat_timeout;
+reg [2:0] sync_halted;
+reg [2:0] sync_uncorrect;
+reg [2:0] sync_ecorrect;
+always @ (posedge HCLK) begin
+  sync_heartbeat_timeout <= {sync_heartbeat_timeout[1:0], HEARTBEAT_TIMEOUT_DETECT};
+  sync_halted <= {sync_halted[1:0], HALTED_DETECT};
+  sync_uncorrect <= {sync_uncorrect[1:0], UNCORRECT_DETECT};
+  sync_ecorrect <= {sync_ecorrect[1:0], ECORRECT_DETECT};
+end
+
+// SEM Controller Interrupt Status
+reg heartbeat_timeout_sts;
+reg halted_sts;
+reg uncorrect_sts;
+reg ecorrect_sts;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    heartbeat_timeout_sts <= 1'b0;
+    halted_sts <= 1'b0;
+    uncorrect_sts <= 1'b0;
+    ecorrect_sts <= 1'b0;
+  end
+  else begin
+    if (WADR == `SYSMON_INT_STATUS) begin
+      if (chk_enbit(1, `SEM_HTIMEOUT_INT, REG_WENB) & REG_WDAT[`SEM_HTIMEOUT_INT])
+        heartbeat_timeout_sts <= 1'b0;
+      if (chk_enbit(1, `SEM_HALTED_INT, REG_WENB) & REG_WDAT[`SEM_HALTED_INT])
+        halted_sts <= 1'b0;
+      if (chk_enbit(1, `SEM_UNCORRECT_INT, REG_WENB) & REG_WDAT[`SEM_UNCORRECT_INT])
+        uncorrect_sts <= 1'b0;
+      if (chk_enbit(1, `SEM_ECORRECT_INT, REG_WENB) & REG_WDAT[`SEM_ECORRECT_INT])
+        ecorrect_sts <= 1'b0;
+    end
+    if (~sync_heartbeat_timeout[2] & sync_heartbeat_timeout[1])
+      heartbeat_timeout_sts <= 1'b1;
+    if (~sync_halted[2] & sync_halted[1])
+      halted_sts <= 1'b1;
+    if (~sync_uncorrect[2] & sync_uncorrect[1])
+      uncorrect_sts <= 1'b1;
+    if (~sync_ecorrect[2] & sync_ecorrect[1])
+      ecorrect_sts <= 1'b1;
+  end
+end
+wire [31:0] rd_sysmon_intsts = 32'h0000_0000 | (heartbeat_timeout_sts << `SEM_HTIMEOUT_INT)
+                                             | (halted_sts << `SEM_HALTED_INT)
+                                             | (uncorrect_sts << `SEM_UNCORRECT_INT)
+                                             | (ecorrect_sts << `SEM_ECORRECT_INT);
+
+// SEM Controller Interrupt Enable
+reg heartbeat_timeout_enb;
+reg halted_enb;
+reg uncorrect_enb;
+reg ecorrect_enb;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    heartbeat_timeout_enb <= 1'b0;
+    halted_enb <= 1'b0;
+    uncorrect_enb <= 1'b0;
+    ecorrect_enb <= 1'b0;
+  end
+  else begin
+    if (WADR == `SYSMON_INT_ENABLE) begin
+      if (chk_enbit(1, `SEM_HTIMEOUT_ENB, REG_WENB))
+        heartbeat_timeout_enb <= REG_WDAT[`SEM_HTIMEOUT_ENB];
+      if (chk_enbit(1, `SEM_HALTED_ENB, REG_WENB))
+        halted_enb <= REG_WDAT[`SEM_HALTED_ENB];
+      if (chk_enbit(1, `SEM_UNCORRECT_ENB, REG_WENB))
+        uncorrect_enb <= REG_WDAT[`SEM_UNCORRECT_ENB];
+      if (chk_enbit(1, `SEM_ECORRECT_ENB, REG_WENB))
+        ecorrect_enb <= REG_WDAT[`SEM_ECORRECT_ENB];
+    end
+  end
+end
+wire [31:0] rd_sysmon_intenb = 32'h0000_0000 | (heartbeat_timeout_enb << `SEM_HTIMEOUT_ENB)
+                                             | (halted_enb << `SEM_HALTED_ENB)
+                                             | (uncorrect_enb << `SEM_UNCORRECT_ENB)
+                                             | (ecorrect_enb << `SEM_ECORRECT_ENB);
+
+assign SYSMON_HW_INT = (ecorrect_enb & ecorrect_sts)
+                     | (uncorrect_enb & uncorrect_sts)
+                     | (halted_enb & halted_sts)
+                     | (heartbeat_timeout_enb & heartbeat_timeout_sts);
+
+// SEM Controller Register
+// ----------------------------------------
+// SEM State
+reg [4:0] sem_pre_sts;
+reg [4:0] sem_cur_sts;
+reg [2:0] sync_status_change;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    sem_pre_sts <= 5'h0;
+    sem_cur_sts <= 5'h0;
+  end
+  else begin
+    sync_status_change <= {sync_status_change[1:0], SEM_STATUS_CHANGE};
+    if (~sync_status_change[2] & sync_status_change[1]) begin
+      sem_pre_sts <= SEM_PREVIOUS_STATUS;
+      sem_cur_sts <= SEM_CURRENT_STATUS;
+    end
+  end
+end
+wire [31:0] rd_sem_state = 32'h0000_0000 | (sem_pre_sts[4] << `SEM_PRE_INJECT)
+                                         | (sem_pre_sts[3] << `SEM_PRE_CLASSIFIC)
+                                         | (sem_pre_sts[2] << `SEM_PRE_CORRECT)
+                                         | (sem_pre_sts[1] << `SEM_PRE_OBSERVE)
+                                         | (sem_pre_sts[0] << `SEM_PRE_INIT)
+                                         | (sem_cur_sts[4] << `SEM_CUR_INJECT)
+                                         | (sem_cur_sts[3] << `SEM_CUR_CLASSIFIC)
+                                         | (sem_cur_sts[2] << `SEM_CUR_CORRECT)
+                                         | (sem_cur_sts[1] << `SEM_CUR_OBSERVE)
+                                         | (sem_cur_sts[0] << `SEM_CUR_INIT);
+
+// SEM Correction Count
+reg [15:0] sem_ecount;
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    sem_ecount <= 0;
+  else begin
+    if (WADR == `SYSMON_SEM_ECCOUNT & chk_enbit(16, `SEM_CCOUNT, REG_WENB))
+      sem_ecount <= 0;
+    else if (~sync_ecorrect[2] & sync_ecorrect[1])
+      sem_ecount <= sem_ecount + 1;
+  end
+end
+wire [31:0] rd_sem_ccount = 32'h0000_0000 | (sem_ecount << `SEM_CCOUNT);
+
+// SEM Heartbeat timeout
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    HEARTBEAT_TIMEOUT <= 8'hFF;
+  else begin
+      if (WADR == `SYSMON_SEM_HTIMEOUT & chk_enbit(8, `SEM_HTIMEOUT, REG_WENB))
+        HEARTBEAT_TIMEOUT <= REG_WDAT[`SEM_HTIMEOUT +:8];;
+  end
+end
+wire [31:0] rd_sem_htimeout = 32'h0000_0000 | (HEARTBEAT_TIMEOUT << `SEM_HTIMEOUT);
+
+// SEM Error Injection
+reg [2:0] sync_inject_ack;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    INJECT_REQ <= 0;
+    INJECT_ADDRESS <= 0;
+    sync_inject_ack <= 3'b000;
+  end
+  else begin
+    sync_inject_ack <= {sync_inject_ack[1:0], INJECT_ACK};
+    if (WADR == `SYSMON_SEM_EINJECT1) begin
+      if (chk_enbit(8, `SEM_EINJECT1, REG_WENB))
+        INJECT_ADDRESS[0 +:8] <= REG_WDAT[`SEM_EINJECT1 +:8];
+      if (chk_enbit(8, `SEM_EINJECT1+8, REG_WENB))
+        INJECT_ADDRESS[8 +:8] <= REG_WDAT[`SEM_EINJECT1+8 +:8];
+      if (chk_enbit(8, `SEM_EINJECT1+16, REG_WENB))
+        INJECT_ADDRESS[16 +:8] <= REG_WDAT[`SEM_EINJECT1+16 +:8];
+      if (chk_enbit(8, `SEM_EINJECT1+24, REG_WENB))
+        INJECT_ADDRESS[24 +:8] <= REG_WDAT[`SEM_EINJECT1+24 +:8];
+    end
+    else if (WADR == `SYSMON_SEM_EINJECT2) begin
+      if (chk_enbit(8, `SEM_EINJECT2, REG_WENB)) begin
+        INJECT_ADDRESS[32 +:8] <= REG_WDAT[`SEM_EINJECT2 +:8];
+        INJECT_REQ <= 1'b1;
+      end
+    end
+
+    if (INJECT_REQ) begin
+      if (~sync_inject_ack[2] & sync_inject_ack[1])
+        INJECT_REQ <= 1'b0;
+    end
+  end
+end
+
 // XADC Register Access
 // ----------------------------------------
 reg [6:0] latch_reg_radr;
@@ -243,6 +432,11 @@ always @ (posedge HCLK) begin
   else if (REG_RENB | xadc_valid) begin
     if      (RADR == `SYSMON_WDOG_CTRL)  REG_RDAT <= rd_wdogctrl;
     else if (RADR == `SYSMON_WDOG_SIVAL) REG_RDAT <= rd_wdogsigival;
+    else if (RADR == `SYSMON_INT_STATUS) REG_RDAT <= rd_sysmon_intsts;
+    else if (RADR == `SYSMON_INT_ENABLE) REG_RDAT <= rd_sysmon_intenb;
+    else if (RADR == `SYSMON_SEM_STATE)  REG_RDAT <= rd_sem_state;
+    else if (RADR == `SYSMON_SEM_ECCOUNT)REG_RDAT <= rd_sem_ccount;
+    else if (RADR == `SYSMON_SEM_HTIMEOUT)REG_RDAT <= rd_sem_htimeout;
     else if (xadc_valid)                 REG_RDAT <= {16'h0000, XADC_DO};
     else                                 REG_RDAT <= 32'h0000_00000;
   end
