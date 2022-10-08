@@ -71,18 +71,18 @@ $(CM3_SYNTH_DIR)/sc_cm3_wrapper.dcp $(CM3_SYNTH_DIR)/AhbSToAxi_design.v: $(RTL_R
 PHONY += synthesis_ip
 synthesis_ip: $(AXI_CROSSBAR_DCP)
 
-$(AXI_CROSSBAR_DIR)/$(MAIN_AXI_CROSSBAR).xci $(AXI_CROSSBAR_DIR)/$(UDL_AXI_CROSSBAR).xci:
+$(AXI_CROSSBAR_DIR)/$(MAIN_AXI_CROSSBAR)/$(MAIN_AXI_CROSSBAR).xci $(AXI_CROSSBAR_DIR)/$(UDL_AXI_CROSSBAR)/$(UDL_AXI_CROSSBAR).xci:
 	cd $(AXI_CROSSBAR_DIR) && make MODULE=$(notdir $(basename $@))
 
-$(DESIGN_DIR)/$(MAIN_AXI_CROSSBAR)/$(MAIN_AXI_CROSSBAR).dcp: $(AXI_CROSSBAR_DIR)/$(MAIN_AXI_CROSSBAR).xci
+$(DESIGN_DIR)/$(MAIN_AXI_CROSSBAR)/$(MAIN_AXI_CROSSBAR).dcp: $(AXI_CROSSBAR_DIR)/$(MAIN_AXI_CROSSBAR)/$(MAIN_AXI_CROSSBAR).xci
 	$(MKDIR) -p $(LOG_DIR)
-	$(VIVADOTCL) -source tcl/synthesis_axi_crossbar_ip.tcl -log $(LOG_DIR)/$(basename $(<F))_synthesis.log -tclargs $(<F)
+	$(VIVADOTCL) -source tcl/synthesis_ip.tcl -log $(LOG_DIR)/$(basename $(<F))_synthesis.log -tclargs $(<)
 	echo '*' > $(LOG_DIR)/.gitignore
 	echo '*' > $(DESIGN_DIR)/.gitignore
 
-$(DESIGN_DIR)/$(UDL_AXI_CROSSBAR)/$(UDL_AXI_CROSSBAR).dcp: $(AXI_CROSSBAR_DIR)/$(UDL_AXI_CROSSBAR).xci
+$(DESIGN_DIR)/$(UDL_AXI_CROSSBAR)/$(UDL_AXI_CROSSBAR).dcp: $(AXI_CROSSBAR_DIR)/$(UDL_AXI_CROSSBAR)/$(UDL_AXI_CROSSBAR).xci
 	$(MKDIR) -p $(LOG_DIR)
-	$(VIVADOTCL) -source tcl/synthesis_axi_crossbar_ip.tcl -log $(LOG_DIR)/$(basename $(<F))_synthesis.log -tclargs $(<F)
+	$(VIVADOTCL) -source tcl/synthesis_ip.tcl -log $(LOG_DIR)/$(basename $(<F))_synthesis.log -tclargs $(<)
 	echo '*' > $(LOG_DIR)/.gitignore
 	echo '*' > $(DESIGN_DIR)/.gitignore
 

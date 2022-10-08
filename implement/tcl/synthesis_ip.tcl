@@ -1,7 +1,7 @@
 # --------------------------------------------------
 # Space Cubics OBC A1 (SC-OBC-A1)
-# AXI Crossbar Synthesis script
-#  synthesis_axi_crossbar_ip.tcl
+# IP Core Synthesis script
+#  synthesis_ip.tcl
 #  Copyright © 2022 Space Cubics, LLC.
 # --------------------------------------------------
 
@@ -9,12 +9,14 @@ source tcl/set_environment.tcl
 source tcl/set_device.tcl
 
 # setting ip core name
-regsub -all ".xci" [lindex $argv 0] {} target_ip
+#regsub -all ".xci" [lindex $argv 0] {} xci_file
+set xci_file [lindex $argv 0]
+set target_ip [file rootname [file tail $xci_file]]
 puts ${target_ip}
 set outdir ${rootd}/${target_ip}
 file mkdir ${outdir}
 
-if { [file exists ${axiipd}/${target_ip}/${target_ip}.xci] == 0} then {
+if { [file exists $xci_file] == 0} then {
     puts "xci not defined"
     exit
 }
@@ -25,8 +27,8 @@ puts "Synthesis ${target_ip}"
 if { [file exists tcl/pre_read_${target_ip}.tcl] == 1} then {
     source tcl/pre_read_${target_ip}.tcl
 }
-read_ip ${axiipd}/${target_ip}/${target_ip}.xci
-generate_target -force {synthesis simulation implementation} [get_files ${axiipd}/${target_ip}/${target_ip}.xci]
+read_ip $xci_file
+generate_target -force {synthesis simulation implementation} [get_files $xci_file]
 
 # xdc setting
 if { [ file exists ${xdcd}/${target_ip}/synthesis_${target_ip}.sdc ] == 1 } then {
