@@ -10,6 +10,7 @@ set logd ./log
 
 # data directory
 set rootd   ./output
+set reptd   ./report
 set xcid    ./ip
 set axiipd  ${xcid}/axi_crossbar
 set rtllist ./tcl/dut_rtl.list

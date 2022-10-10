@@ -42,6 +42,7 @@ RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(wildcard $(list)/*.v)
 
 LOG_DIR              := log
 DESIGN_DIR           := output
+REPORT_DIR           := report
 CONSTRAINTS_DIR      := constraints
 BIT_DIR              := bitstream
 GIT_DIR              := ../.git
@@ -121,6 +122,7 @@ route: $(DESIGN_DIR)/route/$(TOPMODULE)_route.dcp
 
 $(DESIGN_DIR)/route/$(TOPMODULE)_route.dcp: $(DESIGN_DIR)/place/$(TOPMODULE)_place.dcp
 	$(VIVADOTCL) -source tcl/route.tcl -log $(LOG_DIR)/$(TOPMODULE)_route.log -tclargs $(TOPMODULE) $<
+	echo '*' > $(REPORT_DIR)/.gitignore
 
 # Generate Bitstream file
 # ---------------------------------------------------------------------------

@@ -42,7 +42,7 @@ route_design -timing_summary
 phys_opt_design -routing_opt
 
 # Export design report
-report_utilization -file ${outdir}/report_utilization_route.log
+report_utilization -file ${reptd}/report_utilization_route.log
 
 # Export design
 write_verilog -force -mode funcsim -cell ${topmodule} ${rootd}/route/${topmodule}_route_funcsim_netlist.v
