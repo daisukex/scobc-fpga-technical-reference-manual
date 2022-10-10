@@ -13,6 +13,7 @@ task cm3_isr_check;
   input [31:0] count_limit;
   reg [31:0] count;
 begin
+  count = 0;
   while (~CM3_ISR[isr]) begin
     @ (posedge CM3_CLK);
     count = count + 1;

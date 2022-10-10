@@ -29,14 +29,17 @@ CORTEX_M3_IP_DIR     := $(IP_DIR_ROOT)/$(CORTEX_M3_IP)
 AXI_CROSSBAR_IP_DIR  := $(IP_DIR_ROOT)/axi_crossbar
 MAIN_AXI_CROSSBAR_IP  = main_axi_crossbar
 UDL_AXI_CROSSBAR_IP   = udl_axi_crossbar
+SEM_IP                = sem_core
+SEM_IP_DIR           := $(IP_DIR_ROOT)/$(SEM_IP)
 
 # RTL Directory
 DUT_ROOT_DIR         := ../rtl
 DUT_DIR_LIST         := $(shell find $(DUT_ROOT_DIR) -type d)
 MAIN_AXI_CROSSBAR_DIR:= $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/sim $(AXI_CROSSBAR_IP_DIR)/$(MAIN_AXI_CROSSBAR_IP)/hdl
 UDL_AXI_CROSSBAR_DIR := $(AXI_CROSSBAR_IP_DIR)/$(UDL_AXI_CROSSBAR_IP)/sim
+SEM_DIR              := $(SEM_IP_DIR)/$(SEM_IP)/sim $(SEM_IP_DIR)/$(SEM_IP)/hdl
 
-RTL_DIR_LIST         := $(DUT_DIR_LIST) $(MAIN_AXI_CROSSBAR_DIR) $(UDL_AXI_CROSSBAR_DIR) $(CORTEX_M3_DIR)
+RTL_DIR_LIST         := $(DUT_DIR_LIST) $(MAIN_AXI_CROSSBAR_DIR) $(UDL_AXI_CROSSBAR_DIR) $(CORTEX_M3_DIR) $(SEM_DIR)
 RTL_LIST             := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.v)))
 RTL_HEADER_LIST      := $(foreach list, $(RTL_DIR_LIST), $(notdir $(wildcard $(list)/*.vh)))
 
@@ -83,6 +86,7 @@ sim_preparation:
 generate_ip:
 	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(MAIN_AXI_CROSSBAR_IP)
 	cd $(AXI_CROSSBAR_IP_DIR) && make generate_target MODULE=$(UDL_AXI_CROSSBAR_IP)
+	cd $(SEM_IP_DIR) && make generate_target
 	cd $(CORTEX_M3_IP_DIR) && make
 
 # Compile Design

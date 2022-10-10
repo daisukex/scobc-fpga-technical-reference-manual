@@ -19,6 +19,7 @@ module lpahb_ss # (
   output UARTLITE_ISR,
   output INTERNAL_I2CM_ISR,
   output EXTERNAL_I2CM_ISR,
+  output SYSMON_HW_ISR,
   input [1:0] TRCH_BOOT,
   output [1:0] CLKMODE,
   output CMC_REQ,
@@ -410,6 +411,7 @@ system_monitor system_monitor (
   .HRESETN(hresetn),
   .REF_CLK(REF_CLK),
   .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
+  .SYSMON_HW_INT(SYSMON_HW_ISR),
 
   // AHB Interface
   .HSEL(shsel[AHB_SYSMON_CH]),
