@@ -147,20 +147,20 @@ set_property [get_ports FPGA_RESERVE]         -dict { PACKAGE_PIN AC16 IOSTANDAR
 set_property [get_ports FPGA_PWR_CYCLE_REQ]   -dict { PACKAGE_PIN AE18 IOSTANDARD LVCMOS33 }
 
 # ULPI Interface
-set_property [get_ports ULPI_CS]              -dict { PACKAGE_PIN AB1  IOSTANDARD LVCMOS33 }
-set_property [get_ports ULPI_RESET_B]         -dict { PACKAGE_PIN AB2  IOSTANDARD LVCMOS33 }
-set_property [get_ports ULPI_CLOCK]           -dict { PACKAGE_PIN AA3  IOSTANDARD LVCMOS33 }
-set_property [get_ports ULPI_DIR]             -dict { PACKAGE_PIN AF5  IOSTANDARD LVCMOS33 }
-set_property [get_ports ULPI_NXT]             -dict { PACKAGE_PIN AF4  IOSTANDARD LVCMOS33 }
-set_property [get_ports ULPI_STP]             -dict { PACKAGE_PIN AE5  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[0]}]       -dict { PACKAGE_PIN AE3  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[1]}]       -dict { PACKAGE_PIN AF3  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[2]}]       -dict { PACKAGE_PIN AE2  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[3]}]       -dict { PACKAGE_PIN AF2  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[4]}]       -dict { PACKAGE_PIN AE1  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[5]}]       -dict { PACKAGE_PIN AD1  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[6]}]       -dict { PACKAGE_PIN AC2  IOSTANDARD LVCMOS33 }
-set_property [get_ports {ULPI_DATA[7]}]       -dict { PACKAGE_PIN AC1  IOSTANDARD LVCMOS33 }
+set_property [get_ports ULPI_CS]              -dict { PACKAGE_PIN AB1  IOSTANDARD LVCMOS18 }
+set_property [get_ports ULPI_RESET_B]         -dict { PACKAGE_PIN AB2  IOSTANDARD LVCMOS18 }
+set_property [get_ports ULPI_CLOCK]           -dict { PACKAGE_PIN AA3  IOSTANDARD LVCMOS18 }
+set_property [get_ports ULPI_DIR]             -dict { PACKAGE_PIN AF5  IOSTANDARD LVCMOS18 }
+set_property [get_ports ULPI_NXT]             -dict { PACKAGE_PIN AF4  IOSTANDARD LVCMOS18 }
+set_property [get_ports ULPI_STP]             -dict { PACKAGE_PIN AE5  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[0]}]       -dict { PACKAGE_PIN AE3  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[1]}]       -dict { PACKAGE_PIN AF3  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[2]}]       -dict { PACKAGE_PIN AE2  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[3]}]       -dict { PACKAGE_PIN AF2  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[4]}]       -dict { PACKAGE_PIN AE1  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[5]}]       -dict { PACKAGE_PIN AD1  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[6]}]       -dict { PACKAGE_PIN AC2  IOSTANDARD LVCMOS18 }
+set_property [get_ports {ULPI_DATA[7]}]       -dict { PACKAGE_PIN AC1  IOSTANDARD LVCMOS18 }
 set_property [get_ports ULPI_REFCLK]          -dict { PACKAGE_PIN AF17 IOSTANDARD LVCMOS33 }
 
 # User IO Interface
