@@ -53,6 +53,12 @@ place_design -post_place_opt
 phys_opt_design -placement_opt -critical_cell_opt
 report_high_fanout_nets
 
+# Export design report
+if { [file exists $reptd] == 0} then {
+    file mkdir ${reptd}
+}
+report_io -file ${reptd}/report_io_place.log
+
 # Export design
 write_verilog -force -mode funcsim -cell ${topmodule} ${rootd}/place/${topmodule}_place_funcsim_netlist.v
 write_verilog -force -mode design  -cell ${topmodule} ${rootd}/place/${topmodule}_place_design_netlist.v
