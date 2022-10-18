@@ -178,7 +178,7 @@ wire [31:0] rd_pwrcycle = 32'h0000_0000 | (PWR_CYCLE_REQ << `SR_PWECYCLEREQ);
 (* dont_touch = "yes" *) reg [31:0] spad4 [0:3];
 reg [31:0] rd_spad1, rd_spad2, rd_spad3, rd_spad4;
 always @ (posedge HCLK) begin
-  if (!HRESETN) begin
+  if (!POR_RSTB) begin
     for (n=0; n<=3; n=n+1) begin
       spad1[n] <= 32'h0000_0000;
       spad2[n] <= 32'h0000_0000;

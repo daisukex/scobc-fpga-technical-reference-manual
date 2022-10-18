@@ -74,6 +74,9 @@ initial begin
   repeat (100) @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .expdata(1<<`SR_ITCMEN), .check(1));
 
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .data(16'h5A5A<<`SR_ITCMENPKC | 0<<`SR_ITCMEN));
+  @ (posedge SYS_RSTB);
+
   //--------------------------------------------------
   label    = "Check Configuration Memory Register: CFGMEMCTL";
   simcount = 3;
@@ -209,6 +212,9 @@ initial begin
   label    = "Check System Register: SPAD1-SPAD4";
   simcount = 5;
   //--------------------------------------------------
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .data(16'h5A5A<<`SR_ITCMENPKC | 0<<`SR_ITCMEN));
+  @ (posedge SYS_RSTB);
+
   @(posedge SYS_CLK);
   display_subcount_text(1, "Check SPAD1-SPAD4 Initial Value", 1);
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD1), .expdata(32'h0000_0000), .check(1));
@@ -226,6 +232,31 @@ initial begin
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD2), .expdata(32'h0706_0504), .check(1));
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD3), .expdata(32'h0B0A_0908), .check(1));
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD4), .expdata(32'h0F0E_0D0C), .check(1));
+  repeat (100) @ (posedge SYS_CLK);
+
+  display_subcount_text(3, "Change ITCMEN and CPU Reset", 1);
+  write_transaction(.master(2), .addr(`SYSREG_BASE+`SYSREG_CODEMSEL), .data(16'h5A5A<<`SR_ITCMENPKC | 1<<`SR_ITCMEN));
+  @ (posedge SYS_RSTB);
+
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD1), .expdata(32'h0302_0100), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD2), .expdata(32'h0706_0504), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD3), .expdata(32'h0B0A_0908), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD4), .expdata(32'h0F0E_0D0C), .check(1));
+  repeat (100) @ (posedge SYS_CLK);
+
+  display_subcount_text(4, "Set Power On Reset", 1);
+  system_reconfig();
+  skip_sram_init();
+  @ (posedge SYS_RSTB);
+  @ (posedge CMC_REQ);
+  @ (posedge CMC_ACK);
+  @ (negedge CMC_REQ);
+  @ (negedge CMC_ACK);
+
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD1), .expdata(32'h0000_0000), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD2), .expdata(32'h0000_0000), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD3), .expdata(32'h0000_0000), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_SPAD4), .expdata(32'h0000_0000), .check(1));
   repeat (100) @ (posedge SYS_CLK);
 
   //--------------------------------------------------
