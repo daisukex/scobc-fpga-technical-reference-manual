@@ -565,6 +565,7 @@ sc_hrmem_sram # (
   .POR_RST_N(BOOT_RSTB),
   .RAM_INIT_REQ(INIT_REQ),
   .RAM_INIT_DONE(INIT_DONE),
+  .RD_LTCY_MODE(1'b0),
 
   // CM3 CODE Bus AHB Slave Interface
   .CODE_SHSEL(cm3_cod_hsel),

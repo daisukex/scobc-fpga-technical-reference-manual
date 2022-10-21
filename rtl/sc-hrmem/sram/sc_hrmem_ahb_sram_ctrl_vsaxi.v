@@ -15,6 +15,7 @@ module sc_hrmem_ahb_sram_ctrl_vsaxi # (
   input                       HCLK,
   input                       HRESETN,
   input                       RAM_INIT_DONE,
+  input                       RD_LTCY_MODE,
 
   // AHB Slave Interface
   input                       HSEL,
@@ -72,6 +73,8 @@ module sc_hrmem_ahb_sram_ctrl_vsaxi # (
   input                       RAM_RDT_VAL,
   input      [P_DT_W-1:0]     RAM_RDATA
 );
+
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
 
 wire                 w_hready;
 
@@ -202,8 +205,10 @@ always @ (posedge HCLK or negedge HRESETN) begin
                                 ((SELF_STATE == P_WAIT_CONF) & SELF_RD_ACC_BUSY & w_wait_end) |
                                  (SELF_STATE == P_WAIT_WR2RD)) & ~w_wr2rd_wait & ~PF_SRCH_VAL};
     r_self_rd_busy_p       <= {r_self_rd_busy_p[0], RAM_REN & (HTRANS == 2'b01) & r_htrans_p1[1]};
-    r_self_rd_burst_dt_msk <= ((SELF_RD_ACC_END & SELF_BURST_EN) | |r_self_rd_b_acc_end_p) &
-                              ~(|r_self_rd_after_b_st_p[P_RD_LTCY-2 +: 2] | r_self_rd_busy_p[1]);
+    r_self_rd_burst_dt_msk <= ((SELF_RD_ACC_END & SELF_BURST_EN) |
+                               (RD_LTCY_MODE & |r_self_rd_b_acc_end_p[P_RD_LTCY-1:0]) |
+                               (~RD_LTCY_MODE & |r_self_rd_b_acc_end_p[P_RD_LTCY-2:0])) &
+                              ~(|r_self_rd_after_b_st_p[RD_LTCY_SEL-2 +: 2] | r_self_rd_busy_p[1]);
     r_other_rd_burst_en_p1 <= OTHER_RD_BURST_EN;
     r_other_rd_state_p1    <= OTHER_RD_STATE;
   end

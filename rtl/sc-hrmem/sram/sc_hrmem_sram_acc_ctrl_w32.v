@@ -11,6 +11,8 @@ module sc_hrmem_sram_acc_ctrl_w32 # (
   input CLK,
   input RESET_N,
 
+  input RD_LTCY_MODE,
+
   // RAM Access Control Interface
   input INIT_EN,
   input [19:0] INIT_ADR,
@@ -48,6 +50,8 @@ module sc_hrmem_sram_acc_ctrl_w32 # (
   inout  [15:0] SR2_IO,
   input  SR2_ERR
 );
+
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
 
 wire w_wen_sel;
 wire [19:0] w_wadr_sel;
@@ -222,23 +226,23 @@ always@ (posedge CLK or negedge RESET_N) begin
     ECCERR_ADR  <= 0;
     ECCERR_BTEN <= 0;
   end
-  else if (r_ren_p[P_RD_LTCY-2]) begin
+  else if (r_ren_p[RD_LTCY_SEL-2]) begin
     RDATA       <= 0;
     ECC1ERR     <= 0;
     ECCERR_ADR  <= 0;
     ECCERR_BTEN <= 0;
-    if (r_rbten_p[P_RD_LTCY-2][3])
+    if (r_rbten_p[RD_LTCY_SEL-2][3])
       RDATA[31:24] <= w_sr2_din[15:8];
-    if (r_rbten_p[P_RD_LTCY-2][2])
+    if (r_rbten_p[RD_LTCY_SEL-2][2])
       RDATA[23:16] <= w_sr2_din[7:0];
-    if (r_rbten_p[P_RD_LTCY-2][1])
+    if (r_rbten_p[RD_LTCY_SEL-2][1])
       RDATA[15:8]  <= w_sr1_din[15:8];
-    if (r_rbten_p[P_RD_LTCY-2][0])
+    if (r_rbten_p[RD_LTCY_SEL-2][0])
       RDATA[7:0]   <= w_sr1_din[7:0];
-    if ((|r_rbten_p[P_RD_LTCY-2][1:0] & SR1_ERR) | (|r_rbten_p[P_RD_LTCY-2][3:2] & SR2_ERR)) begin
+    if ((|r_rbten_p[RD_LTCY_SEL-2][1:0] & SR1_ERR) | (|r_rbten_p[RD_LTCY_SEL-2][3:2] & SR2_ERR)) begin
       ECC1ERR     <= 1'b1;
-      ECCERR_ADR  <= r_radr_p[P_RD_LTCY-2];
-      ECCERR_BTEN <= r_rbten_p[P_RD_LTCY-2];
+      ECCERR_ADR  <= r_radr_p[RD_LTCY_SEL-2];
+      ECCERR_BTEN <= r_rbten_p[RD_LTCY_SEL-2];
     end
   end
   else begin

@@ -13,6 +13,8 @@ module sc_hrmem_sram_ecc_ctrl # (
   input                   CLK,
   input                   RESET_N,
 
+  input                   RD_LTCY_MODE,
+
   // AXI SRAM Controller Interface
   input                   AXI_WEN,
   input      [P_AD_W-1:0] AXI_WADR,
@@ -63,6 +65,8 @@ module sc_hrmem_sram_ecc_ctrl # (
 
 parameter P_SFIFO_AD_W = 4; // Stock FIFO Address WIDTH
 parameter [P_SFIFO_AD_W-1:0] P_SFIFO_AMF_CAP = 5; // Remaining Stock FIFO capacity when Allmost Full
+
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
 
 reg [1:0] axi_wen_retim;
 reg [P_AD_W-1:0] axi_wadr_retim;
@@ -135,7 +139,10 @@ always @ (posedge CLK or negedge RESET_N) begin
 end
 
 // Memory Auto Read Valid
-assign MEM_ATRD_VAL = r_mem_atrd_trg & ~(AXI_REN | |axi_ren_retim | AXI_WEN | |axi_wen_retim |
+assign MEM_ATRD_VAL = r_mem_atrd_trg & ~(AXI_REN |
+                                         (RD_LTCY_MODE & |axi_ren_retim[P_RD_LTCY-3:0]) |
+                                         (~RD_LTCY_MODE & |axi_ren_retim[P_RD_LTCY-4:0]) |
+                                         AXI_WEN | |axi_wen_retim |
                                          MEM_COR_VAL_BEF | MEM_COR_VAL | cor_val_retim |
                                          r_mem_atrd_val_1p);
 
@@ -160,11 +167,14 @@ always @ (posedge CLK or negedge RESET_N) begin
   end
 end
 
-assign w_hprio_acc    = AXI_WEN | axi_wen_retim[0] | AXI_REN | |axi_ren_retim | MEM_COR_VAL;
+assign w_hprio_acc    = AXI_WEN | axi_wen_retim[0] | AXI_REN |
+                        (RD_LTCY_MODE & |axi_ren_retim[P_RD_LTCY-3:0]) |
+                        (~RD_LTCY_MODE & |axi_ren_retim[P_RD_LTCY-4:0]) |
+                        MEM_COR_VAL;
 assign w_col_mask     = axi_wen_retim[0] & (ECCERR_ADR == axi_wadr_retim);
-assign w_write_conf   = ram_ren_p[P_RD_LTCY-2] & INT_ECC1ERR & w_hprio_acc & ~w_col_mask;
+assign w_write_conf   = ram_ren_p[RD_LTCY_SEL-2] & INT_ECC1ERR & w_hprio_acc & ~w_col_mask;
 assign w_sfifo_wr_val = w_write_conf & (~r_sfifo_full | w_sfifo_rd_val);
-assign w_sfifo_rd_val = ~((ram_ren_p[P_RD_LTCY-2] & INT_ECC1ERR) | w_hprio_acc) &
+assign w_sfifo_rd_val = ~((ram_ren_p[RD_LTCY_SEL-2] & INT_ECC1ERR) | w_hprio_acc) &
                         (r_sfifo_wp != r_sfifo_rp | r_sfifo_full);
 assign w_sfifo_rev_val = ((pre_cor_val & (AXI_WEN | AXI_REN)) | r_cor_val_lat) &
                          (~r_sfifo_full | w_sfifo_rd_val);
@@ -302,7 +312,7 @@ always @ (posedge CLK or negedge RESET_N) begin
     MEM_COR_BTEN <= 0;
     MEM_COR_DATA <= 0;
   end else if (ECC_COL_EN & ~w_hprio_acc) begin
-    if (ram_ren_p[P_RD_LTCY-2] & INT_ECC1ERR) begin
+    if (ram_ren_p[RD_LTCY_SEL-2] & INT_ECC1ERR) begin
       pre_cor_val  <= 1;
       MEM_COR_ADR  <= ECCERR_ADR;
       MEM_COR_BTEN <= ECCERR_BTEN;
@@ -327,7 +337,7 @@ always @ (posedge CLK or negedge RESET_N) begin
 end
 assign MEM_COR_VAL = pre_cor_val & ~(AXI_WEN | AXI_REN);
 assign MEM_COR_VAL_BEF = ECC_COL_EN & ~w_hprio_acc &
-                         ((ram_ren_p[P_RD_LTCY-2] & INT_ECC1ERR) | w_sfifo_rd_val);
+                         ((ram_ren_p[RD_LTCY_SEL-2] & INT_ECC1ERR) | w_sfifo_rd_val);
 
 // ECC Error Detect Output
 always @ (posedge CLK or negedge RESET_N) begin
@@ -340,13 +350,13 @@ always @ (posedge CLK or negedge RESET_N) begin
     RAM_ECC2ERR_ATRD <= 0;
     RAM_ECCERR_ADR   <= 0;
   end else begin
-    RAM_ECC1ERR      <= ram_ren_p[P_RD_LTCY-2] & INT_ECC1ERR;
-    RAM_ECC2ERR      <= ram_ren_p[P_RD_LTCY-2] & INT_ECC2ERR;
-    RAM_ECC1ERR_AXI  <= ram_rd_axi_p[P_RD_LTCY-2] & INT_ECC1ERR;
-    RAM_ECC2ERR_AXI  <= ram_rd_axi_p[P_RD_LTCY-2] & INT_ECC2ERR;
-    RAM_ECC1ERR_ATRD <= ram_rd_atrd_p[P_RD_LTCY-2] & INT_ECC1ERR;
-    RAM_ECC2ERR_ATRD <= ram_rd_atrd_p[P_RD_LTCY-2] & INT_ECC2ERR;
-    if (ram_ren_p[P_RD_LTCY-2] & (INT_ECC1ERR | INT_ECC2ERR))
+    RAM_ECC1ERR      <= ram_ren_p[RD_LTCY_SEL-2] & INT_ECC1ERR;
+    RAM_ECC2ERR      <= ram_ren_p[RD_LTCY_SEL-2] & INT_ECC2ERR;
+    RAM_ECC1ERR_AXI  <= ram_rd_axi_p[RD_LTCY_SEL-2] & INT_ECC1ERR;
+    RAM_ECC2ERR_AXI  <= ram_rd_axi_p[RD_LTCY_SEL-2] & INT_ECC2ERR;
+    RAM_ECC1ERR_ATRD <= ram_rd_atrd_p[RD_LTCY_SEL-2] & INT_ECC1ERR;
+    RAM_ECC2ERR_ATRD <= ram_rd_atrd_p[RD_LTCY_SEL-2] & INT_ECC2ERR;
+    if (ram_ren_p[RD_LTCY_SEL-2] & (INT_ECC1ERR | INT_ECC2ERR))
       RAM_ECCERR_ADR   <= ECCERR_ADR;
   end
 end
