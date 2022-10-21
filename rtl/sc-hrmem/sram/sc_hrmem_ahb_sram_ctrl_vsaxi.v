@@ -84,8 +84,8 @@ reg                  r_self_wr_acc_end_p3;
 reg                  r_other_wr_acc_end_p1;
 reg                  r_other_wr_acc_end_p2;
 reg [P_RD_LTCY-1:0]  r_self_rd_b_acc_end_p;
-reg [P_RD_LTCY-2:0]  r_self_rd_after_b_st_p;
-reg [P_RD_LTCY-2:0]  r_self_rd_busy_p;
+reg [P_RD_LTCY-1:0]  r_self_rd_after_b_st_p;
+reg [1:0]            r_self_rd_busy_p;
 reg                  r_self_rd_burst_dt_msk;
 reg                  r_other_rd_burst_en_p1;
 reg [1:0]            r_other_rd_state_p1;
@@ -197,11 +197,13 @@ always @ (posedge HCLK or negedge HRESETN) begin
     r_other_wr_acc_end_p1  <= OTHER_WR_ACC_END;
     r_other_wr_acc_end_p2  <= r_other_wr_acc_end_p1;
     r_self_rd_b_acc_end_p  <= {r_self_rd_b_acc_end_p[P_RD_LTCY-2:0], SELF_RD_ACC_END & SELF_BURST_EN};
-    r_self_rd_after_b_st_p <= {r_self_rd_after_b_st_p[P_RD_LTCY-3:0],
-                               SELF_RD_ACC_START & ~w_wait_flg & ~w_wr2rd_wait & ~PF_SRCH_VAL};
-    r_self_rd_busy_p       <= {r_self_rd_busy_p[P_RD_LTCY-3:0], RAM_REN & (HTRANS == 2'b01) & r_htrans_p1[1]};
+    r_self_rd_after_b_st_p <= {r_self_rd_after_b_st_p[P_RD_LTCY-2:0],
+                               ((SELF_RD_ACC_START & ~w_wait_flg) |
+                                ((SELF_STATE == P_WAIT_CONF) & SELF_RD_ACC_BUSY & w_wait_end) |
+                                 (SELF_STATE == P_WAIT_WR2RD)) & ~w_wr2rd_wait & ~PF_SRCH_VAL};
+    r_self_rd_busy_p       <= {r_self_rd_busy_p[0], RAM_REN & (HTRANS == 2'b01) & r_htrans_p1[1]};
     r_self_rd_burst_dt_msk <= ((SELF_RD_ACC_END & SELF_BURST_EN) | |r_self_rd_b_acc_end_p) &
-                              ~(r_self_rd_after_b_st_p[P_RD_LTCY-2] | r_self_rd_busy_p[P_RD_LTCY-2]);
+                              ~(|r_self_rd_after_b_st_p[P_RD_LTCY-2 +: 2] | r_self_rd_busy_p[1]);
     r_other_rd_burst_en_p1 <= OTHER_RD_BURST_EN;
     r_other_rd_state_p1    <= OTHER_RD_STATE;
   end

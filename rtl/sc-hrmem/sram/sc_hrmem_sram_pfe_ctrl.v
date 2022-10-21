@@ -180,8 +180,8 @@ always @ (posedge SYSCLK or negedge RESETB) begin
   end
 end
 
-assign w_pf_ram_rd_hit = r_pf_lat_en & r_pf_srch_val_lat & r_pf_acc_ren_retim[2] & ~PF_RD_DT_MSK &
-                         (r_ram_radr_lat == r_pf_acc_radr_retim[2]);
+assign w_pf_ram_rd_hit = r_pf_lat_en & r_pf_srch_val_lat & r_pf_acc_ren_retim[P_RD_LTCY-1] & ~PF_RD_DT_MSK &
+                         (r_ram_radr_lat == r_pf_acc_radr_retim[P_RD_LTCY-1]);
 
 assign PF_RWAIT = r_pf_acc_rd | r_pf_lat_en;
 

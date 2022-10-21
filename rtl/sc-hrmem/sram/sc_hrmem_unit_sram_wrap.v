@@ -134,7 +134,8 @@ end
 // SRAM Controller
 sc_hrmem_unit_sram_ctrl # (
   .P_AD_W(P_MEM_AD_W),
-  .P_DT_W(P_DT_W)
+  .P_DT_W(P_DT_W),
+  .P_RD_LTCY(P_RD_LTCY)
 ) unit_ram_ctrl (
   // System Interface
   .RAM_CLK(RAM_CLK),                                //  input

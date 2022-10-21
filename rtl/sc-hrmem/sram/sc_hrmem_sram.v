@@ -117,7 +117,7 @@ parameter P_BANK_W = (P_DT_W == (2 << 4)) ? 2 :
                      (P_DT_W == (2 << 9)) ? 7 :
                                             1 ;
 
-parameter P_RD_LTCY = 3; // AHB Read Data Letency: 4Cycle
+parameter P_RD_LTCY = 4; // AHB Read Data Letency: 5Cycle
 
 wire hrmem_resetn;
 
