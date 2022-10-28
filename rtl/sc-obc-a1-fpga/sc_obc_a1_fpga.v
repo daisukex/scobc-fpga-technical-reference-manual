@@ -53,7 +53,6 @@ module sc_obc_a1_fpga # (
   // CFG QSPI Flash Interface
   output CFG_MEM_SEL,
   input  CFG_MEM_MON,
-  output CFG_MEM_SCK,
   output CFG_MEM_CS_B,
   inout  [3:0] CFG_MEM_IO,
 
@@ -138,6 +137,8 @@ wire sys_rstb_sync_refclk;
 wire sys_rstb_sync_userclk1;
 wire sys_rstb_sync_userclk2;
 wire bus_rstb;
+
+wire cfg_mem_sck;
 
 wire [MAINAXI_UDL_M_AXI_ID_WIDTH-1:0] udl_axim_awid;
 wire [31:0] udl_axim_awaddr;
@@ -438,7 +439,7 @@ sc_obc_core # (
   // ------------------------------
   .CFG_MEM_SEL(CFG_MEM_SEL),
   .CFG_MEM_MON(CFG_MEM_MON),
-  .CFG_MEM_SCK(CFG_MEM_SCK),
+  .CFG_MEM_SCK(cfg_mem_sck),
   .CFG_MEM_CS_B(CFG_MEM_CS_B),
   .CFG_MEM_IO(CFG_MEM_IO),
 
@@ -506,6 +507,22 @@ sc_obc_core # (
   .TDI(tdi),
   .TDO(tdo),
   .NTDOEN(ntdoen)
+);
+
+STARTUPE2 startupe2 (
+  .CLK(1'b0),
+  .GSR(1'b0),
+  .GTS(1'b0),
+  .KEYCLEARB(1'b0),
+  .PACK(1'b0),
+  .PREQ(/*open*/),
+  .USRCCLKO(cfg_mem_sck),
+  .USRCCLKTS(1'b0),
+  .USRDONEO(1'b1),
+  .USRDONETS(1'b0),
+  .CFGCLK(/*open*/),
+  .CFGMCLK(/*open*/),
+  .EOS(/*open*/)
 );
 
 // SWJ-DP Selector

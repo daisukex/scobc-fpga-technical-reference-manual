@@ -92,7 +92,6 @@ set_property [get_ports {SRAM2_IO[15]}]       -dict { PACKAGE_PIN E17  IOSTANDAR
 # Configuration QSPI Flash Interface
 set_property [get_ports CFG_MEM_SEL]          -dict { PACKAGE_PIN AF19 IOSTANDARD LVCMOS33 };
 set_property [get_ports CFG_MEM_MON]          -dict { PACKAGE_PIN AF20 IOSTANDARD LVCMOS33 };
-set_property [get_ports CFG_MEM_SCK]          -dict { PACKAGE_PIN P16  IOSTANDARD LVCMOS33 };
 set_property [get_ports CFG_MEM_CS_B]         -dict { PACKAGE_PIN P18  IOSTANDARD LVCMOS33 };
 set_property [get_ports {CFG_MEM_IO[0]}]      -dict { PACKAGE_PIN R14  IOSTANDARD LVCMOS33 };
 set_property [get_ports {CFG_MEM_IO[1]}]      -dict { PACKAGE_PIN R15  IOSTANDARD LVCMOS33 };
