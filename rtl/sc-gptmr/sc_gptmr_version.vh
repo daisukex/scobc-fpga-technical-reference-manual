@@ -1,0 +1,3 @@
+`define GPTMR_MAJVERVAL    8'h00
+`define GPTMR_MINVERVAL    8'h01
+`define GPTMR_PATVERVAL 16'h0001
