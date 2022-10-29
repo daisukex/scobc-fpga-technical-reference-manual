@@ -113,19 +113,19 @@ assign wen[3] = wbyte &  (latch_addr[1:0] == 2'b11)
               | wword;
 
 always @ (*) begin
-  REG_WADR <= latch_addr;
-  REG_WTYP <= btype(latch_burst);
-  REG_WENB <= 4'h0;
+  REG_WADR = latch_addr;
+  REG_WTYP = btype(latch_burst);
+  REG_WENB = 4'h0;
   if (CYCLE_MODE == 0) begin
     if (latch_wvalid) begin
-      REG_WENB <= wen;
-      REG_WDAT <= HWDATA;
+      REG_WENB = wen;
+      REG_WDAT = HWDATA;
     end
   end
   else begin
-    REG_WDAT <= latch_wdata;
+    REG_WDAT = latch_wdata;
     if (latch_dvalid) begin
-      REG_WENB <= wen;
+      REG_WENB = wen;
     end
   end
 end
