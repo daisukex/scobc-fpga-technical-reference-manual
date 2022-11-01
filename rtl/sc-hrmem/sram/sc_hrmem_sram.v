@@ -122,9 +122,6 @@ parameter P_RD_LTCY = 4; // AHB Read Data Letency: 5Cycle
 
 wire hrmem_resetn;
 
-reg r_rd_ltcy_mode_p1;
-reg r_rd_ltcy_mode_sync;
-
 wire w_reg_dphase;
 wire w_reg_w1r0;
 wire [31:0] w_reg_addr;
@@ -226,18 +223,6 @@ wire w_ram_init_en;
 
 assign hrmem_resetn = SYSRST_N & MODULE_RSTN;
 
-// Read Latency Synchronizer
-always @ (posedge SYSCLK or negedge w_sync_por_rstb) begin
-  if (!w_sync_por_rstb) begin
-    r_rd_ltcy_mode_p1   <= 0;
-    r_rd_ltcy_mode_sync <= 0;
-  end
-  else begin
-    r_rd_ltcy_mode_p1   <= RD_LTCY_MODE;
-    r_rd_ltcy_mode_sync <= r_rd_ltcy_mode_p1;
-  end
-end
-
 // AHB Slave
 sc_ahb_slave ahb_slave (
   // AHB Interface
@@ -333,7 +318,7 @@ sc_hrmem_ahb_sram_ctrl_vsaxi # (
   .HCLK(SYSCLK),                            //  input
   .HRESETN(hrmem_resetn),                   //  input
   .RAM_INIT_DONE(r_ram_init_done_sync),     //  input
-  .RD_LTCY_MODE(r_rd_ltcy_mode_sync),       //  input
+  .RD_LTCY_MODE(RD_LTCY_MODE),              //  input
   // AHB Slave Interface
   .HSEL(CODE_SHSEL),                        //  input
   .HADDR(CODE_SHADDR),                      //  input [P_AHB_AD_W-1:0]
@@ -548,7 +533,7 @@ sc_hrmem_sram_pfe_ctrl # (
   // System Interface
   .SYSCLK(SYSCLK),                  // input
   .RESETB(hrmem_resetn),            // input
-  .RD_LTCY_MODE(r_rd_ltcy_mode_sync), // input
+  .RD_LTCY_MODE(RD_LTCY_MODE),      // input
   // AXI SRAM Controller Interface
   .PF_SRCH_VAL(w_pf_srch_val),      // input
   .RAM_REN(w_code_ram_ren),         // input
@@ -588,7 +573,7 @@ sc_hrmem_unit_sram_wrap # (
   // System Interface
   .RAM_CLK(SYSCLK),                                  //  input
   .RESET_N(hrmem_resetn),                            //  input
-  .RD_LTCY_MODE(r_rd_ltcy_mode_sync),                //  input
+  .RD_LTCY_MODE(RD_LTCY_MODE),                       //  input
   // SRAM Initialize Controller Interface
   .INIT_EN(w_ram_init_en),                           //  input
   .INIT_ADR(w_ram_init_addr),                        //  input [P_MEM_AD_W-1:0]
