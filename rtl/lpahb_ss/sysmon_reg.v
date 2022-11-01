@@ -350,7 +350,7 @@ always @ (posedge HCLK) begin
     HEARTBEAT_TIMEOUT <= 8'hFF;
   else begin
       if (WADR == `SYSMON_SEM_HTIMEOUT & chk_enbit(8, `SEM_HTIMEOUT, REG_WENB))
-        HEARTBEAT_TIMEOUT <= REG_WDAT[`SEM_HTIMEOUT +:8];;
+        HEARTBEAT_TIMEOUT <= REG_WDAT[`SEM_HTIMEOUT +:8];
   end
 end
 wire [31:0] rd_sem_htimeout = 32'h0000_0000 | (HEARTBEAT_TIMEOUT << `SEM_HTIMEOUT);
