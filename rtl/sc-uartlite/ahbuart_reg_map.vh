@@ -21,6 +21,7 @@
 `define  AHBUFRAMEERR           6
 `define  AHBUPRTYERR            7
 `define  AHBURXUNDERRUNERR      8
+`define  AHBUTXOVERRUNERR       9
 // Control Register
 `define AHBUCTRLR        16'h000C
 `define  AHBUTXFIFORST          0
