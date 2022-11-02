@@ -16,13 +16,23 @@ module uart_tim_gen (
 );
 
 // Divider
+reg [15:0] divider_rate_p1;
+always @ (posedge SYSCLK or negedge RESETB)
+begin
+  if (!RESETB)
+    divider_rate_p1 <= 16'h0;
+  else
+    divider_rate_p1 <= DIVIDER_RATE;
+end
+
 reg [15:0] counter;
 reg txactive;
 always @ (posedge SYSCLK or negedge RESETB)
 begin
   if (!RESETB)
     counter <= 16'h0;
-  else if (counter == DIVIDER_RATE)
+  else if (counter == DIVIDER_RATE |
+           DIVIDER_RATE != divider_rate_p1)
     counter <= 16'h0;
   else if (TXEN | txactive)
     counter <= counter + 1;
