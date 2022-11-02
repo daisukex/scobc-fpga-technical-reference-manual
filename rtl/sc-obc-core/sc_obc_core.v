@@ -552,6 +552,16 @@ sc_cm3_ss # (
   .NTDOEN(NTDOEN)
 );
 
+wire read_latency_mode;
+hrmem_latency_sel latency_sel (
+  .SYS_CLK(SYS_CLK),
+  .SYS_RSTB(SYS_RSTB),
+  .CLKMODE(CLKMODE),
+  .CMC_REQ(CMC_REQ),
+  .CMC_ACK(CMC_ACK),
+  .LATENCY_SEL(read_latency_mode)
+);
+
 sc_hrmem_sram # (
   .SC_HRMEM_SRAM_SYS_AXI_ID_W(MAINAXI_S_AXI_ID_WIDTH),
   .SC_HRMEM_SRAM_PFB_STG_NUM(8),
@@ -565,7 +575,7 @@ sc_hrmem_sram # (
   .POR_RST_N(BOOT_RSTB),
   .RAM_INIT_REQ(INIT_REQ),
   .RAM_INIT_DONE(INIT_DONE),
-  .RD_LTCY_MODE(1'b0),
+  .RD_LTCY_MODE(read_latency_mode),
 
   // CM3 CODE Bus AHB Slave Interface
   .CODE_SHSEL(cm3_cod_hsel),
