@@ -20,6 +20,8 @@ module lpahb_ss # (
   output INTERNAL_I2CM_ISR,
   output EXTERNAL_I2CM_ISR,
   output SYSMON_HW_ISR,
+  output GPTMR_GTMR_ISR,
+  output GPTMR_SITMR_ISR,
   input [1:0] TRCH_BOOT,
   output [1:0] CLKMODE,
   output CMC_REQ,
@@ -458,8 +460,8 @@ sc_gptmr # (
   .SHRESP(shresp[2*AHB_GPTMR_CH +:2]),
 
   // Interrupt Signal
-  .GTMR_INT(/*open*/),
-  .SITMR_INT(/*open*/),
+  .GTMR_INT(GPTMR_GTMR_ISR),
+  .SITMR_INT(GPTMR_SITMR_ISR),
   .HITMR_INT_REQ(/*open*/),
   .HITMR_INT_ACK(8'h0)
 );

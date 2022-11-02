@@ -247,7 +247,7 @@ module sc_obc_core # (
 assign CPU_LOCKUP_RSTEN = 0;
 
 localparam LPAHB_CONSOLE_UART_DIV = 16'h01A0;
-localparam CM3SS_PRIMARY_ISR_NUM = 9;
+localparam CM3SS_PRIMARY_ISR_NUM = 12;
 
 // SC-OBC-SS Interrupt Signal
 wire [CM3SS_PRIMARY_ISR_NUM-1:0] internal_isr;
@@ -260,6 +260,11 @@ wire uartlite_isr;
 wire internal_i2c_isr;
 wire external_i2c_isr;
 wire sysmon_hw_isr;
+wire gptmr_gtmr_isr;
+wire gptmr_sitmr_isr;
+assign internal_isr[11] = gptmr_sitmr_isr;
+assign internal_isr[10] = gptmr_gtmr_isr;
+assign internal_isr[9] = 1'b0;
 assign internal_isr[8] = sysmon_hw_isr;
 assign internal_isr[7] = external_i2c_isr;
 assign internal_isr[6] = internal_i2c_isr;
@@ -1011,6 +1016,8 @@ lpahb_ss # (
   .INTERNAL_I2CM_ISR(internal_i2c_isr),
   .EXTERNAL_I2CM_ISR(external_i2c_isr),
   .SYSMON_HW_ISR(sysmon_hw_isr),
+  .GPTMR_GTMR_ISR(gptmr_gtmr_isr),
+  .GPTMR_SITMR_ISR(gptmr_sitmr_isr),
   .TRCH_BOOT(FPGA_BOOT),
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
