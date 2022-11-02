@@ -84,7 +84,7 @@ wire (pull1, pull0) internal_i2cm_sda = 1'b1;
 wire (pull1, pull0) internal_i2cm_scl = 1'b1;
 wire (pull1, pull0) external_i2cm_sda = 1'b1;
 wire (pull1, pull0) external_i2cm_scl = 1'b1;
-wire cfg_mem_sck;
+wire cfg_mem_sck = dut.CFG_MEM_SCK;
 wire cfg_mem_cs_b;
 wire (pull1, pull0) [3:0] cfg_mem_io = 4'b1111;
 wire data_mem1_sck;
@@ -144,7 +144,6 @@ sc_obc_a1_fpga # (
   // CFG QSPI Flash Interface
   .CFG_MEM_SEL(cfg_mem_sel),
   .CFG_MEM_MON(cfg_mem_mon),
-  .CFG_MEM_SCK(cfg_mem_sck),
   .CFG_MEM_CS_B(cfg_mem_cs_b),
   .CFG_MEM_IO(cfg_mem_io),
 
