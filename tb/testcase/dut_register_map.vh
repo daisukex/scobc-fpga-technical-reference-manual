@@ -13,3 +13,4 @@
 `include "sc_can_reg_map.vh"
 `include "sc_qspim_reg_map.vh"
 `include "sc_hrmem_reg_map.vh"
+`include "sc_gptmr_reg_map.vh"

@@ -15,6 +15,7 @@
 `define INT_I2CM_BASE 32'h4F02_0000
 `define EXT_I2CM_BASE 32'h4F03_0000
 `define SYS_MON_BASE  32'h4F04_0000
+`define GPTMR_BASE    32'h4F05_0000
 `define HRMEM_MR_BASE 32'h6000_0000
 
 `define CM3_ISR_UARTLITE 0
@@ -25,3 +26,5 @@
 `define CM3_ISR_CAN      5
 `define CM3_ISR_INT_I2CM 6
 `define CM3_ISR_EXT_I2CM 7
+`define CM3_ISR_GTMR     10
+`define CM3_ISR_SITMR    11

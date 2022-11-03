@@ -6,11 +6,14 @@
 //-----------------------------------------------
 module sc_hrmem_unit_sram_ctrl # (
   parameter P_AD_W = 20,
-  parameter P_DT_W = 32
+  parameter P_DT_W = 32,
+  parameter P_RD_LTCY = 3
 ) (
   // System Interface
   input                 RAM_CLK,
   input                 RESET_N,
+
+  input                 RD_LTCY_MODE,
 
   // SRAM Initialize Controller Interface
   input                 INIT_EN,
@@ -92,11 +95,13 @@ wire [P_DT_W/8-1:0] w_eccerr_bten;
 
 sc_hrmem_sram_ecc_ctrl # (
   .P_AD_W(P_AD_W),
-  .P_DT_W(P_DT_W)
+  .P_DT_W(P_DT_W),
+  .P_RD_LTCY(P_RD_LTCY)
 ) ram_ecc_ctrl (
   // System Interface
   .CLK(RAM_CLK),                           //  input
   .RESET_N(RESET_N),                       //  input
+  .RD_LTCY_MODE(RD_LTCY_MODE),             //  input
   // AXI SRAM Controller Interface
   .AXI_WEN(AXI_RAM_WEN),                   //  input
   .AXI_WADR(AXI_RAM_WADR),                 //  input [P_AD_W-1:0]
@@ -180,10 +185,14 @@ sc_hrmem_sram_acc_sel # (
   .RAM_RADR(w_ram_radr)                    // output [P_AD_W-1:0]
 );
 
-sc_hrmem_sram_acc_ctrl_w32 sram_acc_ctrl (
+sc_hrmem_sram_acc_ctrl_w32 # (
+  .P_RD_LTCY(P_RD_LTCY-1)
+) sram_acc_ctrl (
   // System Interface
   .CLK(RAM_CLK),                           //  input
   .RESET_N(RESET_N),                       //  input
+
+  .RD_LTCY_MODE(RD_LTCY_MODE),             //  input
 
   // RAM Access Control Interface
   .INIT_EN(INIT_EN),                       //  input

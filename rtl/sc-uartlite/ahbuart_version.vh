@@ -1,3 +1,3 @@
-`define AHBU_MAJVERVAL    8'h00
-`define AHBU_MINVERVAL    8'h01
-`define AHBU_PATVERVAL 16'h0001
+`define AHBU_MAJVERVAL    8'h01
+`define AHBU_MINVERVAL    8'h00
+`define AHBU_PATVERVAL 16'h0000

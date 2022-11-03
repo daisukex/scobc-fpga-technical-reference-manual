@@ -17,6 +17,7 @@ module sc_hrmem_sram # (
   input                                   POR_RST_N,
   input                                   RAM_INIT_REQ,
   output                                  RAM_INIT_DONE,
+  input                                   RD_LTCY_MODE,
 
   // CM3 CODE Bus AHB Slave Interface
   input                                   CODE_SHSEL,
@@ -117,7 +118,7 @@ parameter P_BANK_W = (P_DT_W == (2 << 4)) ? 2 :
                      (P_DT_W == (2 << 9)) ? 7 :
                                             1 ;
 
-parameter P_RD_LTCY = 3; // AHB Read Data Letency: 4Cycle
+parameter P_RD_LTCY = 4; // AHB Read Data Letency: 5Cycle
 
 wire hrmem_resetn;
 
@@ -317,6 +318,7 @@ sc_hrmem_ahb_sram_ctrl_vsaxi # (
   .HCLK(SYSCLK),                            //  input
   .HRESETN(hrmem_resetn),                   //  input
   .RAM_INIT_DONE(r_ram_init_done_sync),     //  input
+  .RD_LTCY_MODE(RD_LTCY_MODE),              //  input
   // AHB Slave Interface
   .HSEL(CODE_SHSEL),                        //  input
   .HADDR(CODE_SHADDR),                      //  input [P_AHB_AD_W-1:0]
@@ -531,6 +533,7 @@ sc_hrmem_sram_pfe_ctrl # (
   // System Interface
   .SYSCLK(SYSCLK),                  // input
   .RESETB(hrmem_resetn),            // input
+  .RD_LTCY_MODE(RD_LTCY_MODE),      // input
   // AXI SRAM Controller Interface
   .PF_SRCH_VAL(w_pf_srch_val),      // input
   .RAM_REN(w_code_ram_ren),         // input
@@ -570,6 +573,7 @@ sc_hrmem_unit_sram_wrap # (
   // System Interface
   .RAM_CLK(SYSCLK),                                  //  input
   .RESET_N(hrmem_resetn),                            //  input
+  .RD_LTCY_MODE(RD_LTCY_MODE),                       //  input
   // SRAM Initialize Controller Interface
   .INIT_EN(w_ram_init_en),                           //  input
   .INIT_ADR(w_ram_init_addr),                        //  input [P_MEM_AD_W-1:0]

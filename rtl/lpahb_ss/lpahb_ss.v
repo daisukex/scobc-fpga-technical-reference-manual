@@ -20,6 +20,8 @@ module lpahb_ss # (
   output INTERNAL_I2CM_ISR,
   output EXTERNAL_I2CM_ISR,
   output SYSMON_HW_ISR,
+  output GPTMR_GTMR_ISR,
+  output GPTMR_SITMR_ISR,
   input [1:0] TRCH_BOOT,
   output [1:0] CLKMODE,
   output CMC_REQ,
@@ -111,7 +113,7 @@ wire dhreadyout;
 wire [1:0] dhresp;
 
 localparam LPAHB_HCLK_IDLE_BIT = 5;
-localparam AHB_NUMBER_OF_SLAVE = 5;
+localparam AHB_NUMBER_OF_SLAVE = 6;
 localparam AHB_S0_BASE_ADDR = 16'h4F00;
 localparam AHB_S0_ADDR_WIDTH = 16;
 localparam AHB_S1_BASE_ADDR = 16'h4F01;
@@ -122,6 +124,8 @@ localparam AHB_S3_BASE_ADDR = 16'h4F03;
 localparam AHB_S3_ADDR_WIDTH = 16;
 localparam AHB_S4_BASE_ADDR = 16'h4F04;
 localparam AHB_S4_ADDR_WIDTH = 16;
+localparam AHB_S5_BASE_ADDR = 16'h4F05;
+localparam AHB_S5_ADDR_WIDTH = 16;
 
 wire [AHB_NUMBER_OF_SLAVE-1:0] shsel;
 wire [32*AHB_NUMBER_OF_SLAVE-1:0] shrdata;
@@ -134,6 +138,7 @@ localparam AHB_UARTLT_CH = 1;
 localparam AHB_ITI2CM_CH = 2;
 localparam AHB_ETI2CM_CH = 3;
 localparam AHB_SYSMON_CH = 4;
+localparam AHB_GPTMR_CH = 5;
 
 // AXI-AHB Bridge
 // --------------------------------------------------
@@ -211,7 +216,9 @@ sc_ahbip_decoder # (
   .SC_AHBIP_S3_BASE_ADDR(AHB_S3_BASE_ADDR),
   .SC_AHBIP_S3_ADDR_WIDTH(AHB_S3_ADDR_WIDTH),
   .SC_AHBIP_S4_BASE_ADDR(AHB_S4_BASE_ADDR),
-  .SC_AHBIP_S4_ADDR_WIDTH(AHB_S4_ADDR_WIDTH)
+  .SC_AHBIP_S4_ADDR_WIDTH(AHB_S4_ADDR_WIDTH),
+  .SC_AHBIP_S5_BASE_ADDR(AHB_S5_BASE_ADDR),
+  .SC_AHBIP_S5_ADDR_WIDTH(AHB_S5_ADDR_WIDTH)
 ) ahb_addr_dec (
   // System Interface
   .HCLK(hclk),
@@ -232,15 +239,7 @@ sc_ahbip_decoder # (
 
 // Read Data Multiplexer
 sc_ahbip_rdmux # (
-  .SC_AHBIP_NUMBER_OF_SLAVE(AHB_NUMBER_OF_SLAVE),
-  .SC_AHBIP_S0_BASE_ADDR(AHB_S0_BASE_ADDR),
-  .SC_AHBIP_S0_ADDR_WIDTH(AHB_S0_ADDR_WIDTH),
-  .SC_AHBIP_S1_BASE_ADDR(AHB_S1_BASE_ADDR),
-  .SC_AHBIP_S1_ADDR_WIDTH(AHB_S1_ADDR_WIDTH),
-  .SC_AHBIP_S2_BASE_ADDR(AHB_S2_BASE_ADDR),
-  .SC_AHBIP_S2_ADDR_WIDTH(AHB_S2_ADDR_WIDTH),
-  .SC_AHBIP_S3_BASE_ADDR(AHB_S3_BASE_ADDR),
-  .SC_AHBIP_S3_ADDR_WIDTH(AHB_S3_ADDR_WIDTH)
+  .SC_AHBIP_NUMBER_OF_SLAVE(AHB_NUMBER_OF_SLAVE)
 ) ahb_rdata_mux (
   .HCLK(hclk),
   // AHB Central Address Decoder Interface
@@ -428,6 +427,43 @@ system_monitor system_monitor (
 
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
   .WDOG_RST_REQ(wdog_rst_req)
+);
+
+// General Purpose Timer
+sc_gptmr # (
+  .GTMR_COMPARE_CHANNEL(4),
+  .GTMR_PRESCALER_BIT_WIDTH(21),
+  .SITMR_COMPARE_CHANNEL(8),
+  .HITMR_COMPARE_CHANNEL(8)
+) gptmr (
+  // System Interface
+  .HRESETN(hresetn),
+  .HCLK(hclk),
+  .TMR_RSTB(SYS_RSTB_SYNC_REFCLK),
+  .TMR_CLK(REF_CLK),
+  .MODULE_RSTN(1'b1),
+
+  // Configuration Interface
+  .GTMR_PRESCALER_VALUE(21'h16E35F),
+
+  // AHB Slave Interface
+  .SHSEL(shsel[AHB_GPTMR_CH]),
+  .SHADDR(mhaddr),
+  .SHTRANS(mhtrans),
+  .SHSIZE(mhsize),
+  .SHBURST(mhburst),
+  .SHWRITE(mhwrite),
+  .SHREADYIN(shreadyin[AHB_GPTMR_CH]),
+  .SHREADYOUT(shreadyout[AHB_GPTMR_CH]),
+  .SHWDATA(mhwdata),
+  .SHRDATA(shrdata[32*AHB_GPTMR_CH +:32]),
+  .SHRESP(shresp[2*AHB_GPTMR_CH +:2]),
+
+  // Interrupt Signal
+  .GTMR_INT(GPTMR_GTMR_ISR),
+  .SITMR_INT(GPTMR_SITMR_ISR),
+  .HITMR_INT_REQ(/*open*/),
+  .HITMR_INT_ACK(8'h0)
 );
 
 endmodule

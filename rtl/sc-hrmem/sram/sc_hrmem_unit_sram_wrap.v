@@ -15,6 +15,8 @@ module sc_hrmem_unit_sram_wrap # (
   input                       RAM_CLK,
   input                       RESET_N,
 
+  input                       RD_LTCY_MODE,
+
   // SRAM Initialize Controller Interface
   input                       INIT_EN,
   input      [P_MEM_AD_W-1:0] INIT_ADR,
@@ -78,6 +80,8 @@ module sc_hrmem_unit_sram_wrap # (
   output reg [15:0]           ECC_COL_DISC_CNT
 );
 
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
+
 reg                   r_ram_wen;
 reg  [P_AXI_AD_W-1:0] r_ram_wadr;
 reg  [P_DT_W-1:0]     r_ram_wdata;
@@ -134,11 +138,13 @@ end
 // SRAM Controller
 sc_hrmem_unit_sram_ctrl # (
   .P_AD_W(P_MEM_AD_W),
-  .P_DT_W(P_DT_W)
+  .P_DT_W(P_DT_W),
+  .P_RD_LTCY(P_RD_LTCY)
 ) unit_ram_ctrl (
   // System Interface
   .RAM_CLK(RAM_CLK),                                //  input
   .RESET_N(RESET_N),                                //  input
+  .RD_LTCY_MODE(RD_LTCY_MODE),                      //  input
   // SRAM Initialize Controller Interface
   .INIT_EN(INIT_EN),                                //  input
   .INIT_ADR(INIT_ADR),                              //  input [P_AD_W-1:0]
@@ -196,8 +202,8 @@ always @ (posedge RAM_CLK or negedge RESET_N) begin
 end
 
 // Unit RAM Read Data Valid
-assign CODE_RAM_RDT_VAL = r_code_ram_ren_dttim[P_RD_LTCY-1];
-assign SYS_RAM_RDT_VAL  = r_sys_ram_ren_dttim[P_RD_LTCY-1];
+assign CODE_RAM_RDT_VAL = r_code_ram_ren_dttim[RD_LTCY_SEL-1];
+assign SYS_RAM_RDT_VAL  = r_sys_ram_ren_dttim[RD_LTCY_SEL-1];
 
 // Unit RAM Read Data Select
 assign CODE_RAM_RDATA = w_ram_rdata;

@@ -129,11 +129,15 @@ reg r_intena_sts;
 reg r_rxf_overrun_sts;
 reg r_rxfrmerr_sts;
 reg r_rxprtyerr_sts;
+reg r_rxf_underrun_sts;
+reg r_txf_overrun_sts;
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
     r_rxf_overrun_sts <= 1'b0;
     r_rxfrmerr_sts    <= 1'b0;
     r_rxprtyerr_sts   <= 1'b0;
+    r_rxf_underrun_sts <= 1'b0;
+    r_txf_overrun_sts <= 1'b0;
   end else begin
     if (REG_RXF_OVERRUN)
       r_rxf_overrun_sts <= 1'b1;
@@ -141,16 +145,28 @@ always @ (posedge SYSCLK or negedge RESETB) begin
       r_rxfrmerr_sts    <= 1'b1;
     if (REG_UART_RXPRTYERR)
       r_rxprtyerr_sts   <= 1'b1;
-    if (w_hit_statr & w_reg_read & REG_BYTEEN[0]) begin
-      r_rxf_overrun_sts <= 1'b0;
-      r_rxfrmerr_sts    <= 1'b0;
-      r_rxprtyerr_sts   <= 1'b0;
+    if (w_rxf_rerr)
+      r_rxf_underrun_sts <= 1'b1;
+    if (w_txf_werr)
+      r_txf_overrun_sts <= 1'b1;
+    if (w_hit_statr & w_reg_read) begin
+      if (REG_BYTEEN[0]) begin
+        r_rxf_overrun_sts <= 1'b0;
+        r_rxfrmerr_sts    <= 1'b0;
+        r_rxprtyerr_sts   <= 1'b0;
+      end
+      if (REG_BYTEEN[1]) begin
+        r_rxf_underrun_sts <= 1'b0;
+        r_txf_overrun_sts  <= 1'b0;
+      end
     end
   end
 end
 
 wire [31:0] w_rd_statr;
 assign w_rd_statr = (w_hit_statr & w_reg_read) ?
+                    {{32-1-`AHBUTXOVERRUNERR{1'b0}}, r_txf_overrun_sts, {`AHBUTXOVERRUNERR{1'b0}}} |
+                    {{32-1-`AHBURXUNDERRUNERR{1'b0}}, r_rxf_underrun_sts, {`AHBURXUNDERRUNERR{1'b0}}} |
                     {{32-1-`AHBUPRTYERR{1'b0}},     r_rxprtyerr_sts,    {`AHBUPRTYERR{1'b0}}}    |
                     {{32-1-`AHBUFRAMEERR{1'b0}},    r_rxfrmerr_sts,     {`AHBUFRAMEERR{1'b0}}}   |
                     {{32-1-`AHBUOVERRUNERR{1'b0}},  r_rxf_overrun_sts,  {`AHBUOVERRUNERR{1'b0}}} |
@@ -209,25 +225,33 @@ assign w_rd_ahbuver = (w_hit_ahbuver & w_reg_read) ?
 
 // AHB Accsess Slave Error
 //----------------------------------------------
-assign REG_ACCERR = w_rxf_rerr | w_txf_werr;
+assign REG_ACCERR = 1'b0;
 
 // Interrupt
 //----------------------------------------------
 reg r_rxf_dvalid_p1;
 reg r_txf_empty_p1;
+reg r_rxf_rerr_p1;
+reg r_txf_werr_p1;
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
     r_rxf_dvalid_p1 <= 1'b0;
     r_txf_empty_p1  <= 1'b1;
+    r_rxf_rerr_p1   <= 1'b0;
+    r_txf_werr_p1   <= 1'b0;
   end else begin
     r_rxf_dvalid_p1 <= REG_RXF_DVALID;
     r_txf_empty_p1  <= REG_TXF_EMPTY;
+    r_rxf_rerr_p1   <= w_rxf_rerr;
+    r_txf_werr_p1   <= w_txf_werr;
   end
 end
 
 assign INTERRUPT = r_intena_sts &
                    ((REG_RXF_DVALID & ~r_rxf_dvalid_p1)|
-                    (REG_TXF_EMPTY  & ~r_txf_empty_p1) );
+                    (REG_TXF_EMPTY  & ~r_txf_empty_p1)|
+                    (w_rxf_rerr     & ~r_rxf_rerr_p1)|
+                    (w_txf_werr     & ~r_txf_werr_p1));
 
 // AHB Read Data
 //----------------------------------------------

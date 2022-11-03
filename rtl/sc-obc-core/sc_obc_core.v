@@ -247,7 +247,7 @@ module sc_obc_core # (
 assign CPU_LOCKUP_RSTEN = 0;
 
 localparam LPAHB_CONSOLE_UART_DIV = 16'h01A0;
-localparam CM3SS_PRIMARY_ISR_NUM = 9;
+localparam CM3SS_PRIMARY_ISR_NUM = 12;
 
 // SC-OBC-SS Interrupt Signal
 wire [CM3SS_PRIMARY_ISR_NUM-1:0] internal_isr;
@@ -260,6 +260,11 @@ wire uartlite_isr;
 wire internal_i2c_isr;
 wire external_i2c_isr;
 wire sysmon_hw_isr;
+wire gptmr_gtmr_isr;
+wire gptmr_sitmr_isr;
+assign internal_isr[11] = gptmr_sitmr_isr;
+assign internal_isr[10] = gptmr_gtmr_isr;
+assign internal_isr[9] = 1'b0;
 assign internal_isr[8] = sysmon_hw_isr;
 assign internal_isr[7] = external_i2c_isr;
 assign internal_isr[6] = internal_i2c_isr;
@@ -552,6 +557,16 @@ sc_cm3_ss # (
   .NTDOEN(NTDOEN)
 );
 
+wire read_latency_mode;
+hrmem_latency_sel latency_sel (
+  .SYS_CLK(SYS_CLK),
+  .SYS_RSTB(SYS_RSTB),
+  .CLKMODE(CLKMODE),
+  .CMC_REQ(CMC_REQ),
+  .CMC_ACK(CMC_ACK),
+  .LATENCY_SEL(read_latency_mode)
+);
+
 sc_hrmem_sram # (
   .SC_HRMEM_SRAM_SYS_AXI_ID_W(MAINAXI_S_AXI_ID_WIDTH),
   .SC_HRMEM_SRAM_PFB_STG_NUM(8),
@@ -565,6 +580,7 @@ sc_hrmem_sram # (
   .POR_RST_N(BOOT_RSTB),
   .RAM_INIT_REQ(INIT_REQ),
   .RAM_INIT_DONE(INIT_DONE),
+  .RD_LTCY_MODE(read_latency_mode),
 
   // CM3 CODE Bus AHB Slave Interface
   .CODE_SHSEL(cm3_cod_hsel),
@@ -1011,6 +1027,8 @@ lpahb_ss # (
   .INTERNAL_I2CM_ISR(internal_i2c_isr),
   .EXTERNAL_I2CM_ISR(external_i2c_isr),
   .SYSMON_HW_ISR(sysmon_hw_isr),
+  .GPTMR_GTMR_ISR(gptmr_gtmr_isr),
+  .GPTMR_SITMR_ISR(gptmr_sitmr_isr),
   .TRCH_BOOT(FPGA_BOOT),
   .CLKMODE(CLKMODE),
   .CMC_REQ(CMC_REQ),
