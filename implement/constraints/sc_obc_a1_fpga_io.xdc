@@ -17,11 +17,11 @@ set_property [get_ports SYSCLK2_EN]           -dict { PACKAGE_PIN W26  IOSTANDAR
 set_property [get_ports CDRST_B]              -dict { PACKAGE_PIN AF18 IOSTANDARD LVCMOS33 }
 
 # Debug Interface
-set_property [get_ports CM3_NTRST]            -dict { PACKAGE_PIN U24  IOSTANDARD LVCMOS33 }
-set_property [get_ports CM3_TDI]              -dict { PACKAGE_PIN Y20  IOSTANDARD LVCMOS33 }
-set_property [get_ports CM3_TCK_SWCLK]        -dict { PACKAGE_PIN W21  IOSTANDARD LVCMOS33 }
-set_property [get_ports CM3_TMS_SWDIO]        -dict { PACKAGE_PIN Y21  IOSTANDARD LVCMOS33 }
-set_property [get_ports CM3_TDO_SWO]          -dict { PACKAGE_PIN W20  IOSTANDARD LVCMOS33 }
+set_property [get_ports CM3_NTRST]            -dict { PACKAGE_PIN U24  IOSTANDARD LVCMOS33 PULLUP TRUE}
+set_property [get_ports CM3_TDI]              -dict { PACKAGE_PIN Y20  IOSTANDARD LVCMOS33 PULLUP TRUE}
+set_property [get_ports CM3_TCK_SWCLK]        -dict { PACKAGE_PIN W21  IOSTANDARD LVCMOS33 PULLUP TRUE}
+set_property [get_ports CM3_TMS_SWDIO]        -dict { PACKAGE_PIN Y21  IOSTANDARD LVCMOS33 PULLUP TRUE}
+set_property [get_ports CM3_TDO_SWO]          -dict { PACKAGE_PIN W20  IOSTANDARD LVCMOS33 PULLUP TRUE}
 
 # SRAM Interface
 set_property [get_ports {SRAM_A[0]}]          -dict { PACKAGE_PIN H26  IOSTANDARD LVCMOS33 }
