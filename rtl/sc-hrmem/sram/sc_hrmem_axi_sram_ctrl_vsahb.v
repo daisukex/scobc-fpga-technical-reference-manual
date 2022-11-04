@@ -167,9 +167,6 @@ wire                 w_rdff_val;
 
 reg [P_DT_W-1:0]     r_ram_rdata_ff [0:P_RD_LTCY-1];
 
-reg                  r_pf_acc_wait_lat;
-reg                  r_pf_acc_wait_lat_p1;
-
 reg [7:0]            r_rlen_cnt;
 reg                  r_rd_burst_en;
 reg                  r_ram_ren_burst;
@@ -827,21 +824,6 @@ generate
     end
   end
 endgenerate
-
-always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
-  if (!S_AXI_ARESETN) begin
-    r_pf_acc_wait_lat    <= 0;
-    r_pf_acc_wait_lat_p1 <= 0;
-  end else begin
-    r_pf_acc_wait_lat_p1 <= r_pf_acc_wait_lat;
-    if (w_pf_acc_wait) begin
-      if ((r_rd_state == P_RD_WAIT) & OTHER_RD_ACC_END)
-        r_pf_acc_wait_lat <= 1'b1;
-    end else begin
-      r_pf_acc_wait_lat <= 0;
-    end
-  end
-end
 
 always @ (posedge S_AXI_ACLK or negedge S_AXI_ARESETN) begin
   if (!S_AXI_ARESETN) begin
