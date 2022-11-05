@@ -290,6 +290,23 @@ initial begin
   read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_PWRCYCLE), .expdata(1<<`SR_PWECYCLEREQ), .check(1));
   pic.CHECK_PWR_CYCLE_REQ(1);
 
+  //--------------------------------------------------
+  label    = "Check System Register: eFUSE DNA";
+  simcount = 7;
+  //--------------------------------------------------
+  display_subcount_text(1, "Check eFuse DNA MSB", 1);
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_FUSEDNA2), .expdata(32'h2A15_6036), .check(1));
+  display_subcount_text(1, "Check eFuse DNA LSB", 1);
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_FUSEDNA1), .expdata(32'h94A3_2800), .check(1));
+
+  //--------------------------------------------------
+  label    = "Check System Register: eFUSE USER";
+  simcount = 8;
+  //--------------------------------------------------
+  display_subcount_text(1, "Check eFuse USER", 1);
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_FUSEUSR), .expdata(32'h1234_5678), .check(1));
+  repeat (100) @ (posedge SYS_CLK);
+
   simfinish(0);
 end
 
