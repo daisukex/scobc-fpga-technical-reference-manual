@@ -217,6 +217,19 @@ always @ (*) begin
   end
 end
 
+// DNA Register
+//----------------------------------------------
+wire [56:0] fuse_dna;
+wire [31:0] fuse_usr;
+efuse_reg efuse_reg (
+  .SYS_CLK(HCLK),
+  .SYS_RSTB(HRESETN),
+  .FUSE_DNA(fuse_dna),
+  .FUSE_USR(fuse_usr)
+);
+wire [31:0] rd_fuse_dna1 = {fuse_dna[24:0], 7'b00_0000};
+wire [31:0] rd_fuse_dna2 = fuse_dna[56:25];
+
 // IP Version Register
 //----------------------------------------------
 wire [31:0] rd_version;
@@ -241,6 +254,9 @@ always @ (posedge HCLK) begin
     else if (RDAD == `SYSREG_SPAD4)     REG_RDAT <= rd_spad4;
     else if (RDAD == `SYSREG_VER)       REG_RDAT <= rd_version;
     else if (RDAD == `SYSREG_BUILDINFO) REG_RDAT <= BUILD_INFO;
+    else if (RDAD == `SYSREG_FUSEDNA1)  REG_RDAT <= rd_fuse_dna1;
+    else if (RDAD == `SYSREG_FUSEDNA2)  REG_RDAT <= rd_fuse_dna2;
+    else if (RDAD == `SYSREG_FUSEUSR)   REG_RDAT <= fuse_usr;
     else                                REG_RDAT <= 32'h0000_00000;
   end
 end

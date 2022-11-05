@@ -41,3 +41,11 @@
 // Git Hash Register
 `define SYSREG_BUILDINFO       16'hFF00
 `define  SR_BUILDINFO                 0
+// FPGA eFuse DNA Register
+`define SYSREG_FUSEDNA1        16'hFF10
+`define  SR_DNA_LSB                   0
+`define SYSREG_FUSEDNA2        16'hFF14
+`define  SR_DNA_MSB                   0
+// FPGA eFuse USER Register
+`define SYSREG_FUSEUSR         16'hFF18
+`define  SR_USER                      0
