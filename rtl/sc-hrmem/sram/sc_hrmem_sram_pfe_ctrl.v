@@ -121,6 +121,17 @@ reg [P_RD_LTCY-1:0]         r_nogo_pf_ren_retim;
 reg [P_RD_LTCY-1:0]         r_nogo_pf_rlat_retim;
 
 reg [p_pfb_line_w-1:0]    r_pfb_line_wsel;
+reg                       r_sp_pfb_line_wsel_val;
+reg [p_sp_pfb_line_w-1:0] r_sp_pfb_line_wsel_set;
+reg                       r_pf_hit_sel_val;
+reg [p_pfb_line_w-1:0]    r_pf_hit_sel_set;
+reg                       r_sp_pf_hit_sel_val;
+reg [p_sp_pfb_line_w-1:0] r_sp_pf_hit_sel_set;
+
+reg [p_sp_pfb_line_w-1:0] r_sp_pfb_line_wsel_lat;
+reg [p_pfb_line_w-1:0]    r_pf_hit_sel_lat;
+reg [p_sp_pfb_line_w-1:0] r_sp_pf_hit_sel_lat;
+
 reg [p_sp_pfb_line_w-1:0] r_sp_pfb_line_wsel;
 reg [p_pfb_line_w-1:0]    r_pf_hit_sel;
 reg [p_sp_pfb_line_w-1:0] r_sp_pf_hit_sel;
@@ -309,11 +320,13 @@ end
 
 always @ (*) begin
   if ((w_pf_acc_start & |w_pfb_adr_hit) | (~w_pf_acc_start & |r_pfb_adr_hit_lat)) begin
+    r_pfb_line_wsel = 0;
     for (i=0; i<P_PFB_LINE_NUM; i=i+1) begin
       if ((w_pf_acc_start & w_pfb_adr_hit[i]) | (~w_pf_acc_start & r_pfb_adr_hit_lat[i]))
         r_pfb_line_wsel = i[p_pfb_line_w-1:0];
     end
   end else if ((w_pf_acc_start & |w_pfb_empty) | (~w_pf_acc_start & |r_pfb_empty_lat)) begin
+    r_pfb_line_wsel = 0;
     for (i=P_PFB_LINE_NUM-1; i>=0; i=i-1) begin
       if ((w_pf_acc_start & w_pfb_empty[i]) | (~w_pf_acc_start & r_pfb_empty_lat[i]))
         r_pfb_line_wsel = i[p_pfb_line_w-1:0];
@@ -322,20 +335,72 @@ always @ (*) begin
     r_pfb_line_wsel = r_pfb_line_wptr;
   end
 
-  for (i=0; i<P_SP_PFB_LINE_NUM; i=i+1) begin
-    if ((w_pf_acc_start & w_sp_pfb_adr_hit[i]) | (~w_pf_acc_start & r_sp_pfb_adr_hit_lat[i]))
-      r_sp_pfb_line_wsel = i[p_sp_pfb_line_w-1:0];
+  if ((w_pf_acc_start & |w_sp_pfb_adr_hit) | (~w_pf_acc_start & |r_sp_pfb_adr_hit_lat)) begin
+    r_sp_pfb_line_wsel_val = 1'b1;
+    r_sp_pfb_line_wsel_set = 0;
+    for (i=0; i<P_SP_PFB_LINE_NUM; i=i+1) begin
+      if ((w_pf_acc_start & w_sp_pfb_adr_hit[i]) | (~w_pf_acc_start & r_sp_pfb_adr_hit_lat[i]))
+        r_sp_pfb_line_wsel_set = i[p_sp_pfb_line_w-1:0];
+    end
+  end
+  else begin
+    r_sp_pfb_line_wsel_val = 0;
+    r_sp_pfb_line_wsel_set = 0;
   end
 
-  for (i=0; i<P_PFB_LINE_NUM; i=i+1) begin
-    if (w_pf_hit[i])
-      r_pf_hit_sel = i[p_pfb_line_w-1:0];
+  if (|w_pf_hit) begin
+    r_pf_hit_sel_val = 1'b1;
+    r_pf_hit_sel_set = 0;
+    for (i=0; i<P_PFB_LINE_NUM; i=i+1) begin
+      if (w_pf_hit[i])
+        r_pf_hit_sel_set = i[p_pfb_line_w-1:0];
+    end
+  end
+  else begin
+    r_pf_hit_sel_val = 0;
+    r_pf_hit_sel_set = 0;
   end
 
-  for (i=0; i<P_SP_PFB_LINE_NUM; i=i+1) begin
-    if (w_sp_pf_hit[i])
-      r_sp_pf_hit_sel = i[p_sp_pfb_line_w-1:0];
+  if (|w_sp_pf_hit) begin
+    r_sp_pf_hit_sel_val = 1'b1;
+    r_sp_pf_hit_sel_set = 0;
+    for (i=0; i<P_SP_PFB_LINE_NUM; i=i+1) begin
+      if (w_sp_pf_hit[i])
+        r_sp_pf_hit_sel_set = i[p_sp_pfb_line_w-1:0];
+    end
   end
+  else begin
+    r_sp_pf_hit_sel_val = 0;
+    r_sp_pf_hit_sel_set = 0;
+  end
+end
+
+always @ (posedge SYSCLK or negedge RESETB) begin
+  if (!RESETB) begin
+    r_sp_pfb_line_wsel_lat <= 0;
+    r_pf_hit_sel_lat       <= 0;
+    r_sp_pf_hit_sel_lat    <= 0;
+  end
+  else begin
+    if (r_sp_pfb_line_wsel_val)
+      r_sp_pfb_line_wsel_lat <= r_sp_pfb_line_wsel_set;
+    if (r_pf_hit_sel_val)
+      r_pf_hit_sel_lat <= r_pf_hit_sel_set;
+    if (r_sp_pf_hit_sel_val)
+      r_sp_pf_hit_sel_lat <= r_sp_pf_hit_sel_set;
+  end
+end
+
+always @ (*) begin
+  r_sp_pfb_line_wsel = r_sp_pfb_line_wsel_lat;
+  r_pf_hit_sel       = r_pf_hit_sel_lat;
+  r_sp_pf_hit_sel    = r_sp_pf_hit_sel_lat;
+  if (r_sp_pfb_line_wsel_val)
+    r_sp_pfb_line_wsel = r_sp_pfb_line_wsel_set;
+  if (r_pf_hit_sel_val)
+    r_pf_hit_sel = r_pf_hit_sel_set;
+  if (r_sp_pf_hit_sel_val)
+    r_sp_pf_hit_sel = r_sp_pf_hit_sel_set;
 end
 
 assign w_pf_acc_end = ~r_pf_acc_rd_retim[RD_LTCY_SEL-2] & r_pf_acc_rd_retim[RD_LTCY_SEL-1];
