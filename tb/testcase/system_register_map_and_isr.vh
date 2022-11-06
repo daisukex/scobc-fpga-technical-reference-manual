@@ -24,5 +24,6 @@
 `define CM3_ISR_FRM_QSPI 4
 `define CM3_ISR_CAN      5
 `define CM3_ISR_EXT_I2CM 7
+`define CM3_ISR_SMON_BHM 9
 `define CM3_ISR_GTMR     10
 `define CM3_ISR_SITMR    11
