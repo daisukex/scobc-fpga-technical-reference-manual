@@ -11,6 +11,7 @@ module system_monitor # (
   // System Interface
   input HCLK,
   input HRESETN,
+  input POR_RSTB,
   input REF_CLK,
   input SYS_RSTB_SYNC_REFCLK,
   output SYSMON_HW_INT,
@@ -133,6 +134,7 @@ sysmon_reg # (
 ) sysmon_reg (
   .HCLK(HCLK),
   .HRESETN(HRESETN),
+  .POR_RSTB(POR_RSTB),
   .REF_CLK(REF_CLK),
   .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
   .SYSMON_HW_INT(SYSMON_HW_INT),

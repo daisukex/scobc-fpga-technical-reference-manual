@@ -13,6 +13,7 @@ module sysmon_reg # (
 ) (
   input HCLK,
   input HRESETN,
+  input POR_RSTB,
   input REF_CLK,
   input SYS_RSTB_SYNC_REFCLK,
   output SYSMON_HW_INT,
@@ -239,6 +240,29 @@ always @ (posedge REF_CLK) begin
     end
     else
       wdog_sig_counter <= wdog_sig_counter + 1;
+  end
+end
+
+// Hardware Status Register
+// ----------------------------------------
+reg [31:0] hw_status1;
+reg [31:0] hw_status2;
+always @ (posedge HCLK) begin
+  if (!POR_RSTB) begin
+    hw_status1 <= 32'h0;
+    hw_status2 <= 32'h0;
+  end
+  else if (WADR == `SYSMON_HW_STATUS1) begin
+    if (REG_WENB[0]) hw_status1[ 0 +:8] <= REG_WDAT[ 0 +:8];
+    if (REG_WENB[1]) hw_status1[ 8 +:8] <= REG_WDAT[ 8 +:8];
+    if (REG_WENB[2]) hw_status1[16 +:8] <= REG_WDAT[16 +:8];
+    if (REG_WENB[3]) hw_status1[24 +:8] <= REG_WDAT[24 +:8];
+  end
+  else if (WADR == `SYSMON_HW_STATUS2) begin
+    if (REG_WENB[0]) hw_status2[ 0 +:8] <= REG_WDAT[ 0 +:8];
+    if (REG_WENB[1]) hw_status2[ 8 +:8] <= REG_WDAT[ 8 +:8];
+    if (REG_WENB[2]) hw_status2[16 +:8] <= REG_WDAT[16 +:8];
+    if (REG_WENB[3]) hw_status2[24 +:8] <= REG_WDAT[24 +:8];
   end
 end
 
@@ -999,6 +1023,8 @@ always @ (posedge HCLK) begin
   else if (REG_RENB | xadc_valid) begin
     if      (RADR == `SYSMON_WDOG_CTRL)  REG_RDAT <= rd_wdogctrl;
     else if (RADR == `SYSMON_WDOG_SIVAL) REG_RDAT <= rd_wdogsigival;
+    else if (RADR == `SYSMON_HW_STATUS1) REG_RDAT <= hw_status1;
+    else if (RADR == `SYSMON_HW_STATUS2) REG_RDAT <= hw_status2;
     else if (RADR == `SYSMON_INT_STATUS) REG_RDAT <= rd_sysmon_intsts;
     else if (RADR == `SYSMON_INT_ENABLE) REG_RDAT <= rd_sysmon_intenb;
     else if (RADR == `SYSMON_SEM_STATE)  REG_RDAT <= rd_sem_state;

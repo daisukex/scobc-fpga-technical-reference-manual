@@ -383,6 +383,7 @@ system_monitor system_monitor (
   // System Interface
   .HCLK(hclk),
   .HRESETN(hresetn),
+  .POR_RSTB(POR_RSTB),
   .REF_CLK(REF_CLK),
   .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
   .SYSMON_HW_INT(SYSMON_HW_ISR),

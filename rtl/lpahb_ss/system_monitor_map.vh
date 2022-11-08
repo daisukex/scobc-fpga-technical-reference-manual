@@ -15,6 +15,12 @@
 `define SYSMON_WDOG_SIVAL  16'h0010
 `define  SM_WDOG_SIVAL            0
 
+// Hardware Status Register
+`define SYSMON_HW_STATUS1  16'h0024
+`define  HWARE_STATUS1            0
+`define SYSMON_HW_STATUS2  16'h0028
+`define  HWARE_STATUS2            0
+
 // System Monitor Interrupt Status Register
 `define SYSMON_INT_STATUS  16'h0030
 `define  SEM_HTIMEOUT_INT        11
