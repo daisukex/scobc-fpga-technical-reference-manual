@@ -287,6 +287,10 @@ sc_obc_core # (
   // Clock
   .REF_CLK(ref_clk),
   .SYS_CLK(sys_clk),
+  .MAXI_CLK(maxi_clk),
+  .ULPI_REFCLK(ULPI_REFCLK),
+  .USER_CLK1(user_clk1),
+  .USER_CLK2(user_clk2),
   .PLLLOCK(plllock),
   .OSC_CLKEN({SYSCLK2_EN, SYSCLK1_EN}),
   // Reset

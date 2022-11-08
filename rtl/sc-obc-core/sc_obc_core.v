@@ -21,6 +21,10 @@ module sc_obc_core # (
   // Clock
   input REF_CLK,
   input SYS_CLK,
+  input MAXI_CLK,
+  input ULPI_REFCLK,
+  input USER_CLK1,
+  input USER_CLK2,
   input PLLLOCK,
   input [1:0] OSC_CLKEN,
   // Reset
@@ -1038,6 +1042,11 @@ lpahb_ss # (
 
   // Clock Monitor Interface
   .OSC_CLKEN(OSC_CLKEN),
+  .SYS_CLK(SYS_CLK),
+  .MAXI_CLK(MAXI_CLK),
+  .ULPI_REFCLK(ULPI_REFCLK),
+  .USER_CLK1(USER_CLK1),
+  .USER_CLK2(USER_CLK2),
 
   // AXI Write Address Channel
   .AWID(lpahb_axim_awid),

@@ -30,6 +30,11 @@ module lpahb_ss # (
 
   // Clock Monitor Interface
   input [1:0] OSC_CLKEN,
+  input SYS_CLK,
+  input MAXI_CLK,
+  input ULPI_REFCLK,
+  input USER_CLK1,
+  input USER_CLK2,
 
   // AXI Write Address Channel
   input [LPAHB_AXI_ID_WIDTH-1:0] AWID,
@@ -417,7 +422,12 @@ system_monitor system_monitor (
   .INTERNAL_I2C_SDA(INTERNAL_I2CM_SDA),
 
   // Clock Monitor Interface
-  .OSC_CLKEN(OSC_CLKEN)
+  .OSC_CLKEN(OSC_CLKEN),
+  .SYS_CLK(SYS_CLK),
+  .MAXI_CLK(MAXI_CLK),
+  .ULPI_REFCLK(ULPI_REFCLK),
+  .USER_CLK1(USER_CLK1),
+  .USER_CLK2(USER_CLK2)
 );
 
 // General Purpose Timer

@@ -43,7 +43,12 @@ module system_monitor # (
   inout INTERNAL_I2C_SDA,
 
   // Clock Monitor Interface
-  input [1:0] OSC_CLKEN
+  input [1:0] OSC_CLKEN,
+  input SYS_CLK,
+  input MAXI_CLK,
+  input ULPI_REFCLK,
+  input USER_CLK1,
+  input USER_CLK2
 );
 
 wire [31:0] REG_WADR;
@@ -97,6 +102,17 @@ wire ECORRECT_DETECT;
 wire INJECT_REQ;
 wire INJECT_ACK;
 wire [39:0] INJECT_ADDRESS;
+
+wire sys_clk_state;
+wire sys_clk_stop;
+wire maxi_clk_state;
+wire maxi_clk_stop;
+wire ulpi_refclk_state;
+wire ulpi_refclk_stop;
+wire user_clk1_state;
+wire user_clk1_stop;
+wire user_clk2_state;
+wire user_clk2_stop;
 
 sc_ahbip_slave # (
   .CYCLE_MODE(1)
@@ -201,7 +217,17 @@ sysmon_reg # (
   .BHM_BUSY(BHM_BUSY),
 
   // Clock Monitor Interface
-  .OSC_CLKEN(OSC_CLKEN)
+  .OSC_CLKEN(OSC_CLKEN),
+  .SYS_CLK_STATE(sys_clk_state),
+  .SYS_CLK_STOP(sys_clk_stop),
+  .MAXI_CLK_STATE(maxi_clk_state),
+  .MAXI_CLK_STOP(maxi_clk_stop),
+  .ULPI_REFCLK_STATE(ulpi_refclk_state),
+  .ULPI_REFCLK_STOP(ulpi_refclk_stop),
+  .USER_CLK1_STATE(user_clk1_state),
+  .USER_CLK1_STOP(user_clk1_stop),
+  .USER_CLK2_STATE(user_clk2_state),
+  .USER_CLK2_STOP(user_clk2_stop)
 );
 
 xadc_ctrl xadc_ctrl (
@@ -280,6 +306,31 @@ sysmon_bhm # (
   // I2C Interface
   .INTERNAL_I2C_SCL(INTERNAL_I2C_SCL),
   .INTERNAL_I2C_SDA(INTERNAL_I2C_SDA)
+);
+
+sysmon_clk_checker sysmon_clk_checker (
+  // Bus clock
+  .HCLK(HCLK),
+  .HRESETN(HRESETN),
+
+  // Target clock
+  .SYS_CLK(SYS_CLK),
+  .MAXI_CLK(MAXI_CLK),
+  .ULPI_REFCLK(ULPI_REFCLK),
+  .USER_CLK1(USER_CLK1),
+  .USER_CLK2(USER_CLK2),
+
+  // Register Interface
+  .SYS_CLK_STATE(sys_clk_state),
+  .SYS_CLK_STOP(sys_clk_stop),
+  .MAXI_CLK_STATE(maxi_clk_state),
+  .MAXI_CLK_STOP(maxi_clk_stop),
+  .ULPI_REFCLK_STATE(ulpi_refclk_state),
+  .ULPI_REFCLK_STOP(ulpi_refclk_stop),
+  .USER_CLK1_STATE(user_clk1_state),
+  .USER_CLK1_STOP(user_clk1_stop),
+  .USER_CLK2_STATE(user_clk2_state),
+  .USER_CLK2_STOP(user_clk2_stop)
 );
 
 endmodule

@@ -17,6 +17,11 @@
 
 // Clock Monitor Register
 `define SYSMON_CLK_MONITOR 16'h0020
+`define  UCLK2_STS               12
+`define  UCLK1_STS               11
+`define  ULPICLK_STS             10
+`define  MAXICLK_STS              9
+`define  SYSCLK_STS               8
 `define  SM_OSC_CLKEN             0
 
 // Hardware Status Register
