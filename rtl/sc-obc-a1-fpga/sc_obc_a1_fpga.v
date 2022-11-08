@@ -288,6 +288,7 @@ sc_obc_core # (
   .REF_CLK(ref_clk),
   .SYS_CLK(sys_clk),
   .PLLLOCK(plllock),
+  .OSC_CLKEN({SYSCLK2_EN, SYSCLK1_EN}),
   // Reset
   .SYS_RST_REQ(sys_rst_req),
   .REG_RST_REQ(reg_rst_req),

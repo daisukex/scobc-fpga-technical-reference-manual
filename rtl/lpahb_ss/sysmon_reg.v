@@ -77,7 +77,10 @@ module sysmon_reg # (
   input [15:0] BHM_SW_RDDATA,
   output reg [15:0] BHM_CLKPSC,
   output reg [7:0] BHM_I2CACC_CNT,
-  input [5:0] BHM_BUSY
+  input [5:0] BHM_BUSY,
+
+  // Clock Monitor Interface
+  input [1:0] OSC_CLKEN
 );
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
@@ -242,6 +245,10 @@ always @ (posedge REF_CLK) begin
       wdog_sig_counter <= wdog_sig_counter + 1;
   end
 end
+
+// Clock Monitor Register
+// ----------------------------------------
+wire [31:0] rd_clk_monitor = 32'h0000_0000 | (OSC_CLKEN << `SM_OSC_CLKEN);
 
 // Hardware Status Register
 // ----------------------------------------
@@ -1023,6 +1030,7 @@ always @ (posedge HCLK) begin
   else if (REG_RENB | xadc_valid) begin
     if      (RADR == `SYSMON_WDOG_CTRL)  REG_RDAT <= rd_wdogctrl;
     else if (RADR == `SYSMON_WDOG_SIVAL) REG_RDAT <= rd_wdogsigival;
+    else if (RADR == `SYSMON_CLK_MONITOR)REG_RDAT <= rd_clk_monitor;
     else if (RADR == `SYSMON_HW_STATUS1) REG_RDAT <= hw_status1;
     else if (RADR == `SYSMON_HW_STATUS2) REG_RDAT <= hw_status2;
     else if (RADR == `SYSMON_INT_STATUS) REG_RDAT <= rd_sysmon_intsts;

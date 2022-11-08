@@ -28,6 +28,9 @@ module lpahb_ss # (
   input CMC_ACK,
   output PWR_CYCLE_REQ,
 
+  // Clock Monitor Interface
+  input [1:0] OSC_CLKEN,
+
   // AXI Write Address Channel
   input [LPAHB_AXI_ID_WIDTH-1:0] AWID,
   input [31:0] AWADDR,
@@ -411,7 +414,10 @@ system_monitor system_monitor (
   .CVM_WARNING_B(CVM_WARNING_B),
   .TEMP_ALERT_B(TEMP_ALERT_B),
   .INTERNAL_I2C_SCL(INTERNAL_I2CM_SCL),
-  .INTERNAL_I2C_SDA(INTERNAL_I2CM_SDA)
+  .INTERNAL_I2C_SDA(INTERNAL_I2CM_SDA),
+
+  // Clock Monitor Interface
+  .OSC_CLKEN(OSC_CLKEN)
 );
 
 // General Purpose Timer

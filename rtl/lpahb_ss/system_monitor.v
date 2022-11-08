@@ -40,7 +40,10 @@ module system_monitor # (
   input CVM_WARNING_B,
   input TEMP_ALERT_B,
   inout INTERNAL_I2C_SCL,
-  inout INTERNAL_I2C_SDA
+  inout INTERNAL_I2C_SDA,
+
+  // Clock Monitor Interface
+  input [1:0] OSC_CLKEN
 );
 
 wire [31:0] REG_WADR;
@@ -195,7 +198,10 @@ sysmon_reg # (
   .BHM_SW_RDDATA(BHM_SW_RDDATA),
   .BHM_CLKPSC(BHM_CLKPSC),
   .BHM_I2CACC_CNT(BHM_I2CACC_CNT),
-  .BHM_BUSY(BHM_BUSY)
+  .BHM_BUSY(BHM_BUSY),
+
+  // Clock Monitor Interface
+  .OSC_CLKEN(OSC_CLKEN)
 );
 
 xadc_ctrl xadc_ctrl (

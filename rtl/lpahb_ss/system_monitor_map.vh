@@ -15,6 +15,10 @@
 `define SYSMON_WDOG_SIVAL  16'h0010
 `define  SM_WDOG_SIVAL            0
 
+// Clock Monitor Register
+`define SYSMON_CLK_MONITOR 16'h0020
+`define  SM_OSC_CLKEN             0
+
 // Hardware Status Register
 `define SYSMON_HW_STATUS1  16'h0024
 `define  HWARE_STATUS1            0

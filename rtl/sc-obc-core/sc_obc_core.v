@@ -22,6 +22,7 @@ module sc_obc_core # (
   input REF_CLK,
   input SYS_CLK,
   input PLLLOCK,
+  input [1:0] OSC_CLKEN,
   // Reset
   output SYS_RST_REQ,
   output REG_RST_REQ,
@@ -1034,6 +1035,9 @@ lpahb_ss # (
   .CMC_REQ(CMC_REQ),
   .CMC_ACK(CMC_ACK),
   .PWR_CYCLE_REQ(FPGA_PWR_CYCLE_REQ),
+
+  // Clock Monitor Interface
+  .OSC_CLKEN(OSC_CLKEN),
 
   // AXI Write Address Channel
   .AWID(lpahb_axim_awid),
