@@ -48,7 +48,7 @@ initial begin
   simcount = 1;
   //--------------------------------------------------
   display_subcount_text(1, "Check Version Initial Value", 1);
-  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_VER), .expdata(32'h0001_0001), .check(1));
+  read_transaction( .master(2), .addr(`SYSREG_BASE+`SYSREG_VER), .expdata(32'h0100_0000), .check(1));
 
 
   //--------------------------------------------------
