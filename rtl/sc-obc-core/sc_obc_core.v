@@ -257,7 +257,6 @@ wire datamem_qspi_isr;
 wire fram_qspi_isr;
 wire canc_isr;
 wire uartlite_isr;
-wire internal_i2c_isr;
 wire external_i2c_isr;
 wire sysmon_hw_isr;
 wire gptmr_gtmr_isr;
@@ -267,7 +266,7 @@ assign internal_isr[10] = gptmr_gtmr_isr;
 assign internal_isr[9] = 1'b0;
 assign internal_isr[8] = sysmon_hw_isr;
 assign internal_isr[7] = external_i2c_isr;
-assign internal_isr[6] = internal_i2c_isr;
+assign internal_isr[6] = 1'b0;
 assign internal_isr[5] = canc_isr;
 assign internal_isr[4] = fram_qspi_isr;
 assign internal_isr[3] = datamem_qspi_isr;
@@ -1024,7 +1023,6 @@ lpahb_ss # (
   .REF_CLK(REF_CLK),
   .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
   .UARTLITE_ISR(uartlite_isr),
-  .INTERNAL_I2CM_ISR(internal_i2c_isr),
   .EXTERNAL_I2CM_ISR(external_i2c_isr),
   .SYSMON_HW_ISR(sysmon_hw_isr),
   .GPTMR_GTMR_ISR(gptmr_gtmr_isr),

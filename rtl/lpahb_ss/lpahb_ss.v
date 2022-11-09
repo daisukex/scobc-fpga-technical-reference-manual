@@ -17,7 +17,6 @@ module lpahb_ss # (
   input REF_CLK,
   input SYS_RSTB_SYNC_REFCLK,
   output UARTLITE_ISR,
-  output INTERNAL_I2CM_ISR,
   output EXTERNAL_I2CM_ISR,
   output SYSMON_HW_ISR,
   output GPTMR_GTMR_ISR,
@@ -135,10 +134,13 @@ wire [AHB_NUMBER_OF_SLAVE-1:0] shreadyin;
 
 localparam AHB_SYSREG_CH = 0;
 localparam AHB_UARTLT_CH = 1;
-localparam AHB_ITI2CM_CH = 2;
+localparam AHB_EMPTY_CH = 2;
 localparam AHB_ETI2CM_CH = 3;
 localparam AHB_SYSMON_CH = 4;
 localparam AHB_GPTMR_CH = 5;
+
+assign INTERNAL_I2CM_SDA = 1'bz;
+assign INTERNAL_I2CM_SCL = 1'bz;
 
 // AXI-AHB Bridge
 // --------------------------------------------------
@@ -330,42 +332,11 @@ ahbuartlite # (
   .UART_RX(UART_RX)
 );
 
-// I2C Master for Internal I2C
+// AHB Channel 2 (Empty)
 // --------------------------------------------------
-i2c_master # (
-  .P_FIFO_DPTBW(4),
-  .P_FIFO_TYPE(0),
-  .P_INIT_THDSTA(16'h0031),
-  .P_INIT_TSUSTO(16'h0031),
-  .P_INIT_TSUSTA(16'h0031),
-  .P_INIT_THIGH(16'h0039),
-  .P_INIT_THDDAT(16'h0004),
-  .P_INIT_TSUDAT(16'h0039),
-  .P_INIT_TBUF(16'h0045)
-) internal_i2cm (
-  // System Interface
-  .SYSCLK(hclk),
-  .SYSRST_N(hresetn),
-  .MODULE_RSTN(hresetn),
-  .I2CM_INT(INTERNAL_I2CM_ISR),
-
-  // AHB Interface
-  .SHSEL(shsel[AHB_ITI2CM_CH]),
-  .SHADDR(mhaddr),
-  .SHTRANS(mhtrans),
-  .SHSIZE(mhsize),
-  .SHBURST(mhburst),
-  .SHWRITE(mhwrite),
-  .SHREADYIN(shreadyin[AHB_ITI2CM_CH]),
-  .SHREADYOUT(shreadyout[AHB_ITI2CM_CH]),
-  .SHWDATA(mhwdata),
-  .SHRDATA(shrdata[32*AHB_ITI2CM_CH +:32]),
-  .SHRESP(shresp[2*AHB_ITI2CM_CH +:2]),
-
-  // I2C Bus Interface
-  .I2C_SDA(INTERNAL_I2CM_SDA),
-  .I2C_SCL(INTERNAL_I2CM_SCL)
-);
+assign shreadyout[AHB_EMPTY_CH] = 1'b1;
+assign shrdata[32*AHB_EMPTY_CH +:32] = 0;
+assign shresp[2*AHB_EMPTY_CH +:2] = 0;
 
 // I2C Master for External I2C
 // --------------------------------------------------
