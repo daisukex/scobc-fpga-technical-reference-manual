@@ -17,6 +17,7 @@
 
 // Clock Monitor Register
 `define SYSMON_CLK_MONITOR 16'h0020
+`define  PLL_LOCK                16
 `define  UCLK2_STS               12
 `define  UCLK1_STS               11
 `define  ULPICLK_STS             10

@@ -261,7 +261,8 @@ end
 
 // Clock Monitor Register
 // ----------------------------------------
-wire [31:0] rd_clk_monitor = 32'h0000_0000 | (OSC_CLKEN << `SM_OSC_CLKEN)
+wire [31:0] rd_clk_monitor = 32'h0000_0000 | (PLLLOCK << `PLL_LOCK)
+                                           | (OSC_CLKEN << `SM_OSC_CLKEN)
                                            | (SYS_CLK_STATE << `SYSCLK_STS)
                                            | (MAXI_CLK_STATE << `MAXICLK_STS)
                                            | (ULPI_REFCLK_STATE << `ULPICLK_STS)
