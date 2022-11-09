@@ -84,7 +84,7 @@ wire (pull1, pull0) internal_i2cm_sda = 1'b1;
 wire (pull1, pull0) internal_i2cm_scl = 1'b1;
 wire (pull1, pull0) external_i2cm_sda = 1'b1;
 wire (pull1, pull0) external_i2cm_scl = 1'b1;
-wire cfg_mem_sck = dut.CFG_MEM_SCK;
+wire cfg_mem_sck = dut.cfg_mem_sck;
 wire cfg_mem_cs_b;
 wire (pull1, pull0) [3:0] cfg_mem_io = 4'b1111;
 wire data_mem1_sck;
