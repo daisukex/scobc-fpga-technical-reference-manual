@@ -259,11 +259,12 @@ wire canc_isr;
 wire uartlite_isr;
 wire external_i2c_isr;
 wire sysmon_hw_isr;
+wire sysmon_bhm_isr;
 wire gptmr_gtmr_isr;
 wire gptmr_sitmr_isr;
 assign internal_isr[11] = gptmr_sitmr_isr;
 assign internal_isr[10] = gptmr_gtmr_isr;
-assign internal_isr[9] = 1'b0;
+assign internal_isr[9] = sysmon_bhm_isr;
 assign internal_isr[8] = sysmon_hw_isr;
 assign internal_isr[7] = external_i2c_isr;
 assign internal_isr[6] = 1'b0;
@@ -1025,6 +1026,7 @@ lpahb_ss # (
   .UARTLITE_ISR(uartlite_isr),
   .EXTERNAL_I2CM_ISR(external_i2c_isr),
   .SYSMON_HW_ISR(sysmon_hw_isr),
+  .SYSMON_BHM_ISR(sysmon_bhm_isr),
   .GPTMR_GTMR_ISR(gptmr_gtmr_isr),
   .GPTMR_SITMR_ISR(gptmr_sitmr_isr),
   .TRCH_BOOT(FPGA_BOOT),
@@ -1090,6 +1092,9 @@ lpahb_ss # (
   // Internal I2C
   .INTERNAL_I2CM_SDA(INTERNAL_I2CM_SDA),
   .INTERNAL_I2CM_SCL(INTERNAL_I2CM_SCL),
+  .CVM_CRITICAL_B(CVM_CRITICAL_B),
+  .CVM_WARNING_B(CVM_WARNING_B),
+  .TEMP_ALERT_B(TEMP_ALERT_B),
 
   // External I2C
   .EXTERNAL_I2CM_SDA(EXTERNAL_I2CM_SDA),
