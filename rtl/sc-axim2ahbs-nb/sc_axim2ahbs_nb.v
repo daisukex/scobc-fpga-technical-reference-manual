@@ -127,13 +127,11 @@ end
 // Write Data Latch
 reg [31:0] reg_wdata;
 reg [3:0] reg_wstrb;
-reg reg_wlast;
 always @ (posedge ACLK or negedge ARESETN) begin
   if (!ARESETN) begin
     xwdt_valid <= 0;
     reg_wdata <= 0;
     reg_wstrb <= 0;
-    reg_wlast <= 0;
     WREADY <= 1'b0;
   end
   else begin
@@ -149,7 +147,6 @@ always @ (posedge ACLK or negedge ARESETN) begin
     else if (log_wd_valid) begin
       reg_wdata <= WDATA;
       reg_wstrb <= WSTRB;
-      reg_wlast <= WLAST;
       WREADY <= 1'b0;
       xwdt_valid <= 1;
     end
@@ -236,22 +233,18 @@ assign log_ra_valid = ARVALID & ARREADY;
 assign log_rd_valid = RVALID & RREADY;
 
 reg xrad_valid;
-reg [AXIM2AHBSNB_ID_WIDTH:0] reg_arid;
 reg [31:0] reg_araddr;
 reg [7:0] reg_arlen;
 reg [2:0] reg_arsize;
-reg [1:0] reg_arburst;
 wire hrdt_comp;
 
 // Read Address Latch
 always @ (posedge ACLK or negedge ARESETN) begin
   if (!ARESETN) begin
     xrad_valid <= 0;
-    reg_arid <= 0;
     reg_araddr <= 0;
     reg_arlen <= 0;
     reg_arsize <= 0;
-    reg_arburst <= 0;
     ARREADY <= 1'b0;
   end
   else begin
@@ -268,11 +261,9 @@ always @ (posedge ACLK or negedge ARESETN) begin
       xrad_valid <= 0;
     end
     else if (log_ra_valid) begin
-      reg_arid <= ARID;
       reg_araddr <= ARADDR;
       reg_arlen <= ARLEN;
       reg_arsize <= ARSIZE;
-      reg_arburst <= ARBURST;
       ARREADY <= 1'b0;
       xrad_valid <= 1;
     end
