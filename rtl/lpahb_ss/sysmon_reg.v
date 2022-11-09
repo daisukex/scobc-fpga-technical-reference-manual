@@ -80,7 +80,17 @@ module sysmon_reg # (
   input [5:0] BHM_BUSY,
 
   // Clock Monitor Interface
-  input [1:0] OSC_CLKEN
+  input [1:0] OSC_CLKEN,
+  input SYS_CLK_STATE,
+  input SYS_CLK_STOP,
+  input MAXI_CLK_STATE,
+  input MAXI_CLK_STOP,
+  input ULPI_REFCLK_STATE,
+  input ULPI_REFCLK_STOP,
+  input USER_CLK1_STATE,
+  input USER_CLK1_STOP,
+  input USER_CLK2_STATE,
+  input USER_CLK2_STOP
 );
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
@@ -248,7 +258,12 @@ end
 
 // Clock Monitor Register
 // ----------------------------------------
-wire [31:0] rd_clk_monitor = 32'h0000_0000 | (OSC_CLKEN << `SM_OSC_CLKEN);
+wire [31:0] rd_clk_monitor = 32'h0000_0000 | (OSC_CLKEN << `SM_OSC_CLKEN)
+                                           | (SYS_CLK_STATE << `SYSCLK_STS)
+                                           | (MAXI_CLK_STATE << `MAXICLK_STS)
+                                           | (ULPI_REFCLK_STATE << `ULPICLK_STS)
+                                           | (USER_CLK1_STATE << `UCLK1_STS)
+                                           | (USER_CLK2_STATE << `UCLK2_STS);
 
 // Hardware Status Register
 // ----------------------------------------
@@ -286,17 +301,27 @@ always @ (posedge HCLK) begin
   sync_ecorrect <= {sync_ecorrect[1:0], ECORRECT_DETECT};
 end
 
-// SEM Controller Interrupt Status
+// System Monitor Interrupt Status
 reg heartbeat_timeout_sts;
 reg halted_sts;
 reg uncorrect_sts;
 reg ecorrect_sts;
+reg uclk2_stop_sts;
+reg uclk1_stop_sts;
+reg ulpiclk_stop_sts;
+reg maxiclk_stop_sts;
+reg sysclk_stop_sts;
 always @ (posedge HCLK) begin
   if (!HRESETN) begin
     heartbeat_timeout_sts <= 1'b0;
     halted_sts <= 1'b0;
     uncorrect_sts <= 1'b0;
     ecorrect_sts <= 1'b0;
+    uclk2_stop_sts <= 1'b0;
+    uclk1_stop_sts <= 1'b0;
+    ulpiclk_stop_sts <= 1'b0;
+    maxiclk_stop_sts <= 1'b0;
+    sysclk_stop_sts <= 1'b0;
   end
   else begin
     if (WADR == `SYSMON_INT_STATUS) begin
@@ -308,6 +333,16 @@ always @ (posedge HCLK) begin
         uncorrect_sts <= 1'b0;
       if (chk_enbit(1, `SEM_ECORRECT_INT, REG_WENB) & REG_WDAT[`SEM_ECORRECT_INT])
         ecorrect_sts <= 1'b0;
+      if (chk_enbit(1, `UCLK2_STOP_INT, REG_WENB) & REG_WDAT[`UCLK2_STOP_INT])
+        uclk2_stop_sts <= 1'b0;
+      if (chk_enbit(1, `UCLK1_STOP_INT, REG_WENB) & REG_WDAT[`UCLK1_STOP_INT])
+        uclk1_stop_sts <= 1'b0;
+      if (chk_enbit(1, `ULPICLK_STOP_INT, REG_WENB) & REG_WDAT[`ULPICLK_STOP_INT])
+        ulpiclk_stop_sts <= 1'b0;
+      if (chk_enbit(1, `MAXICLK_STOP_INT, REG_WENB) & REG_WDAT[`MAXICLK_STOP_INT])
+        maxiclk_stop_sts <= 1'b0;
+      if (chk_enbit(1, `SYSCLK_STOP_INT, REG_WENB) & REG_WDAT[`SYSCLK_STOP_INT])
+        sysclk_stop_sts <= 1'b0;
     end
     if (~sync_heartbeat_timeout[2] & sync_heartbeat_timeout[1])
       heartbeat_timeout_sts <= 1'b1;
@@ -317,24 +352,49 @@ always @ (posedge HCLK) begin
       uncorrect_sts <= 1'b1;
     if (~sync_ecorrect[2] & sync_ecorrect[1])
       ecorrect_sts <= 1'b1;
+    if (USER_CLK2_STOP)
+      uclk2_stop_sts <= 1'b1;
+    if (USER_CLK1_STOP)
+      uclk1_stop_sts <= 1'b1;
+    if (ULPI_REFCLK_STOP)
+      ulpiclk_stop_sts <= 1'b1;
+    if (MAXI_CLK_STOP)
+      maxiclk_stop_sts <= 1'b1;
+    if (SYS_CLK_STOP)
+      sysclk_stop_sts <= 1'b1;
   end
 end
 wire [31:0] rd_sysmon_intsts = 32'h0000_0000 | (heartbeat_timeout_sts << `SEM_HTIMEOUT_INT)
                                              | (halted_sts << `SEM_HALTED_INT)
                                              | (uncorrect_sts << `SEM_UNCORRECT_INT)
-                                             | (ecorrect_sts << `SEM_ECORRECT_INT);
+                                             | (ecorrect_sts << `SEM_ECORRECT_INT)
+                                             | (uclk2_stop_sts << `UCLK2_STOP_INT)
+                                             | (uclk1_stop_sts << `UCLK1_STOP_INT)
+                                             | (ulpiclk_stop_sts << `ULPICLK_STOP_INT)
+                                             | (maxiclk_stop_sts << `MAXICLK_STOP_INT)
+                                             | (sysclk_stop_sts << `SYSCLK_STOP_INT);
 
 // SEM Controller Interrupt Enable
 reg heartbeat_timeout_enb;
 reg halted_enb;
 reg uncorrect_enb;
 reg ecorrect_enb;
+reg uclk2_stop_enb;
+reg uclk1_stop_enb;
+reg ulpiclk_stop_enb;
+reg maxiclk_stop_enb;
+reg sysclk_stop_enb;
 always @ (posedge HCLK) begin
   if (!HRESETN) begin
     heartbeat_timeout_enb <= 1'b0;
     halted_enb <= 1'b0;
     uncorrect_enb <= 1'b0;
     ecorrect_enb <= 1'b0;
+    uclk2_stop_enb <= 1'b0;
+    uclk1_stop_enb <= 1'b0;
+    ulpiclk_stop_enb <= 1'b0;
+    maxiclk_stop_enb <= 1'b0;
+    sysclk_stop_enb <= 1'b0;
   end
   else begin
     if (WADR == `SYSMON_INT_ENABLE) begin
@@ -346,18 +406,38 @@ always @ (posedge HCLK) begin
         uncorrect_enb <= REG_WDAT[`SEM_UNCORRECT_ENB];
       if (chk_enbit(1, `SEM_ECORRECT_ENB, REG_WENB))
         ecorrect_enb <= REG_WDAT[`SEM_ECORRECT_ENB];
+      if (chk_enbit(1, `UCLK2_STOP_ENB, REG_WENB))
+        uclk2_stop_enb <= REG_WDAT[`UCLK2_STOP_ENB];
+      if (chk_enbit(1, `UCLK1_STOP_ENB, REG_WENB))
+        uclk1_stop_enb <= REG_WDAT[`UCLK1_STOP_ENB];
+      if (chk_enbit(1, `ULPICLK_STOP_ENB, REG_WENB))
+        ulpiclk_stop_enb <= REG_WDAT[`ULPICLK_STOP_ENB];
+      if (chk_enbit(1, `MAXICLK_STOP_ENB, REG_WENB))
+        maxiclk_stop_enb <= REG_WDAT[`MAXICLK_STOP_ENB];
+      if (chk_enbit(1, `SYSCLK_STOP_ENB, REG_WENB))
+        sysclk_stop_enb <= REG_WDAT[`SYSCLK_STOP_ENB];
     end
   end
 end
 wire [31:0] rd_sysmon_intenb = 32'h0000_0000 | (heartbeat_timeout_enb << `SEM_HTIMEOUT_ENB)
                                              | (halted_enb << `SEM_HALTED_ENB)
                                              | (uncorrect_enb << `SEM_UNCORRECT_ENB)
-                                             | (ecorrect_enb << `SEM_ECORRECT_ENB);
+                                             | (ecorrect_enb << `SEM_ECORRECT_ENB)
+                                             | (uclk2_stop_enb << `UCLK2_STOP_ENB)
+                                             | (uclk1_stop_enb << `UCLK1_STOP_ENB)
+                                             | (ulpiclk_stop_enb << `ULPICLK_STOP_ENB)
+                                             | (maxiclk_stop_enb << `MAXICLK_STOP_ENB)
+                                             | (sysclk_stop_enb << `SYSCLK_STOP_ENB);
 
 assign SYSMON_HW_INT = (ecorrect_enb & ecorrect_sts)
                      | (uncorrect_enb & uncorrect_sts)
                      | (halted_enb & halted_sts)
-                     | (heartbeat_timeout_enb & heartbeat_timeout_sts);
+                     | (heartbeat_timeout_enb & heartbeat_timeout_sts)
+                     | (uclk2_stop_enb & uclk2_stop_sts)
+                     | (uclk1_stop_enb & uclk1_stop_sts)
+                     | (ulpiclk_stop_enb & ulpiclk_stop_sts)
+                     | (maxiclk_stop_enb & maxiclk_stop_sts)
+                     | (sysclk_stop_enb & sysclk_stop_sts);
 
 // SEM Controller Register
 // ----------------------------------------

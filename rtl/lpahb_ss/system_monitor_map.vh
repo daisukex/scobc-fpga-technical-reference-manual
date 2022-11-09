@@ -36,6 +36,11 @@
 `define  SEM_HALTED_INT          10
 `define  SEM_UNCORRECT_INT        9
 `define  SEM_ECORRECT_INT         8
+`define  UCLK2_STOP_INT           4
+`define  UCLK1_STOP_INT           3
+`define  ULPICLK_STOP_INT         2
+`define  MAXICLK_STOP_INT         1
+`define  SYSCLK_STOP_INT          0
 
 // System Monitor Interrupt Enable Register
 `define SYSMON_INT_ENABLE  16'h0034
@@ -43,6 +48,11 @@
 `define  SEM_HALTED_ENB          10
 `define  SEM_UNCORRECT_ENB        9
 `define  SEM_ECORRECT_ENB         8
+`define  UCLK2_STOP_ENB           4
+`define  UCLK1_STOP_ENB           3
+`define  ULPICLK_STOP_ENB         2
+`define  MAXICLK_STOP_ENB         1
+`define  SYSCLK_STOP_ENB          0
 
 // SEM Controller State Register
 `define SYSMON_SEM_STATE   16'h0040
