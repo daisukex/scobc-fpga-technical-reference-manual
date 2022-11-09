@@ -48,7 +48,10 @@ module system_monitor # (
   input MAXI_CLK,
   input ULPI_REFCLK,
   input USER_CLK1,
-  input USER_CLK2
+  input USER_CLK2,
+  input CMC_REQ,
+  input [1:0] CLKMODE,
+  input PLLLOCK
 );
 
 wire [31:0] REG_WADR;
@@ -227,7 +230,10 @@ sysmon_reg # (
   .USER_CLK1_STATE(user_clk1_state),
   .USER_CLK1_STOP(user_clk1_stop),
   .USER_CLK2_STATE(user_clk2_state),
-  .USER_CLK2_STOP(user_clk2_stop)
+  .USER_CLK2_STOP(user_clk2_stop),
+  .CMC_REQ(CMC_REQ),
+  .CLKMODE(CLKMODE),
+  .PLLLOCK(PLLLOCK)
 );
 
 xadc_ctrl xadc_ctrl (

@@ -36,6 +36,7 @@
 `define  SEM_HALTED_INT          10
 `define  SEM_UNCORRECT_INT        9
 `define  SEM_ECORRECT_INT         8
+`define  PLL_UNLOCK_INT           7
 `define  UCLK2_STOP_INT           4
 `define  UCLK1_STOP_INT           3
 `define  ULPICLK_STOP_INT         2
@@ -48,6 +49,7 @@
 `define  SEM_HALTED_ENB          10
 `define  SEM_UNCORRECT_ENB        9
 `define  SEM_ECORRECT_ENB         8
+`define  PLL_UNLOCK_ENB           7
 `define  UCLK2_STOP_ENB           4
 `define  UCLK1_STOP_ENB           3
 `define  ULPICLK_STOP_ENB         2

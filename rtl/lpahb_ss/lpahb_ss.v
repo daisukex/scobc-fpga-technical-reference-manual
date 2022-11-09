@@ -35,6 +35,7 @@ module lpahb_ss # (
   input ULPI_REFCLK,
   input USER_CLK1,
   input USER_CLK2,
+  input PLLLOCK,
 
   // AXI Write Address Channel
   input [LPAHB_AXI_ID_WIDTH-1:0] AWID,
@@ -427,7 +428,10 @@ system_monitor system_monitor (
   .MAXI_CLK(MAXI_CLK),
   .ULPI_REFCLK(ULPI_REFCLK),
   .USER_CLK1(USER_CLK1),
-  .USER_CLK2(USER_CLK2)
+  .USER_CLK2(USER_CLK2),
+  .CMC_REQ(CMC_REQ),
+  .CLKMODE(CLKMODE),
+  .PLLLOCK(PLLLOCK)
 );
 
 // General Purpose Timer

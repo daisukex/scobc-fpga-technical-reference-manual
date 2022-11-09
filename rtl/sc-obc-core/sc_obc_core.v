@@ -1047,6 +1047,7 @@ lpahb_ss # (
   .ULPI_REFCLK(ULPI_REFCLK),
   .USER_CLK1(USER_CLK1),
   .USER_CLK2(USER_CLK2),
+  .PLLLOCK(PLLLOCK),
 
   // AXI Write Address Channel
   .AWID(lpahb_axim_awid),

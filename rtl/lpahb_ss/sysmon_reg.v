@@ -90,7 +90,10 @@ module sysmon_reg # (
   input USER_CLK1_STATE,
   input USER_CLK1_STOP,
   input USER_CLK2_STATE,
-  input USER_CLK2_STOP
+  input USER_CLK2_STOP,
+  input CMC_REQ,
+  input [1:0] CLKMODE,
+  input PLLLOCK
 );
 
 wire [23:0] SWDOG_LOWCUP_VALUE = 24'hB71AFF;
@@ -301,6 +304,74 @@ always @ (posedge HCLK) begin
   sync_ecorrect <= {sync_ecorrect[1:0], ECORRECT_DETECT};
 end
 
+// PLL State Check
+reg pll_active;
+reg cmc_req_p;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    pll_active <= 1'b0;
+    cmc_req_p <= 1'b0;
+  end
+  else begin
+    cmc_req_p <= CMC_REQ;
+    if (!cmc_req_p & CMC_REQ) begin
+      if (CLKMODE == 2'b00)
+        pll_active <= 1'b0;
+      else
+        pll_active <= 1'b1;
+    end
+  end
+end
+
+reg sync_plllock;
+reg [1:0] plllock_p;
+reg pll_unlock_clr;
+reg sync_pll_unlock_clr;
+reg [1:0] pll_unlock_clr_p;
+reg sync_pll_active;
+reg pll_active_p;
+always @ (posedge REF_CLK) begin
+  if (!SYS_RSTB_SYNC_REFCLK) begin
+    sync_plllock <= 1'b0;
+    plllock_p <= 2'b00;
+    sync_pll_unlock_clr <= 1'b0;
+    pll_unlock_clr_p <= 2'b00;
+    sync_pll_active <= 1'b0;
+    pll_active_p <= 1'b0;
+  end
+  else begin
+    sync_plllock <= PLLLOCK;
+    plllock_p <= {plllock_p[0], sync_plllock};
+    sync_pll_unlock_clr <= pll_unlock_clr;
+    pll_unlock_clr_p <= {pll_unlock_clr_p[0], sync_pll_unlock_clr};
+    sync_pll_active <= pll_active;
+    pll_active_p <= sync_pll_active;
+  end
+end
+
+reg pll_unlock;
+always @ (posedge REF_CLK) begin
+  if (!SYS_RSTB_SYNC_REFCLK)
+    pll_unlock <= 1'b0;
+  else if (pll_active_p & plllock_p[1] & !plllock_p[0])
+    pll_unlock <= 1'b1;
+  else if (pll_unlock_clr_p[1] != pll_unlock_clr_p[0])
+    pll_unlock <= 1'b0;
+end
+
+reg pll_ulock_sts;
+reg sync_pll_unlock;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    sync_pll_unlock <= 1'b0;
+    pll_ulock_sts <= 1'b0;
+    end
+  else begin
+    sync_pll_unlock <= pll_unlock;
+    pll_ulock_sts <= sync_pll_unlock;
+  end
+end
+
 // System Monitor Interrupt Status
 reg heartbeat_timeout_sts;
 reg halted_sts;
@@ -322,6 +393,7 @@ always @ (posedge HCLK) begin
     ulpiclk_stop_sts <= 1'b0;
     maxiclk_stop_sts <= 1'b0;
     sysclk_stop_sts <= 1'b0;
+    pll_unlock_clr <= 1'b0;
   end
   else begin
     if (WADR == `SYSMON_INT_STATUS) begin
@@ -333,6 +405,8 @@ always @ (posedge HCLK) begin
         uncorrect_sts <= 1'b0;
       if (chk_enbit(1, `SEM_ECORRECT_INT, REG_WENB) & REG_WDAT[`SEM_ECORRECT_INT])
         ecorrect_sts <= 1'b0;
+      if (chk_enbit(1, `PLL_UNLOCK_INT, REG_WENB) & REG_WDAT[`PLL_UNLOCK_INT])
+        pll_unlock_clr <= ~pll_unlock_clr;
       if (chk_enbit(1, `UCLK2_STOP_INT, REG_WENB) & REG_WDAT[`UCLK2_STOP_INT])
         uclk2_stop_sts <= 1'b0;
       if (chk_enbit(1, `UCLK1_STOP_INT, REG_WENB) & REG_WDAT[`UCLK1_STOP_INT])
@@ -368,6 +442,7 @@ wire [31:0] rd_sysmon_intsts = 32'h0000_0000 | (heartbeat_timeout_sts << `SEM_HT
                                              | (halted_sts << `SEM_HALTED_INT)
                                              | (uncorrect_sts << `SEM_UNCORRECT_INT)
                                              | (ecorrect_sts << `SEM_ECORRECT_INT)
+                                             | (pll_ulock_sts << `PLL_UNLOCK_INT)
                                              | (uclk2_stop_sts << `UCLK2_STOP_INT)
                                              | (uclk1_stop_sts << `UCLK1_STOP_INT)
                                              | (ulpiclk_stop_sts << `ULPICLK_STOP_INT)
@@ -379,6 +454,7 @@ reg heartbeat_timeout_enb;
 reg halted_enb;
 reg uncorrect_enb;
 reg ecorrect_enb;
+reg pll_ulock_enb;
 reg uclk2_stop_enb;
 reg uclk1_stop_enb;
 reg ulpiclk_stop_enb;
@@ -390,6 +466,7 @@ always @ (posedge HCLK) begin
     halted_enb <= 1'b0;
     uncorrect_enb <= 1'b0;
     ecorrect_enb <= 1'b0;
+    pll_ulock_enb <= 1'b0;
     uclk2_stop_enb <= 1'b0;
     uclk1_stop_enb <= 1'b0;
     ulpiclk_stop_enb <= 1'b0;
@@ -406,6 +483,8 @@ always @ (posedge HCLK) begin
         uncorrect_enb <= REG_WDAT[`SEM_UNCORRECT_ENB];
       if (chk_enbit(1, `SEM_ECORRECT_ENB, REG_WENB))
         ecorrect_enb <= REG_WDAT[`SEM_ECORRECT_ENB];
+      if (chk_enbit(1, `PLL_UNLOCK_ENB, REG_WENB))
+        pll_ulock_enb <= REG_WDAT[`PLL_UNLOCK_ENB];
       if (chk_enbit(1, `UCLK2_STOP_ENB, REG_WENB))
         uclk2_stop_enb <= REG_WDAT[`UCLK2_STOP_ENB];
       if (chk_enbit(1, `UCLK1_STOP_ENB, REG_WENB))
@@ -423,6 +502,7 @@ wire [31:0] rd_sysmon_intenb = 32'h0000_0000 | (heartbeat_timeout_enb << `SEM_HT
                                              | (halted_enb << `SEM_HALTED_ENB)
                                              | (uncorrect_enb << `SEM_UNCORRECT_ENB)
                                              | (ecorrect_enb << `SEM_ECORRECT_ENB)
+                                             | (pll_ulock_enb << `PLL_UNLOCK_ENB)
                                              | (uclk2_stop_enb << `UCLK2_STOP_ENB)
                                              | (uclk1_stop_enb << `UCLK1_STOP_ENB)
                                              | (ulpiclk_stop_enb << `ULPICLK_STOP_ENB)
@@ -433,6 +513,7 @@ assign SYSMON_HW_INT = (ecorrect_enb & ecorrect_sts)
                      | (uncorrect_enb & uncorrect_sts)
                      | (halted_enb & halted_sts)
                      | (heartbeat_timeout_enb & heartbeat_timeout_sts)
+                     | (pll_ulock_enb & pll_ulock_sts)
                      | (uclk2_stop_enb & uclk2_stop_sts)
                      | (uclk1_stop_enb & uclk1_stop_sts)
                      | (ulpiclk_stop_enb & ulpiclk_stop_sts)
