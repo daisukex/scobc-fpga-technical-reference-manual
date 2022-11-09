@@ -42,7 +42,6 @@ module sc_ahbip_slave # (
 // AHB Control
 // ------------------------------
 wire  creq = HSEL & HREADYIN & HREADYOUT & HTRANS != 2'b00;
-reg latch_avalid;
 reg latch_dvalid;
 reg latch_wvalid;
 reg latch_rvalid;
@@ -53,7 +52,6 @@ reg [31:0] latch_wdata;
 
 always @ (posedge HCLK) begin
   if (!HRESETN) begin
-    latch_avalid <= 1'b0;
     latch_addr <= 32'h0000_0000;
     latch_wvalid <= 1'b0;
     latch_rvalid <= 1'b0;
@@ -62,7 +60,6 @@ always @ (posedge HCLK) begin
   end
   else begin
     if ((REG_RENB & !REG_RWAT) | (|REG_WENB & !REG_WWAT)) begin
-      latch_avalid <= 1'b0;
       latch_wvalid <= 1'b0;
       latch_rvalid <= 1'b0;
     end
@@ -70,7 +67,6 @@ always @ (posedge HCLK) begin
       latch_addr <= HADDR;
       latch_size <= HSIZE;
       latch_burst <= HBURST;
-      latch_avalid <= 1'b1;
       if (HWRITE)
         latch_wvalid <= 1'b1;
       else
