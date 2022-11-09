@@ -358,7 +358,7 @@ wire [3:0] w_cfg_mem_dout;
 wire [3:0] w_cfg_mem_din;
 
 wire w_data_mem_sck;
-wire w_data_mem_cs_b;
+wire [1:0] w_data_mem_cs_b;
 wire [3:0] w_data_mem_oe;
 wire [3:0] w_data_mem_dout;
 wire [3:0] w_data_mem_din;
@@ -368,7 +368,7 @@ wire [3:0] w_data_mem1_din;
 wire [3:0] w_data_mem2_din;
 
 wire w_fram_sck;
-wire w_fram_cs_b;
+wire [1:0] w_fram_cs_b;
 wire [3:0] w_fram_oe;
 wire [3:0] w_fram_dout;
 wire [3:0] w_fram_din;
@@ -650,7 +650,7 @@ sc_qspim # (
   .SC_QSPIM_DT_B_WIDTH(1),
   .SC_QSPIM_FIFO_DEPTH(4),
   .SC_QSPIM_FIFO_TYPE(1),
-  .SC_QSPIM_S_DEV_NUM(1)
+  .SC_QSPIM_S_DEV_NUM(2)
 ) qspim_flash_data (
   // System Interface
   .SYSCLK(SYS_CLK),
@@ -707,11 +707,11 @@ sc_qspim # (
 
 // NOR Flash Data Memory Access Select
 assign DATA_MEM1_SCK = w_data_mem_sck;
-assign DATA_MEM2_SCK = 1'b0;
-assign DATA_MEM1_CS_B = w_data_mem_cs_b;
-assign DATA_MEM2_CS_B = 1'b1;
+assign DATA_MEM2_SCK = w_data_mem_sck;
+assign DATA_MEM1_CS_B = w_data_mem_cs_b[0];
+assign DATA_MEM2_CS_B = w_data_mem_cs_b[1];
 assign w_data_mem1_oe = w_data_mem_oe;
-assign w_data_mem2_oe = 4'h0;
+assign w_data_mem2_oe = w_data_mem_oe;
 
 assign w_data_mem_din = w_data_mem1_din;
 
@@ -737,7 +737,7 @@ sc_qspim # (
   .SC_QSPIM_DT_B_WIDTH(1),
   .SC_QSPIM_FIFO_DEPTH(4),
   .SC_QSPIM_FIFO_TYPE(1),
-  .SC_QSPIM_S_DEV_NUM(1)
+  .SC_QSPIM_S_DEV_NUM(2)
 ) qspim_fram_data (
   // System Interface
   .SYSCLK(SYS_CLK),
@@ -794,11 +794,11 @@ sc_qspim # (
 
 // FeRAM Data Memory Access Select
 assign FRAM1_SCK = w_fram_sck;
-assign FRAM2_SCK = 1'b0;
-assign FRAM1_CS_B = w_fram_cs_b;
-assign FRAM2_CS_B = 1'b1;
+assign FRAM2_SCK = w_fram_sck;
+assign FRAM1_CS_B = w_fram_cs_b[0];
+assign FRAM2_CS_B = w_fram_cs_b[1];
 assign w_fram1_oe = w_fram_oe;
-assign w_fram2_oe = 4'h0;
+assign w_fram2_oe = w_fram_oe;
 
 assign w_fram_din = w_fram1_din;
 
