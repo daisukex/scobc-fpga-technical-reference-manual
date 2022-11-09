@@ -29,7 +29,7 @@ always @ (posedge FPGA_WATCHDOG or negedge FPGA_WATCHDOG) begin
   fpga_toggle_counter = fpga_toggle_counter + 1;
 end
 
-assign testcase_name = "Check System Monitor";
+assign testcase_name = "Check FPGA Watchdog";
 initial begin
   timeout_ms = 10;
   skip_sram_init();
