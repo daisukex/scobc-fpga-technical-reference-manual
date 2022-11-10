@@ -17,9 +17,9 @@ module lpahb_ss # (
   input REF_CLK,
   input SYS_RSTB_SYNC_REFCLK,
   output UARTLITE_ISR,
-  output INTERNAL_I2CM_ISR,
   output EXTERNAL_I2CM_ISR,
   output SYSMON_HW_ISR,
+  output SYSMON_BHM_ISR,
   output GPTMR_GTMR_ISR,
   output GPTMR_SITMR_ISR,
   input [1:0] TRCH_BOOT,
@@ -85,6 +85,9 @@ module lpahb_ss # (
   // Internal I2C
   inout INTERNAL_I2CM_SDA,
   inout INTERNAL_I2CM_SCL,
+  input CVM_CRITICAL_B,
+  input CVM_WARNING_B,
+  input TEMP_ALERT_B,
 
   // External I2C
   inout EXTERNAL_I2CM_SDA,
@@ -111,6 +114,9 @@ wire hclken;
 wire dhreadyin;
 wire dhreadyout;
 wire [1:0] dhresp;
+wire [7:0] gptmr_hitmr_isr;
+wire cvm_data_req_trg;
+wire temp_data_req_trg;
 
 localparam LPAHB_HCLK_IDLE_BIT = 5;
 localparam AHB_NUMBER_OF_SLAVE = 6;
@@ -135,7 +141,7 @@ wire [AHB_NUMBER_OF_SLAVE-1:0] shreadyin;
 
 localparam AHB_SYSREG_CH = 0;
 localparam AHB_UARTLT_CH = 1;
-localparam AHB_ITI2CM_CH = 2;
+localparam AHB_EMPTY_CH = 2;
 localparam AHB_ETI2CM_CH = 3;
 localparam AHB_SYSMON_CH = 4;
 localparam AHB_GPTMR_CH = 5;
@@ -330,55 +336,24 @@ ahbuartlite # (
   .UART_RX(UART_RX)
 );
 
-// I2C Master for Internal I2C
+// AHB Channel 2 (Empty)
 // --------------------------------------------------
-i2c_master # (
-  .P_FIFO_DPTBW(4),
-  .P_FIFO_TYPE(0),
-  .P_INIT_THDSTA(16'h0031),
-  .P_INIT_TSUSTO(16'h0031),
-  .P_INIT_TSUSTA(16'h0031),
-  .P_INIT_THIGH(16'h0039),
-  .P_INIT_THDDAT(16'h0004),
-  .P_INIT_TSUDAT(16'h0039),
-  .P_INIT_TBUF(16'h0045)
-) internal_i2cm (
-  // System Interface
-  .SYSCLK(hclk),
-  .SYSRST_N(hresetn),
-  .MODULE_RSTN(hresetn),
-  .I2CM_INT(INTERNAL_I2CM_ISR),
-
-  // AHB Interface
-  .SHSEL(shsel[AHB_ITI2CM_CH]),
-  .SHADDR(mhaddr),
-  .SHTRANS(mhtrans),
-  .SHSIZE(mhsize),
-  .SHBURST(mhburst),
-  .SHWRITE(mhwrite),
-  .SHREADYIN(shreadyin[AHB_ITI2CM_CH]),
-  .SHREADYOUT(shreadyout[AHB_ITI2CM_CH]),
-  .SHWDATA(mhwdata),
-  .SHRDATA(shrdata[32*AHB_ITI2CM_CH +:32]),
-  .SHRESP(shresp[2*AHB_ITI2CM_CH +:2]),
-
-  // I2C Bus Interface
-  .I2C_SDA(INTERNAL_I2CM_SDA),
-  .I2C_SCL(INTERNAL_I2CM_SCL)
-);
+assign shreadyout[AHB_EMPTY_CH] = 1'b1;
+assign shrdata[32*AHB_EMPTY_CH +:32] = 0;
+assign shresp[2*AHB_EMPTY_CH +:2] = 0;
 
 // I2C Master for External I2C
 // --------------------------------------------------
 i2c_master # (
   .P_FIFO_DPTBW(4),
   .P_FIFO_TYPE(0),
-  .P_INIT_THDSTA(16'h0031),
-  .P_INIT_TSUSTO(16'h0031),
-  .P_INIT_TSUSTA(16'h0031),
-  .P_INIT_THIGH(16'h0039),
-  .P_INIT_THDDAT(16'h0004),
-  .P_INIT_TSUDAT(16'h0039),
-  .P_INIT_TBUF(16'h0045)
+  .P_INIT_THDSTA(16'h0063),
+  .P_INIT_TSUSTO(16'h0063),
+  .P_INIT_TSUSTA(16'h0063),
+  .P_INIT_THIGH(16'h0072),
+  .P_INIT_THDDAT(16'h0009),
+  .P_INIT_TSUDAT(16'h0072),
+  .P_INIT_TBUF(16'h008B)
 ) external_i2cm (
   // System Interface
   .SYSCLK(hclk),
@@ -411,6 +386,7 @@ system_monitor system_monitor (
   .REF_CLK(REF_CLK),
   .SYS_RSTB_SYNC_REFCLK(SYS_RSTB_SYNC_REFCLK),
   .SYSMON_HW_INT(SYSMON_HW_ISR),
+  .SYSMON_BHM_INT(SYSMON_BHM_ISR),
 
   // AHB Interface
   .HSEL(shsel[AHB_SYSMON_CH]),
@@ -426,7 +402,15 @@ system_monitor system_monitor (
   .HRESP(shresp[2*AHB_SYSMON_CH +:2]),
 
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
-  .WDOG_RST_REQ(wdog_rst_req)
+  .WDOG_RST_REQ(wdog_rst_req),
+
+  .CVM_DATA_REQ_TRG(cvm_data_req_trg),
+  .TEMP_DATA_REQ_TRG(temp_data_req_trg),
+  .CVM_CRITICAL_B(CVM_CRITICAL_B),
+  .CVM_WARNING_B(CVM_WARNING_B),
+  .TEMP_ALERT_B(TEMP_ALERT_B),
+  .INTERNAL_I2C_SCL(INTERNAL_I2CM_SCL),
+  .INTERNAL_I2C_SDA(INTERNAL_I2CM_SDA)
 );
 
 // General Purpose Timer
@@ -462,8 +446,26 @@ sc_gptmr # (
   // Interrupt Signal
   .GTMR_INT(GPTMR_GTMR_ISR),
   .SITMR_INT(GPTMR_SITMR_ISR),
-  .HITMR_INT_REQ(/*open*/),
+  .HITMR_INT_REQ(gptmr_hitmr_isr),
   .HITMR_INT_ACK(8'h0)
+);
+
+gptmr_pulse_sync sync_cvm_irs (
+  .TMR_CLK(REF_CLK),
+  .TMR_RSTB(SYS_RSTB_SYNC_REFCLK),
+  .HCLK(hclk),
+  .HRESETN(hresetn),
+  .I_PULSE(gptmr_hitmr_isr[1]),
+  .O_PULSE(cvm_data_req_trg)
+);
+
+gptmr_pulse_sync sync_temp_irs (
+  .TMR_CLK(REF_CLK),
+  .TMR_RSTB(SYS_RSTB_SYNC_REFCLK),
+  .HCLK(hclk),
+  .HRESETN(hresetn),
+  .I_PULSE(gptmr_hitmr_isr[2]),
+  .O_PULSE(temp_data_req_trg)
 );
 
 endmodule

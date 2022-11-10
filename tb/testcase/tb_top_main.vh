@@ -216,7 +216,51 @@ i2c_model # (
   .rclk_hold_time_init(0),
   .clk_period_init(2500000),
   .clk_period_allowable_init(50000)
-) internal_i2c (
+) cvm1 (
+  .SYS_CLK(i2cclk),
+  .I2C_SCL(internal_i2cm_scl),
+  .I2C_SDA(internal_i2cm_sda)
+);
+
+i2c_model # (
+  .rclk_delay_time_init(0),
+  .rclk_hold_time_init(0),
+  .clk_period_init(2500000),
+  .clk_period_allowable_init(50000)
+) cvm2 (
+  .SYS_CLK(i2cclk),
+  .I2C_SCL(internal_i2cm_scl),
+  .I2C_SDA(internal_i2cm_sda)
+);
+
+i2c_model # (
+  .rclk_delay_time_init(0),
+  .rclk_hold_time_init(0),
+  .clk_period_init(2500000),
+  .clk_period_allowable_init(50000)
+) temp1 (
+  .SYS_CLK(i2cclk),
+  .I2C_SCL(internal_i2cm_scl),
+  .I2C_SDA(internal_i2cm_sda)
+);
+
+i2c_model # (
+  .rclk_delay_time_init(0),
+  .rclk_hold_time_init(0),
+  .clk_period_init(2500000),
+  .clk_period_allowable_init(50000)
+) temp2 (
+  .SYS_CLK(i2cclk),
+  .I2C_SCL(internal_i2cm_scl),
+  .I2C_SDA(internal_i2cm_sda)
+);
+
+i2c_model # (
+  .rclk_delay_time_init(0),
+  .rclk_hold_time_init(0),
+  .clk_period_init(2500000),
+  .clk_period_allowable_init(50000)
+) temp3 (
   .SYS_CLK(i2cclk),
   .I2C_SCL(internal_i2cm_scl),
   .I2C_SDA(internal_i2cm_sda)
