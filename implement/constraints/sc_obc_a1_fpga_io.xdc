@@ -50,44 +50,44 @@ set_property [get_ports SRAM1_WE_B]           -dict { PACKAGE_PIN J24  IOSTANDAR
 set_property [get_ports SRAM1_BHE_B]          -dict { PACKAGE_PIN H23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports SRAM1_BLE_B]          -dict { PACKAGE_PIN H24  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports SRAM1_ERR]            -dict { PACKAGE_PIN J23  IOSTANDARD LVCMOS33 }
-set_property [get_ports {SRAM1_IO[0]}]        -dict { PACKAGE_PIN H19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[1]}]        -dict { PACKAGE_PIN G21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[2]}]        -dict { PACKAGE_PIN J19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[3]}]        -dict { PACKAGE_PIN J18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[4]}]        -dict { PACKAGE_PIN K17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[5]}]        -dict { PACKAGE_PIN L17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[6]}]        -dict { PACKAGE_PIN K15  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[7]}]        -dict { PACKAGE_PIN L14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[8]}]        -dict { PACKAGE_PIN H18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[9]}]        -dict { PACKAGE_PIN J20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[10]}]       -dict { PACKAGE_PIN G22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[11]}]       -dict { PACKAGE_PIN K20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[12]}]       -dict { PACKAGE_PIN J16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[13]}]       -dict { PACKAGE_PIN J15  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[14]}]       -dict { PACKAGE_PIN K16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM1_IO[15]}]       -dict { PACKAGE_PIN J14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
+set_property [get_ports {SRAM1_IO[0]}]        -dict { PACKAGE_PIN H19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[1]}]        -dict { PACKAGE_PIN G21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[2]}]        -dict { PACKAGE_PIN J19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[3]}]        -dict { PACKAGE_PIN J18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[4]}]        -dict { PACKAGE_PIN K17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[5]}]        -dict { PACKAGE_PIN L17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[6]}]        -dict { PACKAGE_PIN K15  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[7]}]        -dict { PACKAGE_PIN L14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[8]}]        -dict { PACKAGE_PIN H18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[9]}]        -dict { PACKAGE_PIN J20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[10]}]       -dict { PACKAGE_PIN G22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[11]}]       -dict { PACKAGE_PIN K20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[12]}]       -dict { PACKAGE_PIN J16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[13]}]       -dict { PACKAGE_PIN J15  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[14]}]       -dict { PACKAGE_PIN K16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM1_IO[15]}]       -dict { PACKAGE_PIN J14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 set_property [get_ports SRAM2_CE_B]           -dict { PACKAGE_PIN A22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports SRAM2_OE_B]           -dict { PACKAGE_PIN B21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports SRAM2_WE_B]           -dict { PACKAGE_PIN B22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports SRAM2_BHE_B]          -dict { PACKAGE_PIN C22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports SRAM2_BLE_B]          -dict { PACKAGE_PIN C21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports SRAM2_ERR]            -dict { PACKAGE_PIN D21  IOSTANDARD LVCMOS33 }
-set_property [get_ports {SRAM2_IO[0]}]        -dict { PACKAGE_PIN B17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[1]}]        -dict { PACKAGE_PIN A19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[2]}]        -dict { PACKAGE_PIN C17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[3]}]        -dict { PACKAGE_PIN B20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[4]}]        -dict { PACKAGE_PIN C19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[5]}]        -dict { PACKAGE_PIN D20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[6]}]        -dict { PACKAGE_PIN D16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[7]}]        -dict { PACKAGE_PIN E16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[8]}]        -dict { PACKAGE_PIN A17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[9]}]        -dict { PACKAGE_PIN A20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[10]}]       -dict { PACKAGE_PIN A18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[11]}]       -dict { PACKAGE_PIN B19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[12]}]       -dict { PACKAGE_PIN C18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[13]}]       -dict { PACKAGE_PIN D18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[14]}]       -dict { PACKAGE_PIN D19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {SRAM2_IO[15]}]       -dict { PACKAGE_PIN E17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
+set_property [get_ports {SRAM2_IO[0]}]        -dict { PACKAGE_PIN B17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[1]}]        -dict { PACKAGE_PIN A19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[2]}]        -dict { PACKAGE_PIN C17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[3]}]        -dict { PACKAGE_PIN B20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[4]}]        -dict { PACKAGE_PIN C19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[5]}]        -dict { PACKAGE_PIN D20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[6]}]        -dict { PACKAGE_PIN D16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[7]}]        -dict { PACKAGE_PIN E16  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[8]}]        -dict { PACKAGE_PIN A17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[9]}]        -dict { PACKAGE_PIN A20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[10]}]       -dict { PACKAGE_PIN A18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[11]}]       -dict { PACKAGE_PIN B19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[12]}]       -dict { PACKAGE_PIN C18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[13]}]       -dict { PACKAGE_PIN D18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[14]}]       -dict { PACKAGE_PIN D19  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {SRAM2_IO[15]}]       -dict { PACKAGE_PIN E17  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 
 # Configuration QSPI Flash Interface
 set_property [get_ports CFG_MEM_SEL]          -dict { PACKAGE_PIN AF19 IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
