@@ -76,7 +76,8 @@ initial begin
   label    = "Read ADC Data (1st)";
   simcount = 2;
   //--------------------------------------------------
-  repeat (900) @(posedge SYS_CLK);
+  while ($stime <= 50_000_000)
+    @(posedge SYS_CLK);
   display_subcount_text(1, "Read Temperature (25C)", 1);
   read_transaction (.master(2), .addr(`SYS_MON_BASE+`SYSMON_XADC_BASE+12'h000), .expdata(32'h0000_9770), .check(1),
                                                                                 .chkbit(32'h0000_FFF0));
@@ -97,7 +98,9 @@ initial begin
   label    = "Read ADC Data (2nd)";
   simcount = 3;
   //--------------------------------------------------
-  repeat (20000) @(posedge SYS_CLK);
+  while ($stime <= 150_000_000)
+    @(posedge SYS_CLK);
+
   display_subcount_text(1, "Read Temperature (30C)", 1);
   read_transaction (.master(2), .addr(`SYS_MON_BASE+`SYSMON_XADC_BASE+12'h000), .expdata(32'h0000_99F0), .check(1),
                                                                                 .chkbit(32'h0000_FFF0));
@@ -111,14 +114,15 @@ initial begin
                                                                                 .chkbit(32'h0000_FFF0));
 
   display_subcount_text(4, "Read VCCBRAM (1.00V)", 1);
-  read_transaction (.master(2), .addr(`SYS_MON_BASE+`SYSMON_XADC_BASE+12'h060), .expdata(32'h0000_5990), .check(1),
+  read_transaction (.master(2), .addr(`SYS_MON_BASE+`SYSMON_XADC_BASE+12'h060), .expdata(32'h0000_5550), .check(1),
                                                                                 .chkbit(32'h0000_FFF0));
 
   //--------------------------------------------------
   label    = "Read ADC Data (3rd)";
   simcount = 4;
   //--------------------------------------------------
-  repeat (20000) @(posedge SYS_CLK);
+  while ($stime <= 250_000_000)
+    @(posedge SYS_CLK);
   display_subcount_text(1, "Read Temperature (85C)", 1);
   read_transaction (.master(2), .addr(`SYS_MON_BASE+`SYSMON_XADC_BASE+12'h000), .expdata(32'h0000_B5E0), .check(1),
                                                                                 .chkbit(32'h0000_FFF0));
