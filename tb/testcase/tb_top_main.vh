@@ -40,6 +40,7 @@ end
 
 wire SYS_CLK  = dut.sys_clk;
 wire SYS_RSTB = dut.sys_rstb;
+wire REF_CLK  = dut.ref_clk;
 wire PLLLOCK  = dut.plllock;
 wire CMC_REQ  = dut.cmc_req;
 wire CMC_ACK  = dut.cmc_ack;
