@@ -10,12 +10,13 @@ parameter BUILD_INFO = 32'h00000000;
 localparam SYSCLK_PERIOD = 41666;
 localparam I2CCLK_PERIOD = 33333;
 
+reg clken_ignore = 0;
 reg sysclk1 = 0;
 wire sysclk1en;
 initial begin
   forever begin
     #(SYSCLK_PERIOD/2);
-    if (sysclk1en)
+    if (sysclk1en | clken_ignore)
       sysclk1 = ~sysclk1;
   end
 end
@@ -25,7 +26,7 @@ wire sysclk2en;
 initial begin
   forever begin
     #(SYSCLK_PERIOD/2);
-    if (sysclk2en)
+    if (sysclk2en | clken_ignore)
       sysclk2 = ~sysclk2;
   end
 end
