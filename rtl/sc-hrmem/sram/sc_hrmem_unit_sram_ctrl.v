@@ -206,6 +206,8 @@ sc_hrmem_sram_acc_ctrl_w32 # (
   .REN(w_ram_ren),                         //  input
   .RADR(w_ram_radr),                       //  input [19:0]
   .RBTEN(w_ram_rbten),                     //  input [3:0]
+  .RDT_VAL(/*open*/),                      // output
+  .RDT_LTCY(/*open*/),                     // output
   .RDATA(w_ram_rdata),                     // output [31:0]
 
   .ECC1ERR(w_int_ecc1err),                 // output

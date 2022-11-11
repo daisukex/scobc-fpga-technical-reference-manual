@@ -25,6 +25,8 @@ module sc_hrmem_sram_acc_ctrl_w32 # (
   input REN,
   input [19:0] RADR,
   input [3:0] RBTEN,
+  output reg RDT_VAL,
+  output reg RDT_LTCY,
   output reg [31:0] RDATA,
 
   output reg ECC1ERR,
@@ -51,8 +53,6 @@ module sc_hrmem_sram_acc_ctrl_w32 # (
   input  SR2_ERR
 );
 
-wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
-
 wire w_wen_sel;
 wire [19:0] w_wadr_sel;
 wire [3:0] w_wbten_sel;
@@ -66,6 +66,7 @@ reg [31:0] r_wdata_sel_p1;
 reg [P_RD_LTCY-2:0] r_ren_p;
 reg [19:0] r_radr_p [0:P_RD_LTCY-2];
 reg [3:0] r_rbten_p [0:P_RD_LTCY-2];
+reg r_rd_ltcy_lat;
 
 wire w_ren_sel;
 wire [19:0] w_radr_sel;
@@ -75,6 +76,8 @@ reg [15:0] r_sr1_dout;
 reg [15:0] r_sr2_dout;
 wire [15:0] w_sr1_din;
 wire [15:0] w_sr2_din;
+
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (r_rd_ltcy_lat==0);
 
 integer i;
 
@@ -97,6 +100,7 @@ always@ (posedge CLK or negedge RESET_N) begin
       r_radr_p[i]  <= 0;
       r_rbten_p[i] <= 0;
     end
+    r_rd_ltcy_lat <= 0;
   end
   else begin
     r_ren_p[0]   <= REN;
@@ -109,6 +113,8 @@ always@ (posedge CLK or negedge RESET_N) begin
         r_rbten_p[i] <= r_rbten_p[i-1];
       end
     end
+    if (REN)
+      r_rd_ltcy_lat <= RD_LTCY_MODE;
   end
 end
 
@@ -221,12 +227,16 @@ end
 
 always@ (posedge CLK or negedge RESET_N) begin
   if (!RESET_N) begin
+    RDT_VAL     <= 0;
+    RDT_LTCY    <= 0;
     RDATA       <= 0;
     ECC1ERR     <= 0;
     ECCERR_ADR  <= 0;
     ECCERR_BTEN <= 0;
   end
   else if (r_ren_p[RD_LTCY_SEL-2]) begin
+    RDT_VAL     <= 1'b1;
+    RDT_LTCY    <= r_rd_ltcy_lat;
     RDATA       <= 0;
     ECC1ERR     <= 0;
     ECCERR_ADR  <= 0;
@@ -246,6 +256,8 @@ always@ (posedge CLK or negedge RESET_N) begin
     end
   end
   else begin
+    RDT_VAL     <= 0;
+    RDT_LTCY    <= 0;
     RDATA       <= 0;
     ECC1ERR     <= 0;
     ECCERR_ADR  <= 0;
