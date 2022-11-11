@@ -29,6 +29,8 @@ module sc_hrmem_unit_sram_ctrl # (
   input  [P_AD_W-1:0]   AXI_RAM_RADR,
   output [P_DT_W-1:0]   AXI_RAM_RDATA,
   input  [P_DT_W/8-1:0] AXI_RAM_RBTEN,
+  output                AXI_RAM_RDT_VAL,
+  output                AXI_RAM_RDT_LTCY,
 
   // RAM Scrub Sequencer Interface
   input                 MEM_SCRB_ACT,
@@ -93,6 +95,9 @@ wire                w_int_ecc1err;
 wire [P_AD_W-1:0]   w_eccerr_adr;
 wire [P_DT_W/8-1:0] w_eccerr_bten;
 
+wire                w_rdt_val;
+wire                w_rdt_ltcy;
+
 sc_hrmem_sram_ecc_ctrl # (
   .P_AD_W(P_AD_W),
   .P_DT_W(P_DT_W),
@@ -101,7 +106,6 @@ sc_hrmem_sram_ecc_ctrl # (
   // System Interface
   .CLK(RAM_CLK),                           //  input
   .RESET_N(RESET_N),                       //  input
-  .RD_LTCY_MODE(RD_LTCY_MODE),             //  input
   // AXI SRAM Controller Interface
   .AXI_WEN(AXI_RAM_WEN),                   //  input
   .AXI_WADR(AXI_RAM_WADR),                 //  input [P_AD_W-1:0]
@@ -111,6 +115,8 @@ sc_hrmem_sram_ecc_ctrl # (
   // RAM Interface
   .MEM_ATRD_VAL(w_mem_atrd_val),           // output
   .MEM_ATRD_ADR(w_mem_atrd_adr),           // output [P_AD_W-1:0]
+  .RDT_VAL(w_rdt_val),                     //  input
+  .RDT_LTCY(w_rdt_ltcy),                   //  input
   .INT_ECC1ERR(w_int_ecc1err),             //  input
   .INT_ECC2ERR(1'b0),                      //  input
   .ECCERR_ADR(w_eccerr_adr),               //  input [P_AD_W-1:0]
@@ -206,8 +212,8 @@ sc_hrmem_sram_acc_ctrl_w32 # (
   .REN(w_ram_ren),                         //  input
   .RADR(w_ram_radr),                       //  input [19:0]
   .RBTEN(w_ram_rbten),                     //  input [3:0]
-  .RDT_VAL(/*open*/),                      // output
-  .RDT_LTCY(/*open*/),                     // output
+  .RDT_VAL(w_rdt_val),                     // output
+  .RDT_LTCY(w_rdt_ltcy),                   // output
   .RDATA(w_ram_rdata),                     // output [31:0]
 
   .ECC1ERR(w_int_ecc1err),                 // output
@@ -235,5 +241,7 @@ sc_hrmem_sram_acc_ctrl_w32 # (
 );
 
 assign AXI_RAM_RDATA = w_ram_rdata;
+assign AXI_RAM_RDT_VAL = w_rdt_val;
+assign AXI_RAM_RDT_LTCY = w_rdt_ltcy;
 
 endmodule

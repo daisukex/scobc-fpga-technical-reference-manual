@@ -195,6 +195,8 @@ wire [P_DT_W/8-1:0] w_sys_ram_rbten;
 wire w_sys_ram_rdt_val;
 wire [P_DT_W-1:0] w_sys_ram_rdata;
 
+wire w_ram_rdt_ltcy;
+
 wire w_pf_srch_val;
 wire w_pf_rd_val;
 wire w_pf_rwait;
@@ -318,7 +320,6 @@ sc_hrmem_ahb_sram_ctrl_vsaxi # (
   .HCLK(SYSCLK),                            //  input
   .HRESETN(hrmem_resetn),                   //  input
   .RAM_INIT_DONE(r_ram_init_done_sync),     //  input
-  .RD_LTCY_MODE(RD_LTCY_MODE),              //  input
   // AHB Slave Interface
   .HSEL(CODE_SHSEL),                        //  input
   .HADDR(CODE_SHADDR),                      //  input [P_AHB_AD_W-1:0]
@@ -370,6 +371,7 @@ sc_hrmem_ahb_sram_ctrl_vsaxi # (
   .RAM_RADR(w_code_ram_radr),               // output [P_AHB_AD_W-1:0]
   .RAM_RBTEN(w_code_ram_rbten),             // output [P_DT_W/8-1:0]
   .RAM_RDT_VAL(w_code_ram_rdt_val),         //  input
+  .RAM_RDT_LTCY(w_ram_rdt_ltcy),            //  input
   .RAM_RDATA(w_code_ram_rdata)              //  input [P_DT_W-1:0]
 );
 
@@ -533,7 +535,6 @@ sc_hrmem_sram_pfe_ctrl # (
   // System Interface
   .SYSCLK(SYSCLK),                  // input
   .RESETB(hrmem_resetn),            // input
-  .RD_LTCY_MODE(RD_LTCY_MODE),      // input
   // AXI SRAM Controller Interface
   .PF_SRCH_VAL(w_pf_srch_val),      // input
   .RAM_REN(w_code_ram_ren),         // input
@@ -555,6 +556,7 @@ sc_hrmem_sram_pfe_ctrl # (
   .PF_RADR(w_code_pf_radr),         // output [P_AD_W-1:0]
   .PF_RBTEN(w_code_pf_rbten),       // output [P_DT_W/8-1:0]
   .PF_RDT_VAL(w_code_pf_rdt_val),   // input
+  .PF_RDT_LTCY(w_ram_rdt_ltcy),     // input
   .PF_RDATA(w_code_pf_rdata),       // input  [P_DT_W-1:0]
   // Register Interface
   .REG_SP_PF_EN(w_reg_sp_pf_en),    // input  [P_SP_PFB_LINE_NUM-1:0]
@@ -596,6 +598,7 @@ sc_hrmem_unit_sram_wrap # (
   .SYS_RAM_RBTEN(w_sys_ram_rbten),                   //  input [P_DT_W/8-1:0]
   .SYS_RAM_RDT_VAL(w_sys_ram_rdt_val),               // output
   .SYS_RAM_RDATA(w_sys_ram_rdata),                   // output [P_DT_W-1:0]
+  .RAM_RDT_LTCY(w_ram_rdt_ltcy),                     // output
   // RAM Scrub Sequencer Interface
   .MEM_SCRB_ACT(w_mem_scrb_act),                     //  input
   // SRAM Interface

@@ -40,6 +40,7 @@ module sc_hrmem_unit_sram_wrap # (
   input      [P_DT_W/8-1:0]   SYS_RAM_RBTEN,
   output                      SYS_RAM_RDT_VAL,
   output     [P_DT_W-1:0]     SYS_RAM_RDATA,
+  output                      RAM_RDT_LTCY,
 
   // RAM Scrub Sequencer Interface
   input                       MEM_SCRB_ACT,
@@ -80,8 +81,6 @@ module sc_hrmem_unit_sram_wrap # (
   output reg [15:0]           ECC_COL_DISC_CNT
 );
 
-wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
-
 reg                   r_ram_wen;
 reg  [P_AXI_AD_W-1:0] r_ram_wadr;
 reg  [P_DT_W-1:0]     r_ram_wdata;
@@ -95,8 +94,12 @@ reg  [P_RD_LTCY-1:0]  r_code_ram_ren_dttim;
 reg  [P_RD_LTCY-1:0]  r_sys_ram_ren_dttim;
 
 wire [P_DT_W-1:0]     w_ram_rdata;
+wire                  w_rdt_val;
+wire                  w_rdt_ltcy;
 
 reg r_eccerrcnt_clr_1p;
+
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (w_rdt_ltcy==0);
 
 // SRAM Write Signal Select
 always @ (*) begin
@@ -157,6 +160,8 @@ sc_hrmem_unit_sram_ctrl # (
   .AXI_RAM_RADR(r_ram_radr[P_MEM_AD_W+1:P_BANK_W]), //  input [P_AD_W-1:0]
   .AXI_RAM_RDATA(w_ram_rdata),                      // output [P_DT_W-1:0]
   .AXI_RAM_RBTEN(r_ram_rbten),                      //  input [P_DT_W/8-1:0]
+  .AXI_RAM_RDT_VAL(w_rdt_val),                      // output
+  .AXI_RAM_RDT_LTCY(w_rdt_ltcy),                    // output
   // RAM Scrub Sequencer Interface
   .MEM_SCRB_ACT(MEM_SCRB_ACT),                      //  input
   // SRAM Interface
@@ -202,8 +207,9 @@ always @ (posedge RAM_CLK or negedge RESET_N) begin
 end
 
 // Unit RAM Read Data Valid
-assign CODE_RAM_RDT_VAL = r_code_ram_ren_dttim[RD_LTCY_SEL-1];
-assign SYS_RAM_RDT_VAL  = r_sys_ram_ren_dttim[RD_LTCY_SEL-1];
+assign CODE_RAM_RDT_VAL = w_rdt_val & r_code_ram_ren_dttim[RD_LTCY_SEL-1];
+assign SYS_RAM_RDT_VAL  = w_rdt_val & r_sys_ram_ren_dttim[RD_LTCY_SEL-1];
+assign RAM_RDT_LTCY = w_rdt_ltcy;
 
 // Unit RAM Read Data Select
 assign CODE_RAM_RDATA = w_ram_rdata;

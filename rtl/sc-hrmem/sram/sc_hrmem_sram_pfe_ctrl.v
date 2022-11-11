@@ -17,8 +17,6 @@ module sc_hrmem_sram_pfe_ctrl # (
   input                                     SYSCLK,
   input                                     RESETB,
 
-  input                                     RD_LTCY_MODE,
-
   // AXI SRAM Controller Interface
   input                                     PF_SRCH_VAL,
   input                                     RAM_REN,
@@ -44,6 +42,7 @@ module sc_hrmem_sram_pfe_ctrl # (
   output     [P_AD_W-1:0]                   PF_RADR,
   output     [P_DT_W/8-1:0]                 PF_RBTEN,
   input                                     PF_RDT_VAL,
+  input                                     PF_RDT_LTCY,
   input      [P_DT_W-1:0]                   PF_RDATA,
 
   // Register Interface
@@ -73,7 +72,7 @@ parameter p_sp_pfb_line_w = (P_SP_PFB_LINE_NUM <= (2 << 0)) ? 1 :
                             (P_SP_PFB_LINE_NUM <= (2 << 4)) ? 5 :
                                                               6 ;
 
-wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (PF_RDT_LTCY==0);
 
 wire w_go_pf_ren;
 wire w_nogo_pf_ren;
@@ -195,10 +194,11 @@ always @ (posedge SYSCLK or negedge RESETB) begin
   end
 end
 
-assign w_pf_ram_rd_hit = r_pf_lat_en & r_pf_srch_val_lat & r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~PF_RD_DT_MSK &
+assign w_pf_ram_rd_hit = r_pf_lat_en & r_pf_srch_val_lat &
+                         PF_RDT_VAL & r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~PF_RD_DT_MSK &
                          (r_ram_radr_lat == r_pf_acc_radr_retim[RD_LTCY_SEL-1]);
 
-assign PF_RWAIT = r_pf_acc_rd | r_pf_lat_en;
+assign PF_RWAIT = r_pf_acc_rd | r_pf_acc_rd_retim[0] | r_pf_lat_en;
 
 assign w_ram_radr_sel = (r_pf_lat_en & ~w_go_pf_ren) ? r_ram_radr_lat:
                                                        RAM_RADR;
@@ -310,7 +310,8 @@ always @ (posedge SYSCLK or negedge RESETB) begin
         else
           r_pfb_line_wptr <= r_pfb_line_wptr + 1;
       end
-    end else if (r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1]) begin
+    end else if (PF_RDT_VAL & r_pf_acc_ren_retim[RD_LTCY_SEL-1] &
+                              ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1]) begin
       r_pfb_stg_wptr <= r_pfb_stg_wptr + 1;
     end
     if (REG_PF_FLUSH)
@@ -403,7 +404,8 @@ always @ (*) begin
     r_sp_pf_hit_sel = r_sp_pf_hit_sel_set;
 end
 
-assign w_pf_acc_end = ~r_pf_acc_rd_retim[RD_LTCY_SEL-2] & r_pf_acc_rd_retim[RD_LTCY_SEL-1];
+assign w_pf_acc_end = PF_RDT_VAL & ~r_pf_acc_rd_retim[RD_LTCY_SEL-2] &
+                                   r_pf_acc_rd_retim[RD_LTCY_SEL-1];
 
 assign w_pf_flush_wait = w_pf_acc_start | r_pf_acc_busy;
 
@@ -447,8 +449,8 @@ generate
         end else begin
           if (w_pf_acc_start & ~|w_pfb_adr_hit & ~|w_sp_pfb_adr_hit & r_pfb_line_wsel == gn)
             r_pfb_entry[gn] <= 0;
-          if (~r_sp_pf_en & (r_pfb_line_wsel == gn) & r_pf_acc_ren_retim[RD_LTCY_SEL-1] &
-                                                      ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
+          if (~r_sp_pf_en & (r_pfb_line_wsel == gn) & PF_RDT_VAL &
+              r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
             r_pfb_entry[gn][r_pfb_stg_wptr] <= 1'b1;
           if (w_pf_code_wadr_hit[gn])
             r_pfb_entry_flush_lat[gn][CODE_RAM_WADR[p_pfb_stg_w+P_BANK_W-1:P_BANK_W]] <= 1'b1;
@@ -462,7 +464,7 @@ generate
         end
 
         if (~r_sp_pf_en & r_pfb_line_wsel == gn) begin
-          if (r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
+          if (PF_RDT_VAL & r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
             r_pf_buffer[gn][r_pfb_stg_wptr*P_DT_W +: P_DT_W] <= PF_RDATA;
         end
       end
@@ -501,8 +503,8 @@ generate
               r_sp_pfb_entry[gn][SYS_RAM_WADR[p_pfb_stg_w+P_BANK_W-1:P_BANK_W]]  <= 0;
           end
         end else begin
-          if (r_sp_pf_en & (r_sp_pfb_line_wsel == gn) & r_pf_acc_ren_retim[RD_LTCY_SEL-1] &
-                                                        ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
+          if (r_sp_pf_en & (r_sp_pfb_line_wsel == gn) & PF_RDT_VAL &
+              r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
             r_sp_pfb_entry[gn][r_pfb_stg_wptr] <= 1'b1;
           if (w_sp_pf_code_wadr_hit[gn])
             r_sp_pfb_entry_flush_lat[gn][CODE_RAM_WADR[p_pfb_stg_w+P_BANK_W-1:P_BANK_W]] <= 1'b1;
@@ -511,7 +513,7 @@ generate
         end
 
         if (r_sp_pf_en & r_sp_pfb_line_wsel == gn) begin
-          if (r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
+          if (PF_RDT_VAL & r_pf_acc_ren_retim[RD_LTCY_SEL-1] & ~r_nogo_pf_ren_retim[RD_LTCY_SEL-1])
             r_sp_pf_buffer[gn][r_pfb_stg_wptr*P_DT_W +: P_DT_W] <= PF_RDATA;
         end
       end
@@ -543,8 +545,8 @@ always @ (posedge SYSCLK or negedge RESETB) begin
   end
 end
 
-assign PF_RD_VAL   = r_pfb_rd_val | (r_pf_acc_rd_retim[RD_LTCY_SEL-1] & ~r_pf_acc_rd_retim[RD_LTCY_SEL]) |
-                     w_pf_ram_rd_hit;
+assign PF_RD_VAL   = r_pfb_rd_val | (PF_RDT_VAL & r_pf_acc_rd_retim[RD_LTCY_SEL-1] &
+                     ~r_pf_acc_rd_retim[RD_LTCY_SEL]) | w_pf_ram_rd_hit;
 assign RAM_RDT_VAL = PF_RD_VAL | ((~r_pf_acc_busy | r_nogo_pf_ren_retim[RD_LTCY_SEL-1] |
                      r_nogo_pf_rlat_retim[RD_LTCY_SEL-1]) & PF_RDT_VAL);
 assign RAM_RDATA   = (r_pfb_rd_val) ? r_pf_rd_data:

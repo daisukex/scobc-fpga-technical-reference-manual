@@ -15,7 +15,6 @@ module sc_hrmem_ahb_sram_ctrl_vsaxi # (
   input                       HCLK,
   input                       HRESETN,
   input                       RAM_INIT_DONE,
-  input                       RD_LTCY_MODE,
 
   // AHB Slave Interface
   input                       HSEL,
@@ -58,7 +57,7 @@ module sc_hrmem_ahb_sram_ctrl_vsaxi # (
   output                      PF_SRCH_VAL,
   input                       PF_RD_VAL,
   input                       PF_RWAIT,
-  output                      PF_RD_DT_MSK,
+  output reg                  PF_RD_DT_MSK,
   input                       PF_ACC_VAL,
   input      [P_AHB_AD_W-1:0] PF_ACC_ADR,
 
@@ -71,10 +70,11 @@ module sc_hrmem_ahb_sram_ctrl_vsaxi # (
   output     [P_AHB_AD_W-1:0] RAM_RADR,
   output     [P_DT_W/8-1:0]   RAM_RBTEN,
   input                       RAM_RDT_VAL,
+  input                       RAM_RDT_LTCY,
   input      [P_DT_W-1:0]     RAM_RDATA
 );
 
-wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RD_LTCY_MODE==0);
+wire [2:0] RD_LTCY_SEL = P_RD_LTCY - (RAM_RDT_LTCY==0);
 
 wire                 w_hready;
 
@@ -86,12 +86,13 @@ reg                  r_self_wr_acc_end_p2;
 reg                  r_self_wr_acc_end_p3;
 reg                  r_other_wr_acc_end_p1;
 reg                  r_other_wr_acc_end_p2;
-reg [P_RD_LTCY-1:0]  r_self_rd_b_acc_end_p;
-reg [P_RD_LTCY-1:0]  r_self_rd_after_b_st_p;
-reg [1:0]            r_self_rd_busy_p;
-reg                  r_self_rd_burst_dt_msk;
+reg [P_RD_LTCY:0]    r_self_rd_b_acc_end_p;
+reg [P_RD_LTCY:0]    r_self_rd_after_b_st_p;
+reg [2:0]            r_self_rd_busy_p;
 reg                  r_other_rd_burst_en_p1;
 reg [1:0]            r_other_rd_state_p1;
+
+wire                 w_self_rd_burst_dt_msk;
 
 wire                 w_wr2rd_wait;
 
@@ -185,9 +186,9 @@ always @ (posedge HCLK or negedge HRESETN) begin
     r_self_rd_b_acc_end_p  <= 0;
     r_self_rd_after_b_st_p <= 0;
     r_self_rd_busy_p       <= 0;
-    r_self_rd_burst_dt_msk <= 0;
     r_other_rd_burst_en_p1 <= 0;
     r_other_rd_state_p1    <= 0;
+    PF_RD_DT_MSK           <= 0;
   end
   else begin
     r_htrans_p1            <= HTRANS;
@@ -196,22 +197,23 @@ always @ (posedge HCLK or negedge HRESETN) begin
     r_self_wr_acc_end_p3   <= r_self_wr_acc_end_p2;
     r_other_wr_acc_end_p1  <= OTHER_WR_ACC_END;
     r_other_wr_acc_end_p2  <= r_other_wr_acc_end_p1;
-    r_self_rd_b_acc_end_p  <= {r_self_rd_b_acc_end_p[P_RD_LTCY-2:0], SELF_RD_ACC_END & SELF_BURST_EN};
-    r_self_rd_after_b_st_p <= {r_self_rd_after_b_st_p[P_RD_LTCY-2:0],
+    r_self_rd_b_acc_end_p  <= {r_self_rd_b_acc_end_p[P_RD_LTCY-1:0], SELF_RD_ACC_END & SELF_BURST_EN};
+    r_self_rd_after_b_st_p <= {r_self_rd_after_b_st_p[P_RD_LTCY-1:0],
                                ((SELF_RD_ACC_START & ~w_wait_flg) |
                                 ((SELF_STATE == P_WAIT_CONF) & SELF_RD_ACC_BUSY & w_wait_end) |
                                  (SELF_STATE == P_WAIT_WR2RD)) & ~w_wr2rd_wait & ~PF_SRCH_VAL};
-    r_self_rd_busy_p       <= {r_self_rd_busy_p[0], RAM_REN & (HTRANS == 2'b01) & r_htrans_p1[1]};
-    r_self_rd_burst_dt_msk <= ((SELF_RD_ACC_END & SELF_BURST_EN) |
-                               (RD_LTCY_MODE & |r_self_rd_b_acc_end_p[P_RD_LTCY-1:0]) |
-                               (~RD_LTCY_MODE & |r_self_rd_b_acc_end_p[P_RD_LTCY-2:0])) &
-                              ~(|r_self_rd_after_b_st_p[RD_LTCY_SEL-2 +: 2] | r_self_rd_busy_p[1]);
+    r_self_rd_busy_p       <= {r_self_rd_busy_p[1:0], RAM_REN & (HTRANS == 2'b01) & r_htrans_p1[1]};
     r_other_rd_burst_en_p1 <= OTHER_RD_BURST_EN;
     r_other_rd_state_p1    <= OTHER_RD_STATE;
+    PF_RD_DT_MSK           <= w_self_rd_burst_dt_msk;
   end
 end
 
-assign PF_RD_DT_MSK = r_self_rd_burst_dt_msk;
+assign w_self_rd_burst_dt_msk = ((SELF_RD_ACC_END & SELF_BURST_EN) |
+                                 (RAM_RDT_LTCY & |r_self_rd_b_acc_end_p[P_RD_LTCY:0]) |
+                                 (~RAM_RDT_LTCY & |r_self_rd_b_acc_end_p[P_RD_LTCY-1:0])) &
+                                ~((RAM_RDT_VAL & |r_self_rd_after_b_st_p[RD_LTCY_SEL-1 +: 2]) |
+                                  r_self_rd_busy_p[2]);
 
 assign w_wr2rd_wait = SELF_WR_ACC_END  | r_self_wr_acc_end_p1  | r_self_wr_acc_end_p2 |
                       OTHER_WR_ACC_END | r_other_wr_acc_end_p1;
@@ -437,7 +439,7 @@ always @ (posedge HCLK or negedge HRESETN) begin
           end
         end
         P_RD_DATA : begin
-          if ((RAM_RDT_VAL & ~(r_self_rd_burst_dt_msk | (~w_rdff_val & w_rdff_write))) |
+          if ((RAM_RDT_VAL & ~(w_self_rd_burst_dt_msk | (~w_rdff_val & w_rdff_write))) |
               w_rdff_read | (r_mstbusy_wait & HREADYIN)) begin
             r_pre_rdyout <= 1'b1;
             if (~(r_mstbusy_wait & (HTRANS == 2'b01))) begin
@@ -530,9 +532,9 @@ end
 
 assign w_pf_acc_wait = PF_ACC_VAL;
 
-assign w_rdff_write = (((SELF_STATE == P_RD_DATA) & (~HREADYIN | r_mstbusy_wait | w_rdff_val)) |
+assign w_rdff_write = (((SELF_STATE == P_RD_DATA) & (~HREADYIN | (r_mstbusy_wait & ~(w_hready & HTRANS[1])) | w_rdff_val)) |
                        (SELF_STATE == P_RD_RESP)) &
-                      (RAM_RDT_VAL & ~r_self_rd_burst_dt_msk);
+                      (RAM_RDT_VAL & ~w_self_rd_burst_dt_msk);
 assign w_rdff_read  = (SELF_STATE == P_RD_DATA) & HREADYIN & ~(r_mstbusy_wait & (HTRANS == 2'b01)) & w_rdff_val;
 
 always @ (posedge HCLK or negedge HRESETN) begin
