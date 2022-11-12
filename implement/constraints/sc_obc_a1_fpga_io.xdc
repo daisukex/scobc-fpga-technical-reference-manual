@@ -93,38 +93,38 @@ set_property [get_ports {SRAM2_IO[15]}]       -dict { PACKAGE_PIN E17  IOSTANDAR
 set_property [get_ports CFG_MEM_SEL]          -dict { PACKAGE_PIN AF19 IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports CFG_MEM_MON]          -dict { PACKAGE_PIN AF20 IOSTANDARD LVCMOS33 }
 set_property [get_ports CFG_MEM_CS_B]         -dict { PACKAGE_PIN P18  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {CFG_MEM_IO[0]}]      -dict { PACKAGE_PIN R14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {CFG_MEM_IO[1]}]      -dict { PACKAGE_PIN R15  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {CFG_MEM_IO[2]}]      -dict { PACKAGE_PIN P14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {CFG_MEM_IO[3]}]      -dict { PACKAGE_PIN N14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
+set_property [get_ports {CFG_MEM_IO[0]}]      -dict { PACKAGE_PIN R14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {CFG_MEM_IO[1]}]      -dict { PACKAGE_PIN R15  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {CFG_MEM_IO[2]}]      -dict { PACKAGE_PIN P14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {CFG_MEM_IO[3]}]      -dict { PACKAGE_PIN N14  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 
 # Data QSPI Flash Interface
 set_property [get_ports DATA_MEM1_CS_B]       -dict { PACKAGE_PIN M25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports DATA_MEM1_SCK]        -dict { PACKAGE_PIN M26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM1_IO[0]}]    -dict { PACKAGE_PIN K26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM1_IO[1]}]    -dict { PACKAGE_PIN L24  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM1_IO[2]}]    -dict { PACKAGE_PIN L25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM1_IO[3]}]    -dict { PACKAGE_PIN K25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
+set_property [get_ports {DATA_MEM1_IO[0]}]    -dict { PACKAGE_PIN K26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {DATA_MEM1_IO[1]}]    -dict { PACKAGE_PIN L24  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {DATA_MEM1_IO[2]}]    -dict { PACKAGE_PIN L25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {DATA_MEM1_IO[3]}]    -dict { PACKAGE_PIN K25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 set_property [get_ports DATA_MEM2_CS_B]       -dict { PACKAGE_PIN P25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports DATA_MEM2_SCK]        -dict { PACKAGE_PIN N26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM2_IO[0]}]    -dict { PACKAGE_PIN T25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM2_IO[1]}]    -dict { PACKAGE_PIN R26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM2_IO[2]}]    -dict { PACKAGE_PIN R25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {DATA_MEM2_IO[3]}]    -dict { PACKAGE_PIN P26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
+set_property [get_ports {DATA_MEM2_IO[0]}]    -dict { PACKAGE_PIN T25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {DATA_MEM2_IO[1]}]    -dict { PACKAGE_PIN R26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {DATA_MEM2_IO[2]}]    -dict { PACKAGE_PIN R25  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {DATA_MEM2_IO[3]}]    -dict { PACKAGE_PIN P26  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 
 # FRAM Interface
 set_property [get_ports FRAM1_CS_B]           -dict { PACKAGE_PIN R22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports FRAM1_SCK]            -dict { PACKAGE_PIN M22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM1_IO[0]}]        -dict { PACKAGE_PIN P21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM1_IO[1]}]        -dict { PACKAGE_PIN P23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM1_IO[2]}]        -dict { PACKAGE_PIN N21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM1_IO[3]}]        -dict { PACKAGE_PIN P20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
+set_property [get_ports {FRAM1_IO[0]}]        -dict { PACKAGE_PIN P21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {FRAM1_IO[1]}]        -dict { PACKAGE_PIN P23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {FRAM1_IO[2]}]        -dict { PACKAGE_PIN N21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {FRAM1_IO[3]}]        -dict { PACKAGE_PIN P20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 set_property [get_ports FRAM2_CS_B]           -dict { PACKAGE_PIN M20  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
 set_property [get_ports FRAM2_SCK]            -dict { PACKAGE_PIN R21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM2_IO[0]}]        -dict { PACKAGE_PIN M21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM2_IO[1]}]        -dict { PACKAGE_PIN N22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM2_IO[2]}]        -dict { PACKAGE_PIN N23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
-set_property [get_ports {FRAM2_IO[3]}]        -dict { PACKAGE_PIN R23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST}
+set_property [get_ports {FRAM2_IO[0]}]        -dict { PACKAGE_PIN M21  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {FRAM2_IO[1]}]        -dict { PACKAGE_PIN N22  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {FRAM2_IO[2]}]        -dict { PACKAGE_PIN N23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
+set_property [get_ports {FRAM2_IO[3]}]        -dict { PACKAGE_PIN R23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 
 # CAN Interface
 set_property [get_ports FPGA_CAN_TX]          -dict { PACKAGE_PIN AD21 IOSTANDARD LVCMOS33 }
