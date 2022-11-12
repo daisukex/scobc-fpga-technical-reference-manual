@@ -24,7 +24,7 @@ always @ (posedge SYS_CLK) begin
     shift <= 1'b0;
   end
   else if (count < 58) begin
-    FUSE_DNA <= {FUSE_DNA[55:0], dout};
+    FUSE_DNA <= {dout, FUSE_DNA[56:1]};
     count <= count + 1;
     if (count == 0) begin
       read  <= 0;
@@ -36,7 +36,7 @@ always @ (posedge SYS_CLK) begin
 end
 
 DNA_PORT # (
-  .SIM_DNA_VALUE(57'h542AC06D294650)
+  .SIM_DNA_VALUE(57'h014C5296C06A854)
 ) dna_port (
   .DIN(1'b0),
   .READ(read),
