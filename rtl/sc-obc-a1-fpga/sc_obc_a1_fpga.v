@@ -133,6 +133,7 @@ wire boot_rstb;
 wire por_rstb;
 wire por_rstb_sync_refclk;
 wire sys_rstb;
+wire g_sys_rstb;
 wire sys_rstb_sync_refclk;
 wire sys_rstb_sync_userclk1;
 wire sys_rstb_sync_userclk2;
@@ -270,6 +271,7 @@ scobca1_sysctrl # (
   .SYS_RSTB_SYNC_USERCLK2(sys_rstb_sync_userclk2),
   .BUS_RSTB(bus_rstb)
 );
+BUFG bufg_sys_rstb (.I(sys_rstb), .O(g_sys_rstb));
 
 // OBC Core TOP
 sc_obc_core # (
@@ -299,7 +301,7 @@ sc_obc_core # (
   .BOOT_RSTB(boot_rstb),
   .POR_RSTB(por_rstb),
   .POR_RSTB_SYNC_REFCLK(por_rstb_sync_refclk),
-  .SYS_RSTB(sys_rstb),
+  .SYS_RSTB(g_sys_rstb),
   .SYS_RSTB_SYNC_REFCLK(sys_rstb_sync_refclk),
   .BUS_RSTB(bus_rstb),
   // Clock Mode Control
@@ -562,7 +564,7 @@ udl_axi # (
   .REF_CLK(ref_clk),
   .USER_CLK1(user_clk1),
   .USER_CLK2(user_clk2),
-  .SYS_RSTB(sys_rstb),
+  .SYS_RSTB(g_sys_rstb),
   .SYS_RSTB_SYNC_REFCLK(sys_rstb_sync_refclk),
   .SYS_RSTB_SYNC_USERCLK1(sys_rstb_sync_userclk1),
   .SYS_RSTB_SYNC_USERCLK2(sys_rstb_sync_userclk2),
