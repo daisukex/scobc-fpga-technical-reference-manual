@@ -81,10 +81,10 @@ if {$sdc} then {
         -generic CM3SS_ITCM_INIT=${itcm_init_mode} -generic CM3SS_ITCM_INIT_FILE=${itcm_init_file} -generic BUILD_INFO=${build_info}
 }
 
-# Report Timing
-report_clocks
-report_clock_interaction
-report_clock_networks
+# Report Clock
+report_clocks -file ${rootd}/synthesis/${topmodule}_synthesis_report_clk.log
+report_clock_interaction -append -file ${rootd}/synthesis/${topmodule}_synthesis_report_clk.log
+report_clock_networks    -append -file ${rootd}/synthesis/${topmodule}_synthesis_report_clk.log
 
 # Optimize
 opt_design -directive Explore -debug_log
