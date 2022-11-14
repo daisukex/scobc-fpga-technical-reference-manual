@@ -128,6 +128,9 @@ wire sys_clk;
 wire maxi_clk;
 wire user_clk1;
 wire user_clk2;
+wire [1:0] osc_clken;
+assign SYSCLK1_EN = 1'b1;
+assign SYSCLK2_EN = 1'b1;
 
 wire boot_rstb;
 wire por_rstb;
@@ -240,9 +243,9 @@ scobca1_sysctrl # (
   .SYSCTRL_USER_CLK2_MODE(SYSCTRL_USER_CLK2_MODE)
 ) sysctrl (
   .SYSCLK1(SYSCLK1),
-  .SYSCLK1_EN(SYSCLK1_EN),
+  .SYSCLK1_EN(osc_clken[0]),
   .SYSCLK2(SYSCLK2),
-  .SYSCLK2_EN(SYSCLK2_EN),
+  .SYSCLK2_EN(osc_clken[1]),
   .INIT_REQ(init_req),
   .INIT_DONE(init_done),
   .CLKMODE(clkmode),
@@ -294,7 +297,7 @@ sc_obc_core # (
   .USER_CLK1(user_clk1),
   .USER_CLK2(user_clk2),
   .PLLLOCK(plllock),
-  .OSC_CLKEN({SYSCLK2_EN, SYSCLK1_EN}),
+  .OSC_CLKEN(osc_clken),
   // Reset
   .SYS_RST_REQ(sys_rst_req),
   .REG_RST_REQ(reg_rst_req),
