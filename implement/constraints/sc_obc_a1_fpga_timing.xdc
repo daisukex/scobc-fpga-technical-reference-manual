@@ -18,8 +18,10 @@ create_clock -name user_clk1 -period $uclk1_period [get_pins sysctrl/clk_gen/sco
 create_clock -name user_clk2 -period $uclk2_period [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT5]
 
 set_case_analysis 1 [get_pins  sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKINSEL]
-set_case_analysis 0 [get_pins sysctrl/clk_gen/scobca1_outsel/reg_clkmode[0]]
-set_case_analysis 1 [get_pins sysctrl/clk_gen/scobca1_outsel/reg_clkmode[1]]
+set_case_analysis 1 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S0]
+set_case_analysis 0 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S1]
+set_case_analysis 0 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux48m/S0]
+set_case_analysis 1 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux48m/S1]
 
 set_clock_groups \
     -asynchronous \
