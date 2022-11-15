@@ -506,10 +506,14 @@ sc_hrmem_ram_init_ctrl # (
   .SYSCLK(SYSCLK),                    //  input
   .RESETB(w_sync_por_rstb),           //  input
   .RAM_INIT_REQ(r_ram_init_req_sync), //  input
-  .RAM_INIT_ADDR(w_ram_init_addr),    // output [ADDR_WIDTH-1:0]
-  .RAM_INIT_EN(w_ram_init_en),        // output
-  .RAM_INIT_DONE(RAM_INIT_DONE)       // output
+  .RAM_INIT_ADDR(/*open*/),           // output [ADDR_WIDTH-1:0]
+  .RAM_INIT_EN(/*open*/),             // output
+  .RAM_INIT_DONE(/*open*/)            // output
 );
+
+assign w_ram_init_addr = 0;
+assign w_ram_init_en   = 0;
+assign RAM_INIT_DONE   = r_ram_init_req_sync;
 
 // RAM Initialize Done Synchronizer
 always @ (posedge SYSCLK or negedge hrmem_resetn) begin
