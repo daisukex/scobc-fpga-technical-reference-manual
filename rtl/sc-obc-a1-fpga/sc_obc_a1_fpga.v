@@ -614,8 +614,8 @@ sc_obc_core # (
 
   // External I2C Interface
   // ------------------------------
-  .EXTERNAL_I2CM_SDA(FPGA_EXT_SDA),
-  .EXTERNAL_I2CM_SCL(FPGA_EXT_SCL),
+  .EXTERNAL_I2CM_SDA(/*open*/),
+  .EXTERNAL_I2CM_SCL(/*open*/),
 
   // ULPI Interface
   // ------------------------------
@@ -906,8 +906,8 @@ scobca1_dbgctrl_core dbgctrl_core (
   .SYSCLK1(1'b0),
   .SYSCLK2(1'b0),
 
-  .FPGA_EXT_SCL(/*open*/),
-  .FPGA_EXT_SDA(/*open*/),
+  .FPGA_EXT_SCL(FPGA_EXT_SCL),
+  .FPGA_EXT_SDA(FPGA_EXT_SDA),
 
   .FPGA_BOOT0(1'b0),
   .FPGA_BOOT1(1'b0),
