@@ -181,25 +181,35 @@ module sc_obc_core # (
   input CFG_MEM_MON,
   output CFG_MEM_SCK,
   output CFG_MEM_CS_B,
-  inout  [3:0] CFG_MEM_IO,
+  output [3:0] CFG_MEM_OE,
+  output [3:0] CFG_MEM_DOUT,
+  input  [3:0] CFG_MEM_DIN,
 
   // NOR Flash Data Memory Interface
   // ------------------------------
   output DATA_MEM1_SCK,
   output DATA_MEM1_CS_B,
-  inout  [3:0] DATA_MEM1_IO,
+  output [3:0] DATA_MEM1_OE,
+  output [3:0] DATA_MEM1_DOUT,
+  input  [3:0] DATA_MEM1_DIN,
   output DATA_MEM2_SCK,
   output DATA_MEM2_CS_B,
-  inout  [3:0] DATA_MEM2_IO,
+  output [3:0] DATA_MEM2_OE,
+  output [3:0] DATA_MEM2_DOUT,
+  input  [3:0] DATA_MEM2_DIN,
 
   // FeRAM Data Memory Interface
   // ------------------------------
   output FRAM1_SCK,
   output FRAM1_CS_B,
-  inout  [3:0] FRAM1_IO,
+  output [3:0] FRAM1_OE,
+  output [3:0] FRAM1_DOUT,
+  input  [3:0] FRAM1_DIN,
   output FRAM2_SCK,
   output FRAM2_CS_B,
-  inout  [3:0] FRAM2_IO,
+  output [3:0] FRAM2_OE,
+  output [3:0] FRAM2_DOUT,
+  input  [3:0] FRAM2_DIN,
 
   // CAN Interface
   // ------------------------------
@@ -1076,23 +1086,33 @@ main_axi_ss # (
   // NOR Flash Configuration Memory Interface
   .CFG_MEM_SCK(CFG_MEM_SCK),
   .CFG_MEM_CS_B(CFG_MEM_CS_B),
-  .CFG_MEM_IO(CFG_MEM_IO),
+  .CFG_MEM_OE(CFG_MEM_OE),
+  .CFG_MEM_DOUT(CFG_MEM_DOUT),
+  .CFG_MEM_DIN(CFG_MEM_DIN),
 
   // NOR Flash Data Memory Interface
   .DATA_MEM1_SCK(DATA_MEM1_SCK),
   .DATA_MEM1_CS_B(DATA_MEM1_CS_B),
-  .DATA_MEM1_IO(DATA_MEM1_IO),
+  .DATA_MEM1_OE(DATA_MEM1_OE),
+  .DATA_MEM1_DOUT(DATA_MEM1_DOUT),
+  .DATA_MEM1_DIN(DATA_MEM1_DIN),
   .DATA_MEM2_SCK(DATA_MEM2_SCK),
   .DATA_MEM2_CS_B(DATA_MEM2_CS_B),
-  .DATA_MEM2_IO(DATA_MEM2_IO),
+  .DATA_MEM2_OE(DATA_MEM2_OE),
+  .DATA_MEM2_DOUT(DATA_MEM2_DOUT),
+  .DATA_MEM2_DIN(DATA_MEM2_DIN),
 
   // FeRAM Data Memory Interface
   .FRAM1_SCK(FRAM1_SCK),
   .FRAM1_CS_B(FRAM1_CS_B),
-  .FRAM1_IO(FRAM1_IO),
+  .FRAM1_OE(FRAM1_OE),
+  .FRAM1_DOUT(FRAM1_DOUT),
+  .FRAM1_DIN(FRAM1_DIN),
   .FRAM2_SCK(FRAM2_SCK),
   .FRAM2_CS_B(FRAM2_CS_B),
-  .FRAM2_IO(FRAM2_IO),
+  .FRAM2_OE(FRAM2_OE),
+  .FRAM2_DOUT(FRAM2_DOUT),
+  .FRAM2_DIN(FRAM2_DIN),
 
   // CAN Interface
   .CAN_TX(CAN_TX),

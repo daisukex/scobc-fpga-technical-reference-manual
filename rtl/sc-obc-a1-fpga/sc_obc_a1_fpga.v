@@ -52,22 +52,22 @@ module sc_obc_a1_fpga # (
   // CFG QSPI Flash Interface
   output CFG_MEM_SEL,
   input  CFG_MEM_MON,
-  output CFG_MEM_CS_B,
+  inout  CFG_MEM_CS_B,
   inout  [3:0] CFG_MEM_IO,
 
   // Data QSPI Flash Interface
-  output DATA_MEM1_CS_B,
+  inout  DATA_MEM1_CS_B,
   output DATA_MEM1_SCK,
   inout  [3:0] DATA_MEM1_IO,
-  output DATA_MEM2_CS_B,
+  inout  DATA_MEM2_CS_B,
   output DATA_MEM2_SCK,
   inout  [3:0] DATA_MEM2_IO,
 
   // FRAM Interface
-  output FRAM1_CS_B,
+  inout  FRAM1_CS_B,
   output FRAM1_SCK,
   inout  [3:0] FRAM1_IO,
-  output FRAM2_CS_B,
+  inout  FRAM2_CS_B,
   output FRAM2_SCK,
   inout  [3:0] FRAM2_IO,
 
@@ -245,6 +245,27 @@ wire w_sram2_oe_b;
 wire w_sram2_we_b;
 wire w_sram2_bhe_b;
 wire w_sram2_ble_b;
+
+wire w_cfg_mem_cs_b;
+wire [3:0] w_cfg_mem_oe;
+wire [3:0] w_cfg_mem_dout;
+wire [3:0] w_cfg_mem_din;
+wire w_data_mem1_cs_b;
+wire [3:0] w_data_mem1_oe;
+wire [3:0] w_data_mem1_dout;
+wire [3:0] w_data_mem1_din;
+wire w_data_mem2_cs_b;
+wire [3:0] w_data_mem2_oe;
+wire [3:0] w_data_mem2_dout;
+wire [3:0] w_data_mem2_din;
+wire w_fram1_cs_b;
+wire [3:0] w_fram1_oe;
+wire [3:0] w_fram1_dout;
+wire [3:0] w_fram1_din;
+wire w_fram2_cs_b;
+wire [3:0] w_fram2_oe;
+wire [3:0] w_fram2_dout;
+wire [3:0] w_fram2_din;
 
 wire [2*20-1:0] sram_a_gpio_mode_sel;
 wire [1:0] sram1_ce_b_gpio_mode_sel;
@@ -541,26 +562,36 @@ sc_obc_core # (
   .CFG_MEM_SEL(CFG_MEM_SEL),
   .CFG_MEM_MON(CFG_MEM_MON),
   .CFG_MEM_SCK(cfg_mem_sck),
-  .CFG_MEM_CS_B(CFG_MEM_CS_B),
-  .CFG_MEM_IO(CFG_MEM_IO),
+  .CFG_MEM_CS_B(w_cfg_mem_cs_b),
+  .CFG_MEM_OE(w_cfg_mem_oe),
+  .CFG_MEM_DOUT(w_cfg_mem_dout),
+  .CFG_MEM_DIN(w_cfg_mem_din),
 
   // NOR Flash Data Memory Interface
   // ------------------------------
   .DATA_MEM1_SCK(DATA_MEM1_SCK),
-  .DATA_MEM1_CS_B(DATA_MEM1_CS_B),
-  .DATA_MEM1_IO(DATA_MEM1_IO),
+  .DATA_MEM1_CS_B(w_data_mem1_cs_b),
+  .DATA_MEM1_OE(w_data_mem1_oe),
+  .DATA_MEM1_DOUT(w_data_mem1_dout),
+  .DATA_MEM1_DIN(w_data_mem1_din),
   .DATA_MEM2_SCK(DATA_MEM2_SCK),
-  .DATA_MEM2_CS_B(DATA_MEM2_CS_B),
-  .DATA_MEM2_IO(DATA_MEM2_IO),
+  .DATA_MEM2_CS_B(w_data_mem2_cs_b),
+  .DATA_MEM2_OE(w_data_mem2_oe),
+  .DATA_MEM2_DOUT(w_data_mem2_dout),
+  .DATA_MEM2_DIN(w_data_mem2_din),
 
   // FeRAM Data Memory Interface
   // ------------------------------
   .FRAM1_SCK(FRAM1_SCK),
-  .FRAM1_CS_B(FRAM1_CS_B),
-  .FRAM1_IO(FRAM1_IO),
+  .FRAM1_CS_B(w_fram1_cs_b),
+  .FRAM1_OE(w_fram1_oe),
+  .FRAM1_DOUT(w_fram1_dout),
+  .FRAM1_DIN(w_fram1_din),
   .FRAM2_SCK(FRAM2_SCK),
-  .FRAM2_CS_B(FRAM2_CS_B),
-  .FRAM2_IO(FRAM2_IO),
+  .FRAM2_CS_B(w_fram2_cs_b),
+  .FRAM2_OE(w_fram2_oe),
+  .FRAM2_DOUT(w_fram2_dout),
+  .FRAM2_DIN(w_fram2_din),
 
   // CAN Interface
   // ------------------------------
@@ -857,20 +888,20 @@ scobca1_dbgctrl_core dbgctrl_core (
   .SRAM2_BHE_B(SRAM2_BHE_B),
   .SRAM2_BLE_B(SRAM2_BLE_B),
 
-  .CFG_MEM_CS_B(/*open*/),
-  .CFG_MEM_IO(/*open*/),
+  .CFG_MEM_CS_B(CFG_MEM_CS_B),
+  .CFG_MEM_IO(CFG_MEM_IO),
 
-  .DATA_MEM1_CS_B(/*open*/),
-  .DATA_MEM1_IO(/*open*/),
+  .DATA_MEM1_CS_B(DATA_MEM1_CS_B),
+  .DATA_MEM1_IO(DATA_MEM1_IO),
 
-  .DATA_MEM2_CS_B(/*open*/),
-  .DATA_MEM2_IO(/*open*/),
+  .DATA_MEM2_CS_B(DATA_MEM2_CS_B),
+  .DATA_MEM2_IO(DATA_MEM2_IO),
 
-  .FRAM1_CS_B(/*open*/),
-  .FRAM1_IO(/*open*/),
+  .FRAM1_CS_B(FRAM1_CS_B),
+  .FRAM1_IO(FRAM1_IO),
 
-  .FRAM2_CS_B(/*open*/),
-  .FRAM2_IO(/*open*/),
+  .FRAM2_CS_B(FRAM2_CS_B),
+  .FRAM2_IO(FRAM2_IO),
 
   .SYSCLK1(1'b0),
   .SYSCLK2(1'b0),
@@ -907,30 +938,30 @@ scobca1_dbgctrl_core dbgctrl_core (
   .SRAM2_BHE_B_IPOUT(w_sram2_bhe_b),
   .SRAM2_BLE_B_IPOUT(w_sram2_ble_b),
 
-  .CFG_MEM_CS_B_IPOUT(1'b0),
-  .CFG_MEM_OE_IPOUT(4'h0),
-  .CFG_MEM_DOUT_IPOUT(4'h0),
-  .CFG_MEM_DIN_IPIN(/*open*/),
+  .CFG_MEM_CS_B_IPOUT(w_cfg_mem_cs_b),
+  .CFG_MEM_OE_IPOUT(w_cfg_mem_oe),
+  .CFG_MEM_DOUT_IPOUT(w_cfg_mem_dout),
+  .CFG_MEM_DIN_IPIN(w_cfg_mem_din),
 
-  .DATA_MEM1_CS_B_IPOUT(1'b0),
-  .DATA_MEM1_OE_IPOUT(4'h0),
-  .DATA_MEM1_DOUT_IPOUT(4'h0),
-  .DATA_MEM1_DIN_IPIN(/*open*/),
+  .DATA_MEM1_CS_B_IPOUT(w_data_mem1_cs_b),
+  .DATA_MEM1_OE_IPOUT(w_data_mem1_oe),
+  .DATA_MEM1_DOUT_IPOUT(w_data_mem1_dout),
+  .DATA_MEM1_DIN_IPIN(w_data_mem1_din),
 
-  .DATA_MEM2_CS_B_IPOUT(1'b0),
-  .DATA_MEM2_OE_IPOUT(4'h0),
-  .DATA_MEM2_DOUT_IPOUT(4'h0),
-  .DATA_MEM2_DIN_IPIN(/*open*/),
+  .DATA_MEM2_CS_B_IPOUT(w_data_mem2_cs_b),
+  .DATA_MEM2_OE_IPOUT(w_data_mem2_oe),
+  .DATA_MEM2_DOUT_IPOUT(w_data_mem2_dout),
+  .DATA_MEM2_DIN_IPIN(w_data_mem2_din),
 
-  .FRAM1_CS_B_IPOUT(1'b0),
-  .FRAM1_OE_IPOUT(4'h0),
-  .FRAM1_DOUT_IPOUT(4'h0),
-  .FRAM1_DIN_IPIN(/*open*/),
+  .FRAM1_CS_B_IPOUT(w_fram1_cs_b),
+  .FRAM1_OE_IPOUT(w_fram1_oe),
+  .FRAM1_DOUT_IPOUT(w_fram1_dout),
+  .FRAM1_DIN_IPIN(w_fram1_din),
 
-  .FRAM2_CS_B_IPOUT(1'b0),
-  .FRAM2_OE_IPOUT(4'h0),
-  .FRAM2_DOUT_IPOUT(4'h0),
-  .FRAM2_DIN_IPIN(/*open*/),
+  .FRAM2_CS_B_IPOUT(w_fram2_cs_b),
+  .FRAM2_OE_IPOUT(w_fram2_oe),
+  .FRAM2_DOUT_IPOUT(w_fram2_dout),
+  .FRAM2_DIN_IPIN(w_fram2_din),
 
   .FPGA_WATCHDOG_IPOUT(1'b0),
   .FPGA_PWR_CYCLE_REQ_IPOUT(1'b0),

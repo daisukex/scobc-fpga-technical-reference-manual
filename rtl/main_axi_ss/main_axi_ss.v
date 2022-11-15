@@ -235,23 +235,33 @@ module main_axi_ss # (
   // NOR Flash Configuration Memory Interface
   output CFG_MEM_SCK,
   output CFG_MEM_CS_B,
-  inout  [3:0] CFG_MEM_IO,
+  output [3:0] CFG_MEM_OE,
+  output [3:0] CFG_MEM_DOUT,
+  input  [3:0] CFG_MEM_DIN,
 
   // NOR Flash Data Memory Interface
   output DATA_MEM1_SCK,
   output DATA_MEM1_CS_B,
-  inout  [3:0] DATA_MEM1_IO,
+  output [3:0] DATA_MEM1_OE,
+  output [3:0] DATA_MEM1_DOUT,
+  input  [3:0] DATA_MEM1_DIN,
   output DATA_MEM2_SCK,
   output DATA_MEM2_CS_B,
-  inout  [3:0] DATA_MEM2_IO,
+  output [3:0] DATA_MEM2_OE,
+  output [3:0] DATA_MEM2_DOUT,
+  input  [3:0] DATA_MEM2_DIN,
 
   // FeRAM Data Memory Interface
   output FRAM1_SCK,
   output FRAM1_CS_B,
-  inout  [3:0] FRAM1_IO,
+  output [3:0] FRAM1_OE,
+  output [3:0] FRAM1_DOUT,
+  input  [3:0] FRAM1_DIN,
   output FRAM2_SCK,
   output FRAM2_CS_B,
-  inout  [3:0] FRAM2_IO,
+  output [3:0] FRAM2_OE,
+  output [3:0] FRAM2_DOUT,
+  input  [3:0] FRAM2_DIN,
 
   // CAN Interface
   output CAN_TX,
@@ -362,20 +372,12 @@ wire [1:0] w_data_mem_cs_b;
 wire [3:0] w_data_mem_oe;
 wire [3:0] w_data_mem_dout;
 wire [3:0] w_data_mem_din;
-wire [3:0] w_data_mem1_oe;
-wire [3:0] w_data_mem2_oe;
-wire [3:0] w_data_mem1_din;
-wire [3:0] w_data_mem2_din;
 
 wire w_fram_sck;
 wire [1:0] w_fram_cs_b;
 wire [3:0] w_fram_oe;
 wire [3:0] w_fram_dout;
 wire [3:0] w_fram_din;
-wire [3:0] w_fram1_oe;
-wire [3:0] w_fram2_oe;
-wire [3:0] w_fram1_din;
-wire [3:0] w_fram2_din;
 
 // CPU AXI3 SYS Slave Interface to main_axi_crossbar
 assign axis_awid[S_PORT_NUM_CPU_SYS*MAINAXI_S_AXI_ID_WIDTH +: MAINAXI_S_AXI_ID_WIDTH] = 0;
@@ -627,21 +629,12 @@ sc_qspim # (
   // QSPI Interface
   .QSPI_SCK(CFG_MEM_SCK),
   .QSPI_SS(CFG_MEM_CS_B),
-  .QSPI_OE(w_cfg_mem_oe),
-  .QSPI_DOUT(w_cfg_mem_dout),
-  .QSPI_DIN(w_cfg_mem_din),
+  .QSPI_OE(CFG_MEM_OE),
+  .QSPI_DOUT(CFG_MEM_DOUT),
+  .QSPI_DIN(CFG_MEM_DIN),
 
   // Interrupt Interface
   .QSPI_INT(CFG_MEM_INT)
-);
-
-// CFG_MEM_QSPI Data I/O
-sc_qspim_data_io cfg_mem_qspim_data_io (
-  .QSPI_OE(w_cfg_mem_oe),
-  .QSPI_DOUT(w_cfg_mem_dout),
-  .QSPI_DIN(w_cfg_mem_din),
-
-  .QSPI_IO(CFG_MEM_IO)
 );
 
 // QSPI Master (NOR Flash Data Memory)
@@ -710,26 +703,13 @@ assign DATA_MEM1_SCK = w_data_mem_sck;
 assign DATA_MEM2_SCK = w_data_mem_sck;
 assign DATA_MEM1_CS_B = w_data_mem_cs_b[0];
 assign DATA_MEM2_CS_B = w_data_mem_cs_b[1];
-assign w_data_mem1_oe = w_data_mem_oe;
-assign w_data_mem2_oe = w_data_mem_oe;
+assign DATA_MEM1_OE = w_data_mem_oe;
+assign DATA_MEM2_OE = w_data_mem_oe;
+assign DATA_MEM1_DOUT = w_data_mem_dout;
+assign DATA_MEM2_DOUT = w_data_mem_dout;
 
-assign w_data_mem_din = (~w_data_mem_cs_b[1]) ? w_data_mem2_din: w_data_mem1_din;
-
-// DATA_MEM_QSPI Data I/O
-sc_qspim_data_io data_mem1_qspi_data_io (
-  .QSPI_OE(w_data_mem1_oe),
-  .QSPI_DOUT(w_data_mem_dout),
-  .QSPI_DIN(w_data_mem1_din),
-
-  .QSPI_IO(DATA_MEM1_IO)
-);
-sc_qspim_data_io data_mem2_qspi_data_io (
-  .QSPI_OE(w_data_mem2_oe),
-  .QSPI_DOUT(w_data_mem_dout),
-  .QSPI_DIN(w_data_mem2_din),
-
-  .QSPI_IO(DATA_MEM2_IO)
-);
+assign w_data_mem_din = (~DATA_MEM1_CS_B) ? DATA_MEM1_DIN:
+                        (~DATA_MEM2_CS_B) ? DATA_MEM2_DIN: 4'h0;
 
 // QSPI Master (FeRAM Data Memory)
 sc_qspim # (
@@ -797,26 +777,13 @@ assign FRAM1_SCK = w_fram_sck;
 assign FRAM2_SCK = w_fram_sck;
 assign FRAM1_CS_B = w_fram_cs_b[0];
 assign FRAM2_CS_B = w_fram_cs_b[1];
-assign w_fram1_oe = w_fram_oe;
-assign w_fram2_oe = w_fram_oe;
+assign FRAM1_OE = w_fram_oe;
+assign FRAM2_OE = w_fram_oe;
+assign FRAM1_DOUT = w_fram_dout;
+assign FRAM2_DOUT = w_fram_dout;
 
-assign w_fram_din = (~w_fram_cs_b[1]) ? w_fram2_din: w_fram1_din;
-
-// FRAM_QSPI Data I/O
-sc_qspim_data_io fram1_qspi_data_io (
-  .QSPI_OE(w_fram1_oe),
-  .QSPI_DOUT(w_fram_dout),
-  .QSPI_DIN(w_fram1_din),
-
-  .QSPI_IO(FRAM1_IO)
-);
-sc_qspim_data_io fram2_qspi_data_io (
-  .QSPI_OE(w_fram2_oe),
-  .QSPI_DOUT(w_fram_dout),
-  .QSPI_DIN(w_fram2_din),
-
-  .QSPI_IO(FRAM2_IO)
-);
+assign w_fram_din = (~FRAM1_CS_B) ? FRAM1_DIN:
+                    (~FRAM2_CS_B) ? FRAM2_DIN: 4'h0;
 
 // High Reliability Memory for BlockRAM (Dummy)
 sc_axi_slave # (
