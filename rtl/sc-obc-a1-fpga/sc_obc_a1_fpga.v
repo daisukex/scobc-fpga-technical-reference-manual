@@ -662,4 +662,188 @@ udl_axi # (
 //  .UIO4(UIO4)
 );
 
+
+
+// Debug Controller Core
+scobca1_dbgctrl_core dbgctrl_core (
+  // System Interface
+  .SYS_CLK(sys_clk),
+  .SYS_RSTB(g_sys_rstb),
+
+  // FPGA Interface
+  .SRAM_A(/*open*/),
+  .SRAM1_CE_B(/*open*/),
+  .SRAM1_OE_B(/*open*/),
+  .SRAM1_WE_B(/*open*/),
+  .SRAM1_BHE_B(/*open*/),
+  .SRAM1_BLE_B(/*open*/),
+  .SRAM2_CE_B(/*open*/),
+  .SRAM2_OE_B(/*open*/),
+  .SRAM2_WE_B(/*open*/),
+  .SRAM2_BHE_B(/*open*/),
+  .SRAM2_BLE_B(/*open*/),
+
+  .CFG_MEM_CS_B(/*open*/),
+  .CFG_MEM_IO(/*open*/),
+
+  .DATA_MEM1_CS_B(/*open*/),
+  .DATA_MEM1_IO(/*open*/),
+
+  .DATA_MEM2_CS_B(/*open*/),
+  .DATA_MEM2_IO(/*open*/),
+
+  .FRAM1_CS_B(/*open*/),
+  .FRAM1_IO(/*open*/),
+
+  .FRAM2_CS_B(/*open*/),
+  .FRAM2_IO(/*open*/),
+
+  .SYSCLK1(1'b0),
+  .SYSCLK2(1'b0),
+
+  .FPGA_EXT_SCL(/*open*/),
+  .FPGA_EXT_SDA(/*open*/),
+
+  .FPGA_BOOT0(1'b0),
+  .FPGA_BOOT1(1'b0),
+  .FPGA_WATCHDOG(/*open*/),
+  .FPGA_RESERVE(/*open*/),
+  .FPGA_PWR_CYCLE_REQ(/*open*/),
+
+  .ULPI_CLOCK(1'b0),
+  .ULPI_RESET_B(/*open*/),
+  .ULPI_CS(/*open*/),
+
+  .UIO1(/*open*/),
+  .UIO2(/*open*/),
+  .UIO4(/*open*/),
+
+  .RSV(/*open*/),
+
+  // IP Interface
+  .SRAM_A_IPOUT(20'h0),
+  .SRAM1_CE_B_IPOUT(1'b0),
+  .SRAM1_OE_B_IPOUT(1'b0),
+  .SRAM1_WE_B_IPOUT(1'b0),
+  .SRAM1_BHE_B_IPOUT(1'b0),
+  .SRAM1_BLE_B_IPOUT(1'b0),
+  .SRAM2_CE_B_IPOUT(1'b0),
+  .SRAM2_OE_B_IPOUT(1'b0),
+  .SRAM2_WE_B_IPOUT(1'b0),
+  .SRAM2_BHE_B_IPOUT(1'b0),
+  .SRAM2_BLE_B_IPOUT(1'b0),
+
+  .CFG_MEM_CS_B_IPOUT(1'b0),
+  .CFG_MEM_OE_IPOUT(4'h0),
+  .CFG_MEM_DOUT_IPOUT(4'h0),
+  .CFG_MEM_DIN_IPIN(/*open*/),
+
+  .DATA_MEM1_CS_B_IPOUT(1'b0),
+  .DATA_MEM1_OE_IPOUT(4'h0),
+  .DATA_MEM1_DOUT_IPOUT(4'h0),
+  .DATA_MEM1_DIN_IPIN(/*open*/),
+
+  .DATA_MEM2_CS_B_IPOUT(1'b0),
+  .DATA_MEM2_OE_IPOUT(4'h0),
+  .DATA_MEM2_DOUT_IPOUT(4'h0),
+  .DATA_MEM2_DIN_IPIN(/*open*/),
+
+  .FRAM1_CS_B_IPOUT(1'b0),
+  .FRAM1_OE_IPOUT(4'h0),
+  .FRAM1_DOUT_IPOUT(4'h0),
+  .FRAM1_DIN_IPIN(/*open*/),
+
+  .FRAM2_CS_B_IPOUT(1'b0),
+  .FRAM2_OE_IPOUT(4'h0),
+  .FRAM2_DOUT_IPOUT(4'h0),
+  .FRAM2_DIN_IPIN(/*open*/),
+
+  .FPGA_WATCHDOG_IPOUT(1'b0),
+  .FPGA_PWR_CYCLE_REQ_IPOUT(1'b0),
+
+  .RSV_IPOUT(16'h0),
+  .RSV_IPIN(/*open*/),
+
+  // Debug Register Interface
+  .SRAM_A_GPIO_MODE_SEL(40'h0),
+  .SRAM1_CE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM1_OE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM1_WE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM1_BHE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM1_BLE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM2_CE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM2_OE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM2_WE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM2_BHE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM2_BLE_B_GPIO_MODE_SEL(2'h0),
+  .SRAM_A_GPIO_IN(/*open*/),
+  .SRAM1_CE_B_GPIO_IN(/*open*/),
+  .SRAM1_OE_B_GPIO_IN(/*open*/),
+  .SRAM1_WE_B_GPIO_IN(/*open*/),
+  .SRAM1_BHE_B_GPIO_IN(/*open*/),
+  .SRAM1_BLE_B_GPIO_IN(/*open*/),
+  .SRAM2_CE_B_GPIO_IN(/*open*/),
+  .SRAM2_OE_B_GPIO_IN(/*open*/),
+  .SRAM2_WE_B_GPIO_IN(/*open*/),
+  .SRAM2_BHE_B_GPIO_IN(/*open*/),
+  .SRAM2_BLE_B_GPIO_IN(/*open*/),
+
+  .CFG_MEM_CS_B_GPIO_MODE_SEL(2'h0),
+  .CFG_MEM_IO_GPIO_MODE_SEL(8'h0),
+  .CFG_MEM_CS_B_GPIO_IN(/*open*/),
+  .CFG_MEM_IO_GPIO_IN(/*open*/),
+
+  .DATA_MEM1_CS_B_GPIO_MODE_SEL(2'h0),
+  .DATA_MEM1_IO_GPIO_MODE_SEL(8'h0),
+  .DATA_MEM2_CS_B_GPIO_MODE_SEL(2'h0),
+  .DATA_MEM2_IO_GPIO_MODE_SEL(8'h0),
+  .DATA_MEM1_CS_B_GPIO_IN(/*open*/),
+  .DATA_MEM1_IO_GPIO_IN(/*open*/),
+  .DATA_MEM2_CS_B_GPIO_IN(/*open*/),
+  .DATA_MEM2_IO_GPIO_IN(/*open*/),
+
+  .FRAM1_CS_B_GPIO_MODE_SEL(2'h0),
+  .FRAM1_IO_GPIO_MODE_SEL(8'h0),
+  .FRAM2_CS_B_GPIO_MODE_SEL(2'h0),
+  .FRAM2_IO_GPIO_MODE_SEL(8'h0),
+  .FRAM1_CS_B_GPIO_IN(/*open*/),
+  .FRAM1_IO_GPIO_IN(/*open*/),
+  .FRAM2_CS_B_GPIO_IN(/*open*/),
+  .FRAM2_IO_GPIO_IN(/*open*/),
+
+  .SYSCLK2_STATE(/*open*/),
+  .SYSCLK1_STATE(/*open*/),
+
+  .EXT_I2C_SCL_GPIO_MODE_SEL(2'h0),
+  .EXT_I2C_SDA_GPIO_MODE_SEL(2'h0),
+  .EXT_I2C_SCL_GPIO_IN(/*open*/),
+  .EXT_I2C_SDA_GPIO_IN(/*open*/),
+
+  .FPGA_BOOT_SHIFTREG_IN(/*open*/),
+  .FPGA_WATCHDOG_GPIO_MODE_SEL(2'h0),
+  .FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL(2'h0),
+  .FPGA_RESERVE_GPIO_MODE_SEL(2'h0),
+  .FPGA_WATCHDOG_GPIO_IN(/*open*/),
+  .FPGA_PWR_CYCLE_REQ_GPIO_IN(/*open*/),
+  .FPGA_RESERVE_GPIO_IN(/*open*/),
+
+  .ULPI_CLOCK_STATE(/*open*/),
+  .ULPI_RESET_B_GPIO_MODE_SEL(2'h0),
+  .ULPI_CS_GPIO_MODE_SEL(2'h0),
+  .ULPI_RESET_B_GPIO_IN(/*open*/),
+  .ULPI_CS_GPIO_IN(/*open*/),
+
+  .UIO1_GPIO_MODE_SEL(32'h0),
+  .UIO1_GPIO_IN(/*open*/),
+
+  .UIO2_GPIO_MODE_SEL(32'h0),
+  .UIO2_GPIO_IN(/*open*/),
+
+  .UIO4_GPIO_MODE_SEL(12'h0),
+  .UIO4_GPIO_IN(/*open*/),
+
+  .RSV_GPIO_MODE_SEL(32'h0),
+  .RSV_GPIO_IN(/*open*/)
+);
+
 endmodule
