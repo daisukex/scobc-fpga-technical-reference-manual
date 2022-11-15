@@ -93,9 +93,9 @@ module sc_obc_a1_fpga # (
   inout  FPGA_PWR_CYCLE_REQ,
 
   // ULPI Interface
-  output ULPI_CS,
+  inout ULPI_CS,
   input ULPI_CLOCK,
-  output ULPI_RESET_B,
+  inout ULPI_RESET_B,
   input ULPI_DIR,
   input ULPI_NXT,
   output ULPI_STP,
@@ -622,9 +622,9 @@ sc_obc_core # (
 
   // ULPI Interface
   // ------------------------------
-  .ULPI_CS(ULPI_CS),
-  .ULPI_CLOCK(ULPI_CLOCK),
-  .ULPI_RESET_B(ULPI_RESET_B),
+  .ULPI_CS(/*open*/),
+  .ULPI_CLOCK(1'b0),
+  .ULPI_RESET_B(/*open*/),
   .ULPI_DIR(ULPI_DIR),
   .ULPI_NXT(ULPI_NXT),
   .ULPI_STP(ULPI_STP),
@@ -906,8 +906,8 @@ scobca1_dbgctrl_core dbgctrl_core (
   .FRAM2_CS_B(FRAM2_CS_B),
   .FRAM2_IO(FRAM2_IO),
 
-  .SYSCLK1(1'b0),
-  .SYSCLK2(1'b0),
+  .SYSCLK1(SYSCLK1),
+  .SYSCLK2(SYSCLK2),
 
   .FPGA_EXT_SCL(FPGA_EXT_SCL),
   .FPGA_EXT_SDA(FPGA_EXT_SDA),
@@ -918,9 +918,9 @@ scobca1_dbgctrl_core dbgctrl_core (
   .FPGA_RESERVE(FPGA_RESERVE),
   .FPGA_PWR_CYCLE_REQ(FPGA_PWR_CYCLE_REQ),
 
-  .ULPI_CLOCK(1'b0),
-  .ULPI_RESET_B(/*open*/),
-  .ULPI_CS(/*open*/),
+  .ULPI_CLOCK(ULPI_CLOCK),
+  .ULPI_RESET_B(ULPI_RESET_B),
+  .ULPI_CS(ULPI_CS),
 
   .UIO1(/*open*/),
   .UIO2(/*open*/),
