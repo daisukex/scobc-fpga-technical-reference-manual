@@ -102,6 +102,8 @@ module sc_obc_a1_fpga # (
   inout [7:0] ULPI_DATA,
   output ULPI_REFCLK,
 
+  input PUDC_B,
+
   // User IO Interface
 //  inout  [15:0] UIO1,
 //  inout  [15:0] UIO2,
@@ -712,6 +714,8 @@ sc_obc_core # (
   .ULPI_CS_GPIO_MODE_SEL(ulpi_cs_gpio_mode_sel),
   .ULPI_RESET_B_GPIO_IN(ulpi_reset_b_gpio_in),
   .ULPI_CS_GPIO_IN(ulpi_cs_gpio_in),
+
+  .PUDC_B(PUDC_B),
 
   .UIO1_GPIO_MODE_SEL(uio1_gpio_mode_sel),
   .UIO1_GPIO_IN(uio1_gpio_in),

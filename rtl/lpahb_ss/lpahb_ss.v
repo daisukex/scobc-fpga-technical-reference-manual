@@ -173,6 +173,8 @@ module lpahb_ss # (
   input  ULPI_RESET_B_GPIO_IN,
   input  ULPI_CS_GPIO_IN,
 
+  input  PUDC_B,
+
   output [2*16-1:0] UIO1_GPIO_MODE_SEL,
   input  [15:0] UIO1_GPIO_IN,
 
@@ -669,7 +671,7 @@ scobca1_dbg_reg dbg_reg (
   .ULPI_RESET_B_GPIO_IN(ULPI_RESET_B_GPIO_IN),
   .ULPI_CS_GPIO_IN(ULPI_CS_GPIO_IN),
 
-  .PUDC_B(1'b0),
+  .PUDC_B(PUDC_B),
 
   .UIO1_GPIO_MODE_SEL(UIO1_GPIO_MODE_SEL),
   .UIO1_GPIO_IN(UIO1_GPIO_IN),
