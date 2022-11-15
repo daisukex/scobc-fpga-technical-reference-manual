@@ -88,9 +88,9 @@ module sc_obc_a1_fpga # (
   // TRCH Interface
   input  FPGA_BOOT0,
   input  FPGA_BOOT1,
-  output FPGA_WATCHDOG,
+  inout  FPGA_WATCHDOG,
   inout  FPGA_RESERVE,
-  output FPGA_PWR_CYCLE_REQ,
+  inout  FPGA_PWR_CYCLE_REQ,
 
   // ULPI Interface
   output ULPI_CS,
@@ -267,6 +267,9 @@ wire [3:0] w_fram2_oe;
 wire [3:0] w_fram2_dout;
 wire [3:0] w_fram2_din;
 
+wire w_fpga_watchdog;
+wire w_fpga_pwr_cycle_req;
+
 wire [2*20-1:0] sram_a_gpio_mode_sel;
 wire [1:0] sram1_ce_b_gpio_mode_sel;
 wire [1:0] sram1_oe_b_gpio_mode_sel;
@@ -442,9 +445,9 @@ sc_obc_core # (
   // ------------------------------
   .CDRST_B(1'b0),
   .FPGA_BOOT({FPGA_BOOT1,FPGA_BOOT0}),
-  .FPGA_WATCHDOG(FPGA_WATCHDOG),
-  .FPGA_RESERVE(FPGA_RESERVE),
-  .FPGA_PWR_CYCLE_REQ(FPGA_PWR_CYCLE_REQ),
+  .FPGA_WATCHDOG(w_fpga_watchdog),
+  .FPGA_RESERVE(/*open*/),
+  .FPGA_PWR_CYCLE_REQ(w_fpga_pwr_cycle_req),
 
   // UDL Master Interface
   // ------------------------------
@@ -909,11 +912,11 @@ scobca1_dbgctrl_core dbgctrl_core (
   .FPGA_EXT_SCL(FPGA_EXT_SCL),
   .FPGA_EXT_SDA(FPGA_EXT_SDA),
 
-  .FPGA_BOOT0(1'b0),
-  .FPGA_BOOT1(1'b0),
-  .FPGA_WATCHDOG(/*open*/),
-  .FPGA_RESERVE(/*open*/),
-  .FPGA_PWR_CYCLE_REQ(/*open*/),
+  .FPGA_BOOT0(FPGA_BOOT0),
+  .FPGA_BOOT1(FPGA_BOOT1),
+  .FPGA_WATCHDOG(FPGA_WATCHDOG),
+  .FPGA_RESERVE(FPGA_RESERVE),
+  .FPGA_PWR_CYCLE_REQ(FPGA_PWR_CYCLE_REQ),
 
   .ULPI_CLOCK(1'b0),
   .ULPI_RESET_B(/*open*/),
@@ -963,8 +966,8 @@ scobca1_dbgctrl_core dbgctrl_core (
   .FRAM2_DOUT_IPOUT(w_fram2_dout),
   .FRAM2_DIN_IPIN(w_fram2_din),
 
-  .FPGA_WATCHDOG_IPOUT(1'b0),
-  .FPGA_PWR_CYCLE_REQ_IPOUT(1'b0),
+  .FPGA_WATCHDOG_IPOUT(w_fpga_watchdog),
+  .FPGA_PWR_CYCLE_REQ_IPOUT(w_fpga_pwr_cycle_req),
 
   .RSV_IPOUT(16'h0),
   .RSV_IPIN(/*open*/),
