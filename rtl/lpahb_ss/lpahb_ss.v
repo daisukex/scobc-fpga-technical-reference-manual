@@ -128,7 +128,7 @@ wire cvm_data_req_trg;
 wire temp_data_req_trg;
 
 localparam LPAHB_HCLK_IDLE_BIT = 5;
-localparam AHB_NUMBER_OF_SLAVE = 6;
+localparam AHB_NUMBER_OF_SLAVE = 7;
 localparam AHB_S0_BASE_ADDR = 16'h4F00;
 localparam AHB_S0_ADDR_WIDTH = 16;
 localparam AHB_S1_BASE_ADDR = 16'h4F01;
@@ -141,6 +141,8 @@ localparam AHB_S4_BASE_ADDR = 16'h4F04;
 localparam AHB_S4_ADDR_WIDTH = 16;
 localparam AHB_S5_BASE_ADDR = 16'h4F05;
 localparam AHB_S5_ADDR_WIDTH = 16;
+localparam AHB_S6_BASE_ADDR = 16'h4FF0;
+localparam AHB_S6_ADDR_WIDTH = 16;
 
 wire [AHB_NUMBER_OF_SLAVE-1:0] shsel;
 wire [32*AHB_NUMBER_OF_SLAVE-1:0] shrdata;
@@ -154,6 +156,7 @@ localparam AHB_EMPTY_CH = 2;
 localparam AHB_ETI2CM_CH = 3;
 localparam AHB_SYSMON_CH = 4;
 localparam AHB_GPTMR_CH = 5;
+localparam AHB_DEBUG_CH = 6;
 
 // AXI-AHB Bridge
 // --------------------------------------------------
@@ -233,7 +236,9 @@ sc_ahbip_decoder # (
   .SC_AHBIP_S4_BASE_ADDR(AHB_S4_BASE_ADDR),
   .SC_AHBIP_S4_ADDR_WIDTH(AHB_S4_ADDR_WIDTH),
   .SC_AHBIP_S5_BASE_ADDR(AHB_S5_BASE_ADDR),
-  .SC_AHBIP_S5_ADDR_WIDTH(AHB_S5_ADDR_WIDTH)
+  .SC_AHBIP_S5_ADDR_WIDTH(AHB_S5_ADDR_WIDTH),
+  .SC_AHBIP_S6_BASE_ADDR(AHB_S6_BASE_ADDR),
+  .SC_AHBIP_S6_ADDR_WIDTH(AHB_S6_ADDR_WIDTH)
 ) ahb_addr_dec (
   // System Interface
   .HCLK(hclk),
@@ -487,6 +492,115 @@ gptmr_pulse_sync sync_temp_irs (
   .HRESETN(hresetn),
   .I_PULSE(gptmr_hitmr_isr[2]),
   .O_PULSE(temp_data_req_trg)
+);
+
+
+
+// Debug Controller Register
+scobca1_dbg_reg dbg_reg (
+  // System Interface
+  .HCLK(hclk),
+  .HRESETN(hresetn),
+
+  // AHB Interface
+  .SHSEL(shsel[AHB_DEBUG_CH]),
+  .SHADDR(mhaddr),
+  .SHTRANS(mhtrans),
+  .SHSIZE(mhsize),
+  .SHBURST(mhburst),
+  .SHWRITE(mhwrite),
+  .SHREADYIN(shreadyin[AHB_DEBUG_CH]),
+  .SHREADYOUT(shreadyout[AHB_DEBUG_CH]),
+  .SHWDATA(mhwdata),
+  .SHRDATA(shrdata[32*AHB_DEBUG_CH +:32]),
+  .SHRESP(shresp[2*AHB_DEBUG_CH +:2]),
+
+  // Debug Register Input/Output
+  .SRAM_A_GPIO_MODE_SEL(/*open*/),
+  .SRAM1_CE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM1_OE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM1_WE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM1_BHE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM1_BLE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM2_CE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM2_OE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM2_WE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM2_BHE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM2_BLE_B_GPIO_MODE_SEL(/*open*/),
+  .SRAM_A_GPIO_IN(20'h0),
+  .SRAM1_CE_B_GPIO_IN(1'b0),
+  .SRAM1_OE_B_GPIO_IN(1'b0),
+  .SRAM1_WE_B_GPIO_IN(1'b0),
+  .SRAM1_BHE_B_GPIO_IN(1'b0),
+  .SRAM1_BLE_B_GPIO_IN(1'b0),
+  .SRAM2_CE_B_GPIO_IN(1'b0),
+  .SRAM2_OE_B_GPIO_IN(1'b0),
+  .SRAM2_WE_B_GPIO_IN(1'b0),
+  .SRAM2_BHE_B_GPIO_IN(1'b0),
+  .SRAM2_BLE_B_GPIO_IN(1'b0),
+
+  .CFG_MEM_CS_B_GPIO_MODE_SEL(/*open*/),
+  .CFG_MEM_IO_GPIO_MODE_SEL(/*open*/),
+  .CFG_MEM_CS_B_GPIO_IN(1'b0),
+  .CFG_MEM_IO_GPIO_IN(4'h0),
+
+  .DATA_MEM1_CS_B_GPIO_MODE_SEL(/*open*/),
+  .DATA_MEM1_IO_GPIO_MODE_SEL(/*open*/),
+  .DATA_MEM2_CS_B_GPIO_MODE_SEL(/*open*/),
+  .DATA_MEM2_IO_GPIO_MODE_SEL(/*open*/),
+  .DATA_MEM1_CS_B_GPIO_IN(1'b0),
+  .DATA_MEM1_IO_GPIO_IN(4'h0),
+  .DATA_MEM2_CS_B_GPIO_IN(1'b0),
+  .DATA_MEM2_IO_GPIO_IN(4'h0),
+
+  .FRAM1_CS_B_GPIO_MODE_SEL(/*open*/),
+  .FRAM1_IO_GPIO_MODE_SEL(/*open*/),
+  .FRAM2_CS_B_GPIO_MODE_SEL(/*open*/),
+  .FRAM2_IO_GPIO_MODE_SEL(/*open*/),
+  .FRAM1_CS_B_GPIO_IN(1'b0),
+  .FRAM1_IO_GPIO_IN(4'h0),
+  .FRAM2_CS_B_GPIO_IN(1'b0),
+  .FRAM2_IO_GPIO_IN(4'h0),
+
+  .SYSCLK2_STATE(1'b0),
+  .SYSCLK1_STATE(1'b0),
+
+  .TEMP_ALERT_B(1'b0),
+  .CVM_WARNING_B(1'b0),
+  .CVM_CRITICAL_B(1'b0),
+
+  .EXT_I2C_SCL_GPIO_MODE_SEL(/*open*/),
+  .EXT_I2C_SDA_GPIO_MODE_SEL(/*open*/),
+  .EXT_I2C_SCL_GPIO_IN(1'b0),
+  .EXT_I2C_SDA_GPIO_IN(1'b0),
+
+  .FPGA_BOOT_SHIFTREG_IN(32'h0),
+  .FPGA_WATCHDOG_GPIO_MODE_SEL(/*open*/),
+  .FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL(/*open*/),
+  .FPGA_RESERVE_GPIO_MODE_SEL(/*open*/),
+  .FPGA_WATCHDOG_GPIO_IN(1'b0),
+  .FPGA_PWR_CYCLE_REQ_GPIO_IN(1'b0),
+  .FPGA_RESERVE_GPIO_IN(1'b0),
+
+  .ULPI_CLOCK_STATE(1'b0),
+  .ULPI_RESET_B_GPIO_MODE_SEL(/*open*/),
+  .ULPI_CS_GPIO_MODE_SEL(/*open*/),
+  .ULPI_RESET_B_GPIO_IN(1'b0),
+  .ULPI_CS_GPIO_IN(1'b0),
+
+  .PUDC_B(1'b0),
+
+  .UIO1_GPIO_MODE_SEL(/*open*/),
+  .UIO1_GPIO_IN(16'h0),
+
+  .UIO2_GPIO_MODE_SEL(/*open*/),
+  .UIO2_GPIO_IN(16'h0),
+
+  .UIO4_GPIO_MODE_SEL(/*open*/),
+  .UIO4_GPIO_IN(6'h0),
+
+  .RSV_GPIO_MODE_SEL(/*open*/),
+  .RSV_GPIO_IN(16'h0)
 );
 
 endmodule
