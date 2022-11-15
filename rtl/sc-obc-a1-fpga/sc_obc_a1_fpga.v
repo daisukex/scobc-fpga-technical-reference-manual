@@ -234,6 +234,86 @@ wire tdi;
 wire tdo;
 wire ntdoen;
 
+wire [2*20-1:0] sram_a_gpio_mode_sel;
+wire [1:0] sram1_ce_b_gpio_mode_sel;
+wire [1:0] sram1_oe_b_gpio_mode_sel;
+wire [1:0] sram1_we_b_gpio_mode_sel;
+wire [1:0] sram1_bhe_b_gpio_mode_sel;
+wire [1:0] sram1_ble_b_gpio_mode_sel;
+wire [1:0] sram2_ce_b_gpio_mode_sel;
+wire [1:0] sram2_oe_b_gpio_mode_sel;
+wire [1:0] sram2_we_b_gpio_mode_sel;
+wire [1:0] sram2_bhe_b_gpio_mode_sel;
+wire [1:0] sram2_ble_b_gpio_mode_sel;
+wire [19:0] sram_a_gpio_in;
+wire sram1_ce_b_gpio_in;
+wire sram1_oe_b_gpio_in;
+wire sram1_we_b_gpio_in;
+wire sram1_bhe_b_gpio_in;
+wire sram1_ble_b_gpio_in;
+wire sram2_ce_b_gpio_in;
+wire sram2_oe_b_gpio_in;
+wire sram2_we_b_gpio_in;
+wire sram2_bhe_b_gpio_in;
+wire sram2_ble_b_gpio_in;
+
+wire [1:0] cfg_mem_cs_b_gpio_mode_sel;
+wire [2*4-1:0] cfg_mem_io_gpio_mode_sel;
+wire cfg_mem_cs_b_gpio_in;
+wire [3:0] cfg_mem_io_gpio_in;
+
+wire [1:0] data_mem1_cs_b_gpio_mode_sel;
+wire [2*4-1:0] data_mem1_io_gpio_mode_sel;
+wire [1:0] data_mem2_cs_b_gpio_mode_sel;
+wire [2*4-1:0] data_mem2_io_gpio_mode_sel;
+wire data_mem1_cs_b_gpio_in;
+wire [3:0] data_mem1_io_gpio_in;
+wire data_mem2_cs_b_gpio_in;
+wire [3:0] data_mem2_io_gpio_in;
+
+wire [1:0] fram1_cs_b_gpio_mode_sel;
+wire [2*4-1:0] fram1_io_gpio_mode_sel;
+wire [1:0] fram2_cs_b_gpio_mode_sel;
+wire [2*4-1:0] fram2_io_gpio_mode_sel;
+wire fram1_cs_b_gpio_in;
+wire [3:0] fram1_io_gpio_in;
+wire fram2_cs_b_gpio_in;
+wire [3:0] fram2_io_gpio_in;
+
+wire sysclk2_state;
+wire sysclk1_state;
+
+wire [1:0] ext_i2c_scl_gpio_mode_sel;
+wire [1:0] ext_i2c_sda_gpio_mode_sel;
+wire ext_i2c_scl_gpio_in;
+wire ext_i2c_sda_gpio_in;
+
+wire [31:0] fpga_boot_shiftreg_in;
+wire [1:0] fpga_watchdog_gpio_mode_sel;
+wire [1:0] fpga_pwr_cycle_req_gpio_mode_sel;
+wire [1:0] fpga_reserve_gpio_mode_sel;
+wire fpga_watchdog_gpio_in;
+wire fpga_pwr_cycle_req_gpio_in;
+wire fpga_reserve_gpio_in;
+
+wire ulpi_clock_state;
+wire [1:0] ulpi_reset_b_gpio_mode_sel;
+wire [1:0] ulpi_cs_gpio_mode_sel;
+wire ulpi_reset_b_gpio_in;
+wire ulpi_cs_gpio_in;
+
+wire [2*16-1:0] uio1_gpio_mode_sel;
+wire [15:0] uio1_gpio_in;
+
+wire [2*16-1:0] uio2_gpio_mode_sel;
+wire [15:0] uio2_gpio_in;
+
+wire [2*6-1:0] uio4_gpio_mode_sel;
+wire [5:0] uio4_gpio_in;
+
+wire [2*16-1:0] rsv_gpio_mode_sel;
+wire [15:0] rsv_gpio_in;
+
 // System Controller
 scobca1_sysctrl # (
   .SYSCTRL_USER_CLK1_DIVIDE(SYSCTRL_USER_CLK1_DIVIDE),
@@ -515,7 +595,89 @@ sc_obc_core # (
   .NTRST(ntrst),
   .TDI(tdi),
   .TDO(tdo),
-  .NTDOEN(ntdoen)
+  .NTDOEN(ntdoen),
+
+  // Debug Register Interface
+  // ------------------------------
+  .SRAM_A_GPIO_MODE_SEL(sram_a_gpio_mode_sel),
+  .SRAM1_CE_B_GPIO_MODE_SEL(sram1_ce_b_gpio_mode_sel),
+  .SRAM1_OE_B_GPIO_MODE_SEL(sram1_oe_b_gpio_mode_sel),
+  .SRAM1_WE_B_GPIO_MODE_SEL(sram1_we_b_gpio_mode_sel),
+  .SRAM1_BHE_B_GPIO_MODE_SEL(sram1_bhe_b_gpio_mode_sel),
+  .SRAM1_BLE_B_GPIO_MODE_SEL(sram1_ble_b_gpio_mode_sel),
+  .SRAM2_CE_B_GPIO_MODE_SEL(sram2_ce_b_gpio_mode_sel),
+  .SRAM2_OE_B_GPIO_MODE_SEL(sram2_oe_b_gpio_mode_sel),
+  .SRAM2_WE_B_GPIO_MODE_SEL(sram2_we_b_gpio_mode_sel),
+  .SRAM2_BHE_B_GPIO_MODE_SEL(sram2_bhe_b_gpio_mode_sel),
+  .SRAM2_BLE_B_GPIO_MODE_SEL(sram2_ble_b_gpio_mode_sel),
+  .SRAM_A_GPIO_IN(sram_a_gpio_in),
+  .SRAM1_CE_B_GPIO_IN(sram1_ce_b_gpio_in),
+  .SRAM1_OE_B_GPIO_IN(sram1_oe_b_gpio_in),
+  .SRAM1_WE_B_GPIO_IN(sram1_we_b_gpio_in),
+  .SRAM1_BHE_B_GPIO_IN(sram1_bhe_b_gpio_in),
+  .SRAM1_BLE_B_GPIO_IN(sram1_ble_b_gpio_in),
+  .SRAM2_CE_B_GPIO_IN(sram2_ce_b_gpio_in),
+  .SRAM2_OE_B_GPIO_IN(sram2_oe_b_gpio_in),
+  .SRAM2_WE_B_GPIO_IN(sram2_we_b_gpio_in),
+  .SRAM2_BHE_B_GPIO_IN(sram2_bhe_b_gpio_in),
+  .SRAM2_BLE_B_GPIO_IN(sram2_ble_b_gpio_in),
+
+  .CFG_MEM_CS_B_GPIO_MODE_SEL(cfg_mem_cs_b_gpio_mode_sel),
+  .CFG_MEM_IO_GPIO_MODE_SEL(cfg_mem_io_gpio_mode_sel),
+  .CFG_MEM_CS_B_GPIO_IN(cfg_mem_cs_b_gpio_in),
+  .CFG_MEM_IO_GPIO_IN(cfg_mem_io_gpio_in),
+
+  .DATA_MEM1_CS_B_GPIO_MODE_SEL(data_mem1_cs_b_gpio_mode_sel),
+  .DATA_MEM1_IO_GPIO_MODE_SEL(data_mem1_io_gpio_mode_sel),
+  .DATA_MEM2_CS_B_GPIO_MODE_SEL(data_mem2_cs_b_gpio_mode_sel),
+  .DATA_MEM2_IO_GPIO_MODE_SEL(data_mem2_io_gpio_mode_sel),
+  .DATA_MEM1_CS_B_GPIO_IN(data_mem1_cs_b_gpio_in),
+  .DATA_MEM1_IO_GPIO_IN(data_mem1_io_gpio_in),
+  .DATA_MEM2_CS_B_GPIO_IN(data_mem2_cs_b_gpio_in),
+  .DATA_MEM2_IO_GPIO_IN(data_mem2_io_gpio_in),
+
+  .FRAM1_CS_B_GPIO_MODE_SEL(fram1_cs_b_gpio_mode_sel),
+  .FRAM1_IO_GPIO_MODE_SEL(fram1_io_gpio_mode_sel),
+  .FRAM2_CS_B_GPIO_MODE_SEL(fram2_cs_b_gpio_mode_sel),
+  .FRAM2_IO_GPIO_MODE_SEL(fram2_io_gpio_mode_sel),
+  .FRAM1_CS_B_GPIO_IN(fram1_cs_b_gpio_in),
+  .FRAM1_IO_GPIO_IN(fram1_io_gpio_in),
+  .FRAM2_CS_B_GPIO_IN(fram2_cs_b_gpio_in),
+  .FRAM2_IO_GPIO_IN(fram2_io_gpio_in),
+
+  .SYSCLK2_STATE(sysclk2_state),
+  .SYSCLK1_STATE(sysclk1_state),
+
+  .EXT_I2C_SCL_GPIO_MODE_SEL(ext_i2c_scl_gpio_mode_sel),
+  .EXT_I2C_SDA_GPIO_MODE_SEL(ext_i2c_sda_gpio_mode_sel),
+  .EXT_I2C_SCL_GPIO_IN(ext_i2c_scl_gpio_in),
+  .EXT_I2C_SDA_GPIO_IN(ext_i2c_sda_gpio_in),
+
+  .FPGA_BOOT_SHIFTREG_IN(fpga_boot_shiftreg_in),
+  .FPGA_WATCHDOG_GPIO_MODE_SEL(fpga_watchdog_gpio_mode_sel),
+  .FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL(fpga_pwr_cycle_req_gpio_mode_sel),
+  .FPGA_RESERVE_GPIO_MODE_SEL(fpga_reserve_gpio_mode_sel),
+  .FPGA_WATCHDOG_GPIO_IN(fpga_watchdog_gpio_in),
+  .FPGA_PWR_CYCLE_REQ_GPIO_IN(fpga_pwr_cycle_req_gpio_in),
+  .FPGA_RESERVE_GPIO_IN(fpga_reserve_gpio_in),
+
+  .ULPI_CLOCK_STATE(ulpi_clock_state),
+  .ULPI_RESET_B_GPIO_MODE_SEL(ulpi_reset_b_gpio_mode_sel),
+  .ULPI_CS_GPIO_MODE_SEL(ulpi_cs_gpio_mode_sel),
+  .ULPI_RESET_B_GPIO_IN(ulpi_reset_b_gpio_in),
+  .ULPI_CS_GPIO_IN(ulpi_cs_gpio_in),
+
+  .UIO1_GPIO_MODE_SEL(uio1_gpio_mode_sel),
+  .UIO1_GPIO_IN(uio1_gpio_in),
+
+  .UIO2_GPIO_MODE_SEL(uio2_gpio_mode_sel),
+  .UIO2_GPIO_IN(uio2_gpio_in),
+
+  .UIO4_GPIO_MODE_SEL(uio4_gpio_mode_sel),
+  .UIO4_GPIO_IN(uio4_gpio_in),
+
+  .RSV_GPIO_MODE_SEL(rsv_gpio_mode_sel),
+  .RSV_GPIO_IN(rsv_gpio_in)
 );
 
 STARTUPE2 startupe2 (
@@ -765,85 +927,85 @@ scobca1_dbgctrl_core dbgctrl_core (
   .RSV_IPIN(/*open*/),
 
   // Debug Register Interface
-  .SRAM_A_GPIO_MODE_SEL(40'h0),
-  .SRAM1_CE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM1_OE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM1_WE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM1_BHE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM1_BLE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM2_CE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM2_OE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM2_WE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM2_BHE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM2_BLE_B_GPIO_MODE_SEL(2'h0),
-  .SRAM_A_GPIO_IN(/*open*/),
-  .SRAM1_CE_B_GPIO_IN(/*open*/),
-  .SRAM1_OE_B_GPIO_IN(/*open*/),
-  .SRAM1_WE_B_GPIO_IN(/*open*/),
-  .SRAM1_BHE_B_GPIO_IN(/*open*/),
-  .SRAM1_BLE_B_GPIO_IN(/*open*/),
-  .SRAM2_CE_B_GPIO_IN(/*open*/),
-  .SRAM2_OE_B_GPIO_IN(/*open*/),
-  .SRAM2_WE_B_GPIO_IN(/*open*/),
-  .SRAM2_BHE_B_GPIO_IN(/*open*/),
-  .SRAM2_BLE_B_GPIO_IN(/*open*/),
+  .SRAM_A_GPIO_MODE_SEL(sram_a_gpio_mode_sel),
+  .SRAM1_CE_B_GPIO_MODE_SEL(sram1_ce_b_gpio_mode_sel),
+  .SRAM1_OE_B_GPIO_MODE_SEL(sram1_oe_b_gpio_mode_sel),
+  .SRAM1_WE_B_GPIO_MODE_SEL(sram1_we_b_gpio_mode_sel),
+  .SRAM1_BHE_B_GPIO_MODE_SEL(sram1_bhe_b_gpio_mode_sel),
+  .SRAM1_BLE_B_GPIO_MODE_SEL(sram1_ble_b_gpio_mode_sel),
+  .SRAM2_CE_B_GPIO_MODE_SEL(sram2_ce_b_gpio_mode_sel),
+  .SRAM2_OE_B_GPIO_MODE_SEL(sram2_oe_b_gpio_mode_sel),
+  .SRAM2_WE_B_GPIO_MODE_SEL(sram2_we_b_gpio_mode_sel),
+  .SRAM2_BHE_B_GPIO_MODE_SEL(sram2_bhe_b_gpio_mode_sel),
+  .SRAM2_BLE_B_GPIO_MODE_SEL(sram2_ble_b_gpio_mode_sel),
+  .SRAM_A_GPIO_IN(sram_a_gpio_in),
+  .SRAM1_CE_B_GPIO_IN(sram1_ce_b_gpio_in),
+  .SRAM1_OE_B_GPIO_IN(sram1_oe_b_gpio_in),
+  .SRAM1_WE_B_GPIO_IN(sram1_we_b_gpio_in),
+  .SRAM1_BHE_B_GPIO_IN(sram1_bhe_b_gpio_in),
+  .SRAM1_BLE_B_GPIO_IN(sram1_ble_b_gpio_in),
+  .SRAM2_CE_B_GPIO_IN(sram2_ce_b_gpio_in),
+  .SRAM2_OE_B_GPIO_IN(sram2_oe_b_gpio_in),
+  .SRAM2_WE_B_GPIO_IN(sram2_we_b_gpio_in),
+  .SRAM2_BHE_B_GPIO_IN(sram2_bhe_b_gpio_in),
+  .SRAM2_BLE_B_GPIO_IN(sram2_ble_b_gpio_in),
 
-  .CFG_MEM_CS_B_GPIO_MODE_SEL(2'h0),
-  .CFG_MEM_IO_GPIO_MODE_SEL(8'h0),
-  .CFG_MEM_CS_B_GPIO_IN(/*open*/),
-  .CFG_MEM_IO_GPIO_IN(/*open*/),
+  .CFG_MEM_CS_B_GPIO_MODE_SEL(cfg_mem_cs_b_gpio_mode_sel),
+  .CFG_MEM_IO_GPIO_MODE_SEL(cfg_mem_io_gpio_mode_sel),
+  .CFG_MEM_CS_B_GPIO_IN(cfg_mem_cs_b_gpio_in),
+  .CFG_MEM_IO_GPIO_IN(cfg_mem_io_gpio_in),
 
-  .DATA_MEM1_CS_B_GPIO_MODE_SEL(2'h0),
-  .DATA_MEM1_IO_GPIO_MODE_SEL(8'h0),
-  .DATA_MEM2_CS_B_GPIO_MODE_SEL(2'h0),
-  .DATA_MEM2_IO_GPIO_MODE_SEL(8'h0),
-  .DATA_MEM1_CS_B_GPIO_IN(/*open*/),
-  .DATA_MEM1_IO_GPIO_IN(/*open*/),
-  .DATA_MEM2_CS_B_GPIO_IN(/*open*/),
-  .DATA_MEM2_IO_GPIO_IN(/*open*/),
+  .DATA_MEM1_CS_B_GPIO_MODE_SEL(data_mem1_cs_b_gpio_mode_sel),
+  .DATA_MEM1_IO_GPIO_MODE_SEL(data_mem1_io_gpio_mode_sel),
+  .DATA_MEM2_CS_B_GPIO_MODE_SEL(data_mem2_cs_b_gpio_mode_sel),
+  .DATA_MEM2_IO_GPIO_MODE_SEL(data_mem2_io_gpio_mode_sel),
+  .DATA_MEM1_CS_B_GPIO_IN(data_mem1_cs_b_gpio_in),
+  .DATA_MEM1_IO_GPIO_IN(data_mem1_io_gpio_in),
+  .DATA_MEM2_CS_B_GPIO_IN(data_mem2_cs_b_gpio_in),
+  .DATA_MEM2_IO_GPIO_IN(data_mem2_io_gpio_in),
 
-  .FRAM1_CS_B_GPIO_MODE_SEL(2'h0),
-  .FRAM1_IO_GPIO_MODE_SEL(8'h0),
-  .FRAM2_CS_B_GPIO_MODE_SEL(2'h0),
-  .FRAM2_IO_GPIO_MODE_SEL(8'h0),
-  .FRAM1_CS_B_GPIO_IN(/*open*/),
-  .FRAM1_IO_GPIO_IN(/*open*/),
-  .FRAM2_CS_B_GPIO_IN(/*open*/),
-  .FRAM2_IO_GPIO_IN(/*open*/),
+  .FRAM1_CS_B_GPIO_MODE_SEL(fram1_cs_b_gpio_mode_sel),
+  .FRAM1_IO_GPIO_MODE_SEL(fram1_io_gpio_mode_sel),
+  .FRAM2_CS_B_GPIO_MODE_SEL(fram2_cs_b_gpio_mode_sel),
+  .FRAM2_IO_GPIO_MODE_SEL(fram2_io_gpio_mode_sel),
+  .FRAM1_CS_B_GPIO_IN(fram1_cs_b_gpio_in),
+  .FRAM1_IO_GPIO_IN(fram1_io_gpio_in),
+  .FRAM2_CS_B_GPIO_IN(fram2_cs_b_gpio_in),
+  .FRAM2_IO_GPIO_IN(fram2_io_gpio_in),
 
-  .SYSCLK2_STATE(/*open*/),
-  .SYSCLK1_STATE(/*open*/),
+  .SYSCLK2_STATE(sysclk2_state),
+  .SYSCLK1_STATE(sysclk1_state),
 
-  .EXT_I2C_SCL_GPIO_MODE_SEL(2'h0),
-  .EXT_I2C_SDA_GPIO_MODE_SEL(2'h0),
-  .EXT_I2C_SCL_GPIO_IN(/*open*/),
-  .EXT_I2C_SDA_GPIO_IN(/*open*/),
+  .EXT_I2C_SCL_GPIO_MODE_SEL(ext_i2c_scl_gpio_mode_sel),
+  .EXT_I2C_SDA_GPIO_MODE_SEL(ext_i2c_sda_gpio_mode_sel),
+  .EXT_I2C_SCL_GPIO_IN(ext_i2c_scl_gpio_in),
+  .EXT_I2C_SDA_GPIO_IN(ext_i2c_sda_gpio_in),
 
-  .FPGA_BOOT_SHIFTREG_IN(/*open*/),
-  .FPGA_WATCHDOG_GPIO_MODE_SEL(2'h0),
-  .FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL(2'h0),
-  .FPGA_RESERVE_GPIO_MODE_SEL(2'h0),
-  .FPGA_WATCHDOG_GPIO_IN(/*open*/),
-  .FPGA_PWR_CYCLE_REQ_GPIO_IN(/*open*/),
-  .FPGA_RESERVE_GPIO_IN(/*open*/),
+  .FPGA_BOOT_SHIFTREG_IN(fpga_boot_shiftreg_in),
+  .FPGA_WATCHDOG_GPIO_MODE_SEL(fpga_watchdog_gpio_mode_sel),
+  .FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL(fpga_pwr_cycle_req_gpio_mode_sel),
+  .FPGA_RESERVE_GPIO_MODE_SEL(fpga_reserve_gpio_mode_sel),
+  .FPGA_WATCHDOG_GPIO_IN(fpga_watchdog_gpio_in),
+  .FPGA_PWR_CYCLE_REQ_GPIO_IN(fpga_pwr_cycle_req_gpio_in),
+  .FPGA_RESERVE_GPIO_IN(fpga_reserve_gpio_in),
 
-  .ULPI_CLOCK_STATE(/*open*/),
-  .ULPI_RESET_B_GPIO_MODE_SEL(2'h0),
-  .ULPI_CS_GPIO_MODE_SEL(2'h0),
-  .ULPI_RESET_B_GPIO_IN(/*open*/),
-  .ULPI_CS_GPIO_IN(/*open*/),
+  .ULPI_CLOCK_STATE(ulpi_clock_state),
+  .ULPI_RESET_B_GPIO_MODE_SEL(ulpi_reset_b_gpio_mode_sel),
+  .ULPI_CS_GPIO_MODE_SEL(ulpi_cs_gpio_mode_sel),
+  .ULPI_RESET_B_GPIO_IN(ulpi_reset_b_gpio_in),
+  .ULPI_CS_GPIO_IN(ulpi_cs_gpio_in),
 
-  .UIO1_GPIO_MODE_SEL(32'h0),
-  .UIO1_GPIO_IN(/*open*/),
+  .UIO1_GPIO_MODE_SEL(uio1_gpio_mode_sel),
+  .UIO1_GPIO_IN(uio1_gpio_in),
 
-  .UIO2_GPIO_MODE_SEL(32'h0),
-  .UIO2_GPIO_IN(/*open*/),
+  .UIO2_GPIO_MODE_SEL(uio2_gpio_mode_sel),
+  .UIO2_GPIO_IN(uio2_gpio_in),
 
-  .UIO4_GPIO_MODE_SEL(12'h0),
-  .UIO4_GPIO_IN(/*open*/),
+  .UIO4_GPIO_MODE_SEL(uio4_gpio_mode_sel),
+  .UIO4_GPIO_IN(uio4_gpio_in),
 
-  .RSV_GPIO_MODE_SEL(32'h0),
-  .RSV_GPIO_IN(/*open*/)
+  .RSV_GPIO_MODE_SEL(rsv_gpio_mode_sel),
+  .RSV_GPIO_IN(rsv_gpio_in)
 );
 
 endmodule
