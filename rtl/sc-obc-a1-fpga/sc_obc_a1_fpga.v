@@ -105,8 +105,9 @@ module sc_obc_a1_fpga # (
   input PUDC_B,
 
   // User IO Interface
-//  inout  [15:0] UIO1,
-//  inout  [15:0] UIO2,
+  inout  [15:0] UIO1,
+  inout  [15:0] UIO2,
+  inout  [5:0] UIO4_11_06,
   inout  UIO4
 );
 
@@ -445,7 +446,6 @@ sc_obc_core # (
 
   // TRCH/Board System Interface
   // ------------------------------
-  .CDRST_B(1'b0),
   .FPGA_BOOT({FPGA_BOOT1,FPGA_BOOT0}),
   .FPGA_WATCHDOG(w_fpga_watchdog),
   .FPGA_RESERVE(/*open*/),
@@ -926,9 +926,9 @@ scobca1_dbgctrl_core dbgctrl_core (
   .ULPI_RESET_B(ULPI_RESET_B),
   .ULPI_CS(ULPI_CS),
 
-  .UIO1(/*open*/),
-  .UIO2(/*open*/),
-  .UIO4(/*open*/),
+  .UIO1(UIO1),
+  .UIO2(UIO2),
+  .UIO4(UIO4_11_06),
 
   .RSV(/*open*/),
 

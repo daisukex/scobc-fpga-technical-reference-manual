@@ -58,7 +58,6 @@ module sc_obc_core # (
 
   // TRCH/Board System Interface
   // ------------------------------
-  input CDRST_B,
   input [1:0] FPGA_BOOT,
   output FPGA_WATCHDOG,
   inout FPGA_RESERVE,
