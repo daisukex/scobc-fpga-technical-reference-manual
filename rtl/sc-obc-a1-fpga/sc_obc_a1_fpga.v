@@ -33,19 +33,19 @@ module sc_obc_a1_fpga # (
   output CM3_TDO_SWO,
 
   // SRAM Interface
-  output [19:0] SRAM_A,
-  output SRAM1_CE_B,
-  output SRAM1_OE_B,
-  output SRAM1_WE_B,
-  output SRAM1_BHE_B,
-  output SRAM1_BLE_B,
+  inout  [19:0] SRAM_A,
+  inout  SRAM1_CE_B,
+  inout  SRAM1_OE_B,
+  inout  SRAM1_WE_B,
+  inout  SRAM1_BHE_B,
+  inout  SRAM1_BLE_B,
   input  SRAM1_ERR,
   inout  [15:0] SRAM1_IO,
-  output SRAM2_CE_B,
-  output SRAM2_OE_B,
-  output SRAM2_WE_B,
-  output SRAM2_BHE_B,
-  output SRAM2_BLE_B,
+  inout  SRAM2_CE_B,
+  inout  SRAM2_OE_B,
+  inout  SRAM2_WE_B,
+  inout  SRAM2_BHE_B,
+  inout  SRAM2_BLE_B,
   input  SRAM2_ERR,
   inout  [15:0] SRAM2_IO,
 
@@ -233,6 +233,18 @@ wire ntrst;
 wire tdi;
 wire tdo;
 wire ntdoen;
+
+wire [19:0] w_sram_a;
+wire w_sram1_ce_b;
+wire w_sram1_oe_b;
+wire w_sram1_we_b;
+wire w_sram1_bhe_b;
+wire w_sram1_ble_b;
+wire w_sram2_ce_b;
+wire w_sram2_oe_b;
+wire w_sram2_we_b;
+wire w_sram2_bhe_b;
+wire w_sram2_ble_b;
 
 wire [2*20-1:0] sram_a_gpio_mode_sel;
 wire [1:0] sram1_ce_b_gpio_mode_sel;
@@ -508,19 +520,19 @@ sc_obc_core # (
 
   // SRAM Interface
   // ------------------------------
-  .SRAM_A(SRAM_A),
-  .SRAM1_CE_B(SRAM1_CE_B),
-  .SRAM1_OE_B(SRAM1_OE_B),
-  .SRAM1_WE_B(SRAM1_WE_B),
-  .SRAM1_BHE_B(SRAM1_BHE_B),
-  .SRAM1_BLE_B(SRAM1_BLE_B),
+  .SRAM_A(w_sram_a),
+  .SRAM1_CE_B(w_sram1_ce_b),
+  .SRAM1_OE_B(w_sram1_oe_b),
+  .SRAM1_WE_B(w_sram1_we_b),
+  .SRAM1_BHE_B(w_sram1_bhe_b),
+  .SRAM1_BLE_B(w_sram1_ble_b),
   .SRAM1_ERR(SRAM1_ERR),
   .SRAM1_IO(SRAM1_IO),
-  .SRAM2_CE_B(SRAM2_CE_B),
-  .SRAM2_OE_B(SRAM2_OE_B),
-  .SRAM2_WE_B(SRAM2_WE_B),
-  .SRAM2_BHE_B(SRAM2_BHE_B),
-  .SRAM2_BLE_B(SRAM2_BLE_B),
+  .SRAM2_CE_B(w_sram2_ce_b),
+  .SRAM2_OE_B(w_sram2_oe_b),
+  .SRAM2_WE_B(w_sram2_we_b),
+  .SRAM2_BHE_B(w_sram2_bhe_b),
+  .SRAM2_BLE_B(w_sram2_ble_b),
   .SRAM2_ERR(SRAM2_ERR),
   .SRAM2_IO(SRAM2_IO),
 
@@ -833,17 +845,17 @@ scobca1_dbgctrl_core dbgctrl_core (
   .SYS_RSTB(g_sys_rstb),
 
   // FPGA Interface
-  .SRAM_A(/*open*/),
-  .SRAM1_CE_B(/*open*/),
-  .SRAM1_OE_B(/*open*/),
-  .SRAM1_WE_B(/*open*/),
-  .SRAM1_BHE_B(/*open*/),
-  .SRAM1_BLE_B(/*open*/),
-  .SRAM2_CE_B(/*open*/),
-  .SRAM2_OE_B(/*open*/),
-  .SRAM2_WE_B(/*open*/),
-  .SRAM2_BHE_B(/*open*/),
-  .SRAM2_BLE_B(/*open*/),
+  .SRAM_A(SRAM_A),
+  .SRAM1_CE_B(SRAM1_CE_B),
+  .SRAM1_OE_B(SRAM1_OE_B),
+  .SRAM1_WE_B(SRAM1_WE_B),
+  .SRAM1_BHE_B(SRAM1_BHE_B),
+  .SRAM1_BLE_B(SRAM1_BLE_B),
+  .SRAM2_CE_B(SRAM2_CE_B),
+  .SRAM2_OE_B(SRAM2_OE_B),
+  .SRAM2_WE_B(SRAM2_WE_B),
+  .SRAM2_BHE_B(SRAM2_BHE_B),
+  .SRAM2_BLE_B(SRAM2_BLE_B),
 
   .CFG_MEM_CS_B(/*open*/),
   .CFG_MEM_IO(/*open*/),
@@ -883,17 +895,17 @@ scobca1_dbgctrl_core dbgctrl_core (
   .RSV(/*open*/),
 
   // IP Interface
-  .SRAM_A_IPOUT(20'h0),
-  .SRAM1_CE_B_IPOUT(1'b0),
-  .SRAM1_OE_B_IPOUT(1'b0),
-  .SRAM1_WE_B_IPOUT(1'b0),
-  .SRAM1_BHE_B_IPOUT(1'b0),
-  .SRAM1_BLE_B_IPOUT(1'b0),
-  .SRAM2_CE_B_IPOUT(1'b0),
-  .SRAM2_OE_B_IPOUT(1'b0),
-  .SRAM2_WE_B_IPOUT(1'b0),
-  .SRAM2_BHE_B_IPOUT(1'b0),
-  .SRAM2_BLE_B_IPOUT(1'b0),
+  .SRAM_A_IPOUT(w_sram_a),
+  .SRAM1_CE_B_IPOUT(w_sram1_ce_b),
+  .SRAM1_OE_B_IPOUT(w_sram1_oe_b),
+  .SRAM1_WE_B_IPOUT(w_sram1_we_b),
+  .SRAM1_BHE_B_IPOUT(w_sram1_bhe_b),
+  .SRAM1_BLE_B_IPOUT(w_sram1_ble_b),
+  .SRAM2_CE_B_IPOUT(w_sram2_ce_b),
+  .SRAM2_OE_B_IPOUT(w_sram2_oe_b),
+  .SRAM2_WE_B_IPOUT(w_sram2_we_b),
+  .SRAM2_BHE_B_IPOUT(w_sram2_bhe_b),
+  .SRAM2_BLE_B_IPOUT(w_sram2_ble_b),
 
   .CFG_MEM_CS_B_IPOUT(1'b0),
   .CFG_MEM_OE_IPOUT(4'h0),
