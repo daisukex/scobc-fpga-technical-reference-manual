@@ -39,6 +39,33 @@ create_generated_clock -name user_clk2 -source [get_pins sysctrl/clk_gen/scobca1
                        -add -master_clock [get_clocks refclk1] \
                        [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT5]
 
+# SRAM Interface test clock
+create_generated_clock -name sram1_we_b -divide_by 2 -invert \
+                       -master_clock [get_clocks pllclk48m] -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports SRAM1_WE_B]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks sram1_we_b]
+set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram1_we_b]
+
+create_generated_clock -name sram2_we_b -divide_by 2 -invert \
+                       -master_clock [get_clocks pllclk48m] -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports SRAM2_WE_B]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks sram2_we_b]
+set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram2_we_b]
+
+create_generated_clock -name sram1_oe_b -divide_by 2 -invert \
+                       -master_clock [get_clocks pllclk48m] -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports SRAM1_OE_B]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks sram1_oe_b]
+set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram1_oe_b]
+set_multicycle_path 2 -hold  -end   -from [get_clocks sram1_oe_b] -to [get_clocks pllclk48m]
+
+create_generated_clock -name sram2_oe_b -divide_by 2 -invert \
+                       -master_clock [get_clocks pllclk48m] -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports SRAM2_OE_B]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks sram2_oe_b]
+set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram2_oe_b]
+set_multicycle_path 2 -hold  -end   -from [get_clocks sram2_oe_b] -to [get_clocks pllclk48m]
+
 set_case_analysis 1 [get_pins  sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKINSEL]
 set_case_analysis 1 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S0]
 set_case_analysis 0 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S1]
@@ -55,3 +82,62 @@ set_clock_groups \
     -group [get_clocks user_clk1] \
     -group [get_clocks user_clk2] \
     -group [get_clocks ulpi_refclk]
+
+# SRAM Interface
+set sram_sig_delay_max 20
+set sram_delay_max     10
+set sram_delay_min      3
+set sram_out_max        6
+set sram_out_min        1
+set sram_addr_setup     7
+set sram_addr_hold      0
+set sram_data_setup     5
+set sram_data_hold      0
+set sram_en_setup       7
+set sram_en_hold        0
+set sram_be_setup       7
+set sram_be_hold        0
+set sram_oe_setup       0
+set sram_oe_hold        5
+
+## SRAM Write
+set_max_delay -from [get_clocks pllclk48m] -to [get_ports SRAM1_WE_B] ${sram_sig_delay_max}
+set_output_delay -clock [get_clocks sram1_we_b] -max ${sram_addr_setup}         [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram1_we_b] -min [expr - ${sram_addr_hold}] [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram2_we_b] -max ${sram_addr_setup}         [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram2_we_b] -min [expr - ${sram_addr_hold}] [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram1_we_b] -max ${sram_be_setup}           [get_ports {SRAM1_CE_B}]
+set_output_delay -clock [get_clocks sram1_we_b] -min [expr - ${sram_be_hold}]   [get_ports {SRAM1_CE_B}]
+set_output_delay -clock [get_clocks sram2_we_b] -max ${sram_be_setup}           [get_ports {SRAM2_CE_B}]
+set_output_delay -clock [get_clocks sram2_we_b] -min [expr - ${sram_be_hold}]   [get_ports {SRAM2_CE_B}]
+set_output_delay -clock [get_clocks sram1_we_b] -max ${sram_be_setup}           [get_ports {SRAM1_B*E_B}]
+set_output_delay -clock [get_clocks sram1_we_b] -min [expr - ${sram_be_hold}]   [get_ports {SRAM1_B*E_B}]
+set_output_delay -clock [get_clocks sram2_we_b] -max ${sram_be_setup}           [get_ports {SRAM2_B*E_B}]
+set_output_delay -clock [get_clocks sram2_we_b] -min [expr - ${sram_be_hold}]   [get_ports {SRAM2_B*E_B}]
+set_output_delay -clock [get_clocks sram1_we_b] -max ${sram_data_setup}         [get_ports {SRAM1_IO[*]}]
+set_output_delay -clock [get_clocks sram1_we_b] -min [expr - ${sram_data_hold}] [get_ports {SRAM1_IO[*]}]
+set_output_delay -clock [get_clocks sram2_we_b] -max ${sram_data_setup}         [get_ports {SRAM2_IO[*]}]
+set_output_delay -clock [get_clocks sram2_we_b] -min [expr - ${sram_data_hold}] [get_ports {SRAM2_IO[*]}]
+
+## SRAM Read
+set_max_delay -from [get_clocks pllclk48m] -to [get_ports SRAM1_OE_B] ${sram_sig_delay_max}
+set_output_delay -clock [get_clocks sram1_oe_b] -max ${sram_oe_setup}           [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram1_oe_b] -min [expr - ${sram_oe_hold}]   [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram2_oe_b] -max ${sram_oe_setup}           [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram2_oe_b] -min [expr - ${sram_oe_hold}]   [get_ports {SRAM_A[*]}]
+set_output_delay -clock [get_clocks sram1_oe_b] -max ${sram_oe_setup}           [get_ports {SRAM1_CE_B}]
+set_output_delay -clock [get_clocks sram1_oe_b] -min [expr - ${sram_oe_hold}]   [get_ports {SRAM1_CE_B}]
+set_output_delay -clock [get_clocks sram2_oe_b] -max ${sram_oe_setup}           [get_ports {SRAM2_CE_B}]
+set_output_delay -clock [get_clocks sram2_oe_b] -min [expr - ${sram_oe_hold}]   [get_ports {SRAM2_CE_B}]
+set_output_delay -clock [get_clocks sram1_oe_b] -max ${sram_oe_setup}           [get_ports {SRAM1_B*E_B}]
+set_output_delay -clock [get_clocks sram1_oe_b] -min [expr - ${sram_oe_hold}]   [get_ports {SRAM1_B*E_B}]
+set_output_delay -clock [get_clocks sram2_oe_b] -max ${sram_oe_setup}           [get_ports {SRAM2_B*E_B}]
+set_output_delay -clock [get_clocks sram2_oe_b] -min [expr - ${sram_oe_hold}]   [get_ports {SRAM2_B*E_B}]
+set_input_delay  -clock [get_clocks sram1_oe_b] -clock_fall -max [expr ${board_delay_max} * 2 + ${sram_delay_max}] [get_ports {SRAM1_IO[*]}]
+set_input_delay  -clock [get_clocks sram1_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports {SRAM1_IO[*]}]
+set_input_delay  -clock [get_clocks sram1_oe_b] -clock_fall -max [expr ${board_delay_max} * 2 + ${sram_delay_max}] [get_ports SRAM1_ERR]
+set_input_delay  -clock [get_clocks sram1_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports SRAM1_ERR]
+set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -max [expr ${board_delay_max} * 2 + ${sram_delay_max}] [get_ports {SRAM2_IO[*]}]
+set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports {SRAM2_IO[*]}]
+set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -max [expr ${board_delay_max} * 2 + ${sram_delay_max}] [get_ports SRAM2_ERR]
+set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports SRAM2_ERR]
