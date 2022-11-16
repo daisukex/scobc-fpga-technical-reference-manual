@@ -62,6 +62,8 @@ reg r_wen_sel_p1;
 reg [19:0] r_wadr_sel_p1;
 reg [3:0] r_wbten_sel_p1;
 reg [31:0] r_wdata_sel_p1;
+reg r_sr1_dout_en;
+reg r_sr2_dout_en;
 
 reg [P_RD_LTCY-2:0] r_ren_p;
 reg [19:0] r_radr_p [0:P_RD_LTCY-2];
@@ -91,6 +93,10 @@ always@ (posedge CLK) begin
   r_wadr_sel_p1  <= w_wadr_sel;
   r_wbten_sel_p1 <= w_wbten_sel;
   r_wdata_sel_p1 <= w_wdata_sel;
+  r_sr1_dout_en  <= (w_wen_sel    & |w_wbten_sel[1:0]) |
+                    (r_wen_sel_p1 & |r_wbten_sel_p1[1:0]);
+  r_sr2_dout_en  <= (w_wen_sel    & |w_wbten_sel[3:2]) |
+                    (r_wen_sel_p1 & |r_wbten_sel_p1[3:2]);
 end
 
 always@ (posedge CLK or negedge RESET_N) begin
@@ -275,9 +281,9 @@ always@ (posedge CLK or negedge RESET_N) begin
   end
 end
 
-assign SR1_IO = (SR1_OEB) ? r_sr1_dout : {16{1'bz}};
+assign SR1_IO = (r_sr1_dout_en) ? r_sr1_dout : {16{1'bz}};
 assign w_sr1_din = SR1_IO;
-assign SR2_IO = (SR2_OEB) ? r_sr2_dout : {16{1'bz}};
+assign SR2_IO = (r_sr2_dout_en) ? r_sr2_dout : {16{1'bz}};
 assign w_sr2_din = SR2_IO;
 
 endmodule
