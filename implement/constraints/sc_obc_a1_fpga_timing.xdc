@@ -14,6 +14,10 @@ create_clock -name refclk1 -period $sysclk_period [get_ports SYSCLK1]
 create_clock -name refclk2 -period $sysclk_period [get_ports SYSCLK2]
 create_clock -name tclk    -period $tclk_period   [get_ports CM3_TCK_SWCLK]
 
+create_generated_clock -name refclk -source [get_pins sysctrl/clk_gen/refclk_sel/refclkmux/I0] \
+                       -divide_by 1 -multiply_by 1 \
+                       -add -master_clock [get_clocks refclk1] \
+                       [get_pins sysctrl/clk_gen/refclk_sel/refclkmux/O]
 create_generated_clock -name pllclk96m -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKIN1] \
                        -divide_by 10 -multiply_by 40 \
                        -add -master_clock [get_clocks refclk1] \
@@ -45,6 +49,7 @@ set_clock_groups \
     -asynchronous \
     -group [get_clocks refclk1] \
     -group [get_clocks refclk2] \
+    -group [get_clocks refclk] \
     -group [get_clocks pllclk48m] \
     -group [get_clocks tclk] \
     -group [get_clocks user_clk1] \
