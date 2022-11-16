@@ -86,6 +86,9 @@ report_clocks -file ${rootd}/synthesis/${topmodule}_synthesis_report_clk.log
 report_clock_interaction -append -file ${rootd}/synthesis/${topmodule}_synthesis_report_clk.log
 report_clock_networks    -append -file ${rootd}/synthesis/${topmodule}_synthesis_report_clk.log
 
+# Report High Fanout net
+report_high_fanout_nets -timing -file  ${rootd}/synthesis/${topmodule}_synthesis_high_fanout_net.log
+
 # Optimize
 opt_design -directive Explore -debug_log
 opt_design -propconst -sweep -resynth_area -resynth_seq_area -remap -merge_equivalent_drivers -debug_log
