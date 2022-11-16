@@ -158,24 +158,34 @@ always@ (posedge CLK) begin
   end
   else if (r_wen_sel_p1) begin
     SR_A     <= r_wadr_sel_p1;
-    SR1_CEB  <= 1'b1;
     SR1_OEB  <= 1'b1;
     SR1_WEB  <= 1'b1;
-    SR1_BHEB <= 1'b1;
-    SR1_BLEB <= 1'b1;
-    SR2_CEB  <= 1'b1;
     SR2_OEB  <= 1'b1;
     SR2_WEB  <= 1'b1;
-    SR2_BHEB <= 1'b1;
-    SR2_BLEB <= 1'b1;
-    if (|r_wbten_sel_p1[1:0])
+    if (|r_wbten_sel_p1[1:0]) begin
+      SR1_CEB    <= 0;
+      SR1_BHEB   <= ~r_wbten_sel_p1[1];
+      SR1_BLEB   <= ~r_wbten_sel_p1[0];
       r_sr1_dout <= r_wdata_sel_p1[15:0];
-    else
+    end
+    else begin
+      SR1_CEB    <= 1'b1;
+      SR1_BHEB   <= 1'b1;
+      SR1_BLEB   <= 1'b1;
       r_sr1_dout <= 0;
-    if (|r_wbten_sel_p1[3:2])
+    end
+    if (|r_wbten_sel_p1[3:2]) begin
+      SR2_CEB    <= 0;
+      SR2_BHEB   <= ~r_wbten_sel_p1[3];
+      SR2_BLEB   <= ~r_wbten_sel_p1[2];
       r_sr2_dout <= r_wdata_sel_p1[31:16];
-    else
+    end
+    else begin
+      SR2_CEB    <= 1'b1;
+      SR2_BHEB   <= 1'b1;
+      SR2_BLEB   <= 1'b1;
       r_sr2_dout <= 0;
+    end
   end
   else if (w_ren_sel) begin
     SR_A       <= w_radr_sel;
