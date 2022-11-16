@@ -713,7 +713,7 @@ assign DATA_MEM2_CS_B = w_data_mem_cs_b[1];
 assign w_data_mem1_oe = w_data_mem_oe;
 assign w_data_mem2_oe = w_data_mem_oe;
 
-assign w_data_mem_din = w_data_mem1_din;
+assign w_data_mem_din = (~w_data_mem_cs_b[1]) ? w_data_mem2_din: w_data_mem1_din;
 
 // DATA_MEM_QSPI Data I/O
 sc_qspim_data_io data_mem1_qspi_data_io (
@@ -800,7 +800,7 @@ assign FRAM2_CS_B = w_fram_cs_b[1];
 assign w_fram1_oe = w_fram_oe;
 assign w_fram2_oe = w_fram_oe;
 
-assign w_fram_din = w_fram1_din;
+assign w_fram_din = (~w_fram_cs_b[1]) ? w_fram2_din: w_fram1_din;
 
 // FRAM_QSPI Data I/O
 sc_qspim_data_io fram1_qspi_data_io (
