@@ -74,7 +74,7 @@ wire sram2_err;
 wire [15:0] sram2_io;
 
 wire ulpi_cs;
-wire ulpi_clock;
+//wire ulpi_clock;
 wire ulpi_reset_b;
 wire ulpi_dir;
 wire ulpi_nxt;
@@ -101,6 +101,24 @@ wire (pull1, pull0) [3:0] fram1_io = 4'b1111;
 wire fram2_sck;
 wire fram2_cs_b;
 wire (pull1, pull0) [3:0] fram2_io = 4'b1111;
+
+reg cvm_critical_b = 1'b1;
+reg cvm_warning_b = 1'b1;
+reg temp_alert_b = 1'b1;
+wire (pull1, pull0) fpga_reserve = 1'b1;
+wire (pull1, pull0) pudc_b = 1'b1;
+wire (pull1, pull0) [15:0] uio1 = 0;
+wire (pull1, pull0) [15:0] uio2 = 0;
+wire (pull1, pull0) [5:0] uio4 = 0;
+reg ulpi_clock = 0;
+localparam ULPICLK_PERIOD = 16666;
+initial begin
+  forever begin
+    #(ULPICLK_PERIOD/2);
+    ulpi_clock = ~ulpi_clock;
+  end
+end
+
 
 sc_obc_a1_fpga # (
   .BUILD_INFO(BUILD_INFO),
@@ -172,9 +190,9 @@ sc_obc_a1_fpga # (
   // I2C Interface
   .FPGA_INT_SCL(internal_i2cm_scl),
   .FPGA_INT_SDA(internal_i2cm_sda),
-  .CVM_CRITICAL_B(1'b1),
-  .CVM_WARNING_B(1'b1),
-  .TEMP_ALERT_B(1'b1),
+  .CVM_CRITICAL_B(cvm_critical_b),
+  .CVM_WARNING_B(cvm_warning_b),
+  .TEMP_ALERT_B(temp_alert_b),
   .FPGA_EXT_SCL(external_i2cm_scl),
   .FPGA_EXT_SDA(external_i2cm_sda),
 
@@ -182,7 +200,7 @@ sc_obc_a1_fpga # (
   .FPGA_BOOT0(FPGA_BOOT[0]),
   .FPGA_BOOT1(FPGA_BOOT[1]),
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
-  .FPGA_RESERVE(/*open*/),
+  .FPGA_RESERVE(fpga_reserve),
   .FPGA_PWR_CYCLE_REQ(pwr_cycle_req),
 
   // ULPI Interface
@@ -195,9 +213,12 @@ sc_obc_a1_fpga # (
   .ULPI_DATA(ulpi_data),
   .ULPI_REFCLK(ulpi_refclk),
 
+  .PUDC_B(pudc_b),
+
   // User IO Interface
-//  inout  [15:0] UIO1,
-//  inout  [15:0] UIO2,
+  .UIO1(uio1),
+  .UIO2(uio2),
+  .UIO4_11_06(uio4),
   .UIO4(console_tx)
 );
 
