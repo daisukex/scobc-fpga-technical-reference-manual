@@ -7,6 +7,8 @@
 
 set sysclk_period 41.666
 set tclk_period   63.0
+set board_delay_min  0
+set board_delay_max  0.5
 
 create_clock -name refclk1 -period $sysclk_period [get_ports SYSCLK1]
 create_clock -name refclk2 -period $sysclk_period [get_ports SYSCLK2]
