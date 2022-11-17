@@ -906,6 +906,20 @@ initial begin
     join
   end
 
+  //--------------------------------------------------
+  label    = "HRMEM Memory Scrubbing Control Register Access Check ";
+  simcount = 15;
+  //--------------------------------------------------
+  @(posedge SYS_CLK);
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((0<<`MEMSCRBEN) |
+                                                                             (16'h06FF<<`MEMSCRCYC)), .check(1));
+  write_transaction(.master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .data((1<<`MEMSCRBEN) |
+                                                                          (1<<`COLFSRDSTPB) |
+                                                                          (16'hF900<<`MEMSCRCYC)));
+  read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((1<<`MEMSCRBEN) |
+                                                                             (1<<`COLFSRDSTPB) |
+                                                                             (16'hF900<<`MEMSCRCYC)), .check(1));
+
   repeat (100) @ (posedge SYS_CLK);
   simfinish(0);
 end
