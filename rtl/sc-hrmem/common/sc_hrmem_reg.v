@@ -132,7 +132,7 @@ always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
     w_col_fstk_rdstop_n <= 0;
     REG_MEM_SCRB_CYCLE  <= P_MSC_INI;
-    REG_MEM_SCRB_EN     <= 1'b1;
+    REG_MEM_SCRB_EN     <= 1'b0;
   end else if (w_hit_memscrctrlr & w_reg_write) begin
     if (REG_BYTEEN[3])
       REG_MEM_SCRB_CYCLE[15:8] <= REG_WDATA[`MEMSCRCYC+8 +: 8];
