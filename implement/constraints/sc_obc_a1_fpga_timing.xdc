@@ -66,6 +66,21 @@ set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks
 set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram2_oe_b]
 set_multicycle_path 2 -hold  -end   -from [get_clocks sram2_oe_b] -to [get_clocks pllclk48m]
 
+# QSPI Flash (for Data Store Memory) test clock
+create_generated_clock -name data_mem1_sck -divide_by 2 -invert \
+                       -master_clock pllclk48m -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports DATA_MEM1_SCK]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks data_mem1_sck]
+set_multicycle_path 1 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks data_mem1_sck]
+set_multicycle_path 1 -hold  -end   -from [get_clocks data_mem1_sck] -to [get_clocks pllclk48m]
+
+create_generated_clock -name data_mem2_sck -divide_by 2 -invert \
+                       -master_clock pllclk48m -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports DATA_MEM2_SCK]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks data_mem2_sck]
+set_multicycle_path 1 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks data_mem2_sck]
+set_multicycle_path 1 -hold  -end   -from [get_clocks data_mem2_sck] -to [get_clocks pllclk48m]
+
 set_case_analysis 1 [get_pins  sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKINSEL]
 set_case_analysis 1 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S0]
 set_case_analysis 0 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S1]
@@ -141,6 +156,28 @@ set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -max [expr ${board_d
 set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports {SRAM2_IO[*]}]
 set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -max [expr ${board_delay_max} * 2 + ${sram_delay_max}] [get_ports SRAM2_ERR]
 set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports SRAM2_ERR]
+
+# QSPI Flash (for Data Store Memory) Interface
+set nor_flash_setup      2
+set nor_flash_hold       3
+set nor_flash_delay_max  7
+set nor_flash_delay_min  0
+
+## Data Store Memory 1
+set_output_delay -clock [get_clocks data_mem1_sck] -max ${nor_flash_setup}         [get_ports DATA_MEM1_CS_B]
+set_output_delay -clock [get_clocks data_mem1_sck] -min [expr - ${nor_flash_hold}] [get_ports DATA_MEM1_CS_B]
+set_output_delay -clock [get_clocks data_mem1_sck] -max ${nor_flash_setup}         [get_ports {DATA_MEM1_IO[*]}]
+set_output_delay -clock [get_clocks data_mem1_sck] -min [expr - ${nor_flash_hold}] [get_ports {DATA_MEM1_IO[*]}]
+set_input_delay  -clock [get_clocks data_mem1_sck] -clock_fall -max [expr ${board_delay_max} * 2 + ${nor_flash_delay_max}] [get_ports {DATA_MEM1_IO[*]}]
+set_input_delay  -clock [get_clocks data_mem1_sck] -clock_fall -min [expr ${board_delay_min} * 2 + ${nor_flash_delay_min}] [get_ports {DATA_MEM1_IO[*]}]
+
+## Data Store Memory 2
+set_output_delay -clock [get_clocks data_mem2_sck] -max ${nor_flash_setup}         [get_ports DATA_MEM2_CS_B]
+set_output_delay -clock [get_clocks data_mem2_sck] -min [expr - ${nor_flash_hold}] [get_ports DATA_MEM2_CS_B]
+set_output_delay -clock [get_clocks data_mem2_sck] -max ${nor_flash_setup}         [get_ports {DATA_MEM2_IO[*]}]
+set_output_delay -clock [get_clocks data_mem2_sck] -min [expr - ${nor_flash_hold}] [get_ports {DATA_MEM2_IO[*]}]
+set_input_delay  -clock [get_clocks data_mem2_sck] -clock_fall -max [expr ${board_delay_max} * 2 + ${nor_flash_delay_max}] [get_ports {DATA_MEM2_IO[*]}]
+set_input_delay  -clock [get_clocks data_mem2_sck] -clock_fall -min [expr ${board_delay_min} * 2 + ${nor_flash_delay_min}] [get_ports {DATA_MEM2_IO[*]}]
 
 # Test Interface
 set swjdp_delay   5
