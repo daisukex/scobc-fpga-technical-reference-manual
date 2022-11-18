@@ -24,7 +24,6 @@ module sc_obc_a1_fpga # (
   output SYSCLK1_EN,
   input  SYSCLK2,
   output SYSCLK2_EN,
-  input  CDRST_B,
 
   // Debug Interface
   input  CM3_NTRST,
@@ -328,7 +327,7 @@ sc_obc_core # (
 
   // TRCH/Board System Interface
   // ------------------------------
-  .CDRST_B(CDRST_B),
+  .CDRST_B(1'b0),
   .FPGA_BOOT({FPGA_BOOT1,FPGA_BOOT0}),
   .FPGA_WATCHDOG(FPGA_WATCHDOG),
   .FPGA_RESERVE(FPGA_RESERVE),
