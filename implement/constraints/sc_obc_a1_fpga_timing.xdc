@@ -81,6 +81,21 @@ set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks
 set_multicycle_path 1 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks data_mem2_sck]
 set_multicycle_path 1 -hold  -end   -from [get_clocks data_mem2_sck] -to [get_clocks pllclk48m]
 
+# FRAM test clock
+create_generated_clock -name fram1_sck -divide_by 2 -invert \
+                       -master_clock pllclk48m -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports FRAM1_SCK]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks fram1_sck]
+set_multicycle_path 1 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks fram1_sck]
+set_multicycle_path 1 -hold  -end   -from [get_clocks fram1_sck] -to [get_clocks pllclk48m]
+
+create_generated_clock -name fram2_sck -divide_by 2 -invert \
+                       -master_clock pllclk48m -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_ports FRAM2_SCK]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks fram2_sck]
+set_multicycle_path 1 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks fram2_sck]
+set_multicycle_path 1 -hold  -end   -from [get_clocks fram2_sck] -to [get_clocks pllclk48m]
+
 set_case_analysis 1 [get_pins  sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKINSEL]
 set_case_analysis 1 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S0]
 set_case_analysis 0 [get_pins sysctrl/clk_gen/scobca1_outsel/clkmux96m/S1]
@@ -178,6 +193,28 @@ set_output_delay -clock [get_clocks data_mem2_sck] -max ${nor_flash_setup}      
 set_output_delay -clock [get_clocks data_mem2_sck] -min [expr - ${nor_flash_hold}] [get_ports {DATA_MEM2_IO[*]}]
 set_input_delay  -clock [get_clocks data_mem2_sck] -clock_fall -max [expr ${board_delay_max} * 2 + ${nor_flash_delay_max}] [get_ports {DATA_MEM2_IO[*]}]
 set_input_delay  -clock [get_clocks data_mem2_sck] -clock_fall -min [expr ${board_delay_min} * 2 + ${nor_flash_delay_min}] [get_ports {DATA_MEM2_IO[*]}]
+
+# FRAM Interface
+set fram_setup      2
+set fram_hold       3
+set fram_delay_max  7
+set fram_delay_min  0
+
+## FRAM 1
+set_output_delay -clock [get_clocks fram1_sck] -max ${fram_setup}         [get_ports FRAM1_CS_B]
+set_output_delay -clock [get_clocks fram1_sck] -min [expr - ${fram_hold}] [get_ports FRAM1_CS_B]
+set_output_delay -clock [get_clocks fram1_sck] -max ${fram_setup}         [get_ports {FRAM1_IO[*]}]
+set_output_delay -clock [get_clocks fram1_sck] -min [expr - ${fram_hold}] [get_ports {FRAM1_IO[*]}]
+set_input_delay  -clock [get_clocks fram1_sck] -clock_fall -max [expr ${board_delay_max} * 2 + ${fram_delay_max}] [get_ports {FRAM1_IO[*]}]
+set_input_delay  -clock [get_clocks fram1_sck] -clock_fall -min [expr ${board_delay_min} * 2 + ${fram_delay_min}] [get_ports {FRAM1_IO[*]}]
+
+## FRAM 2
+set_output_delay -clock [get_clocks fram2_sck] -max ${fram_setup}         [get_ports FRAM2_CS_B]
+set_output_delay -clock [get_clocks fram2_sck] -min [expr - ${fram_hold}] [get_ports FRAM2_CS_B]
+set_output_delay -clock [get_clocks fram2_sck] -max ${fram_setup}         [get_ports {FRAM2_IO[*]}]
+set_output_delay -clock [get_clocks fram2_sck] -min [expr - ${fram_hold}] [get_ports {FRAM2_IO[*]}]
+set_input_delay  -clock [get_clocks fram2_sck] -clock_fall -max [expr ${board_delay_max} * 2 + ${fram_delay_max}] [get_ports {FRAM2_IO[*]}]
+set_input_delay  -clock [get_clocks fram2_sck] -clock_fall -min [expr ${board_delay_min} * 2 + ${fram_delay_min}] [get_ports {FRAM2_IO[*]}]
 
 # Test Interface
 set swjdp_delay   5
