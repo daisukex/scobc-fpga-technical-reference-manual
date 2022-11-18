@@ -216,6 +216,12 @@ set_output_delay -clock [get_clocks fram2_sck] -min [expr - ${fram_hold}] [get_p
 set_input_delay  -clock [get_clocks fram2_sck] -clock_fall -max [expr ${board_delay_max} * 2 + ${fram_delay_max}] [get_ports {FRAM2_IO[*]}]
 set_input_delay  -clock [get_clocks fram2_sck] -clock_fall -min [expr ${board_delay_min} * 2 + ${fram_delay_min}] [get_ports {FRAM2_IO[*]}]
 
+# CAN Interface
+set can_delay_max [expr ${sysclk_period} / 2]
+set_output_delay -clock [get_clocks refclk] -max [expr ${sysclk_period} - ${can_delay_max}] [get_ports FPGA_CAN_TX]
+set_output_delay -clock [get_clocks refclk] -max [expr ${sysclk_period} - ${can_delay_max}] [get_ports FPGA_CAN_SLEEP_EN]
+set_input_delay  -clock [get_clocks refclk] -max [expr ${sysclk_period} - ${can_delay_max}] [get_ports FPGA_CAN_RX]
+
 # Test Interface
 set swjdp_delay   5
 set swjdp_setup  10
