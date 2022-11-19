@@ -66,6 +66,16 @@ set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks
 set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram2_oe_b]
 set_multicycle_path 2 -hold  -end   -from [get_clocks sram2_oe_b] -to [get_clocks pllclk48m]
 
+# QSPI Flash (for Configuration Memory) test clock
+create_generated_clock -name cclk -divide_by 2 -invert \
+                       -master_clock [get_clocks pllclk48m] -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
+                       -add [get_pins startupe2/USRCCLKO]
+set_clock_latency -min  0.5 [get_clocks cclk]
+set_clock_latency -max  6.7 [get_clocks cclk]
+set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks cclk]
+set_multicycle_path 1 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks cclk]
+set_multicycle_path 1 -hold  -end   -from [get_clocks cclk] -to [get_clocks pllclk48m]
+
 # QSPI Flash (for Data Store Memory) test clock
 create_generated_clock -name data_mem1_sck -divide_by 2 -invert \
                        -master_clock pllclk48m -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
@@ -177,6 +187,16 @@ set nor_flash_setup      2
 set nor_flash_hold       3
 set nor_flash_delay_max  7
 set nor_flash_delay_min  0
+
+## Configuration Memory
+set_false_path   -from [get_clocks pllclk48m]  -to [get_ports CFG_MEM_SEL]
+set_false_path   -from [get_ports CFG_MEM_MON] -to [get_clocks pllclk48m]
+set_output_delay -clock [get_clocks cclk]  -max ${nor_flash_setup}         [get_ports CFG_MEM_CS_B]
+set_output_delay -clock [get_clocks cclk]  -min [expr - ${nor_flash_hold}] [get_ports CFG_MEM_CS_B]
+set_output_delay -clock [get_clocks cclk]  -max ${nor_flash_setup}         [get_ports {CFG_MEM_IO[*]}]
+set_output_delay -clock [get_clocks cclk]  -min [expr - ${nor_flash_hold}] [get_ports {CFG_MEM_IO[*]}]
+set_input_delay  -clock [get_clocks cclk]  -clock_fall -max [expr ${board_delay_max} * 2 + ${nor_flash_delay_max}] [get_ports {CFG_MEM_IO[*]}]
+set_input_delay  -clock [get_clocks cclk]  -clock_fall -min [expr ${board_delay_min} * 2 + ${nor_flash_delay_min}] [get_ports {CFG_MEM_IO[*]}]
 
 ## Data Store Memory 1
 set_output_delay -clock [get_clocks data_mem1_sck] -max ${nor_flash_setup}         [get_ports DATA_MEM1_CS_B]
