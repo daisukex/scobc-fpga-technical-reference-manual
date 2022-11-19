@@ -123,6 +123,12 @@ set_clock_groups \
     -group [get_clocks user_clk2] \
     -group [get_clocks ulpi_refclk]
 
+# TRCH Interface
+set_false_path -from [get_ports FPGA_BOOT0] -to [get_clocks pllclk48m]
+set_false_path -from [get_ports FPGA_BOOT1] -to [get_clocks pllclk48m]
+set_false_path -from [get_clocks pllclk48m] -to [get_ports FPGA_WATCHDOG]
+set_false_path -from [get_clocks pllclk48m] -to [get_ports FPGA_PWR_CYCLE_REQ]
+
 # SRAM Interface
 set sram_sig_delay_max 20
 set sram_delay_max     10
