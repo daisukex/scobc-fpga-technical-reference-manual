@@ -6,7 +6,7 @@
 # --------------------------------------------------
 
 set sysclk_period 41.666
-set tclk_period   63.0
+set tclk_period   66.6
 set board_delay_min  0
 set board_delay_max  0.5
 
@@ -141,3 +141,21 @@ set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -max [expr ${board_d
 set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports {SRAM2_IO[*]}]
 set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -max [expr ${board_delay_max} * 2 + ${sram_delay_max}] [get_ports SRAM2_ERR]
 set_input_delay  -clock [get_clocks sram2_oe_b] -clock_fall -min [expr ${board_delay_min} * 2 + ${sram_delay_min}] [get_ports SRAM2_ERR]
+
+# Test Interface
+set swjdp_delay   5
+set swjdp_setup  10
+set swjdp_hold   10
+set_input_delay  -clock [get_clocks tclk] -clock_fall -max ${swjdp_delay}                              [get_ports CM3_TMS_SWDIO]
+set_input_delay  -clock [get_clocks tclk] -clock_fall -min [expr - ${swjdp_delay}]                     [get_ports CM3_TMS_SWDIO]
+set_output_delay -clock [get_clocks tclk]             -max [expr ${swjdp_setup} + ${board_delay_max}]  [get_ports CM3_TMS_SWDIO]
+set_output_delay -clock [get_clocks tclk]             -min [expr - ${swjdp_hold} + ${board_delay_min}] [get_ports CM3_TMS_SWDIO]
+set_input_delay  -clock [get_clocks tclk] -clock_fall -max ${swjdp_delay}                              [get_ports CM3_TDI]
+set_input_delay  -clock [get_clocks tclk] -clock_fall -min [expr - ${swjdp_delay}]                     [get_ports CM3_TDI]
+set_input_delay  -clock [get_clocks tclk] -clock_fall -max ${swjdp_delay}                              [get_ports CM3_NTRST]
+set_input_delay  -clock [get_clocks tclk] -clock_fall -min [expr - ${swjdp_delay}]                     [get_ports CM3_NTRST]
+set_output_delay -clock [get_clocks tclk]             -max [expr ${swjdp_setup} + ${board_delay_max}]  [get_ports CM3_TDO_SWO]
+set_output_delay -clock [get_clocks tclk]             -min [expr - ${swjdp_hold} + ${board_delay_min}] [get_ports CM3_TDO_SWO]
+
+set_max_delay -from [get_clocks pllclk48m] -to [get_clocks tclk]      [expr (${sysclk_period} / 40 * 20 * 2) -2]
+set_max_delay -from [get_clocks tclk]      -to [get_clocks pllclk48m] [expr (${sysclk_period} / 40 * 20 * 2) -2]
