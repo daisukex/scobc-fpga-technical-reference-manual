@@ -123,6 +123,9 @@ set_clock_groups \
     -group [get_clocks user_clk2] \
     -group [get_clocks ulpi_refclk]
 
+set_false_path -from [get_clocks pllclk48m] -to [get_cells {obc_core/cm3_ss/isr1/isr_retim_reg[*]}]
+set_false_path -from [get_clocks pllclk48m] -to [get_cells {obc_core/cm3_ss/isr2/isr_retim_reg[*]}]
+
 # TRCH Interface
 set_false_path -from [get_ports FPGA_BOOT0] -to [get_clocks pllclk48m]
 set_false_path -from [get_ports FPGA_BOOT1] -to [get_clocks pllclk48m]

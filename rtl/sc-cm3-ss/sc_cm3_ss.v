@@ -172,6 +172,11 @@ assign stcalib[25]   = 1'b0;
 assign stcalib[24]   = 1'b0;
 assign stcalib[23:0] = 24'h4E1F;
 
+wire [CM3SS_PRIMARY_ISR_NUM-1:0]   int_isr1;
+wire [CM3SS_SECONDARY_ISR_NUM-1:0] int_isr2;
+isr_retiming # (.NUM_OF_INTERRUPT(CM3SS_PRIMARY_ISR_NUM))   isr1 (.SYS_CLK(SYS_CLK), .IN_ISR(INTISR1), .OUT_ISR(int_isr1));
+isr_retiming # (.NUM_OF_INTERRUPT(CM3SS_SECONDARY_ISR_NUM)) isr2 (.SYS_CLK(SYS_CLK), .IN_ISR(INTISR2), .OUT_ISR(int_isr2));
+
 sc_cm3_wrapper cpu_wrapper (
   // System Interface
   .HCLK(SYS_CLK),
@@ -179,8 +184,8 @@ sc_cm3_wrapper cpu_wrapper (
   .DBGRESETn(DBG_RST_N),
   .SYSRESETREQ(SYS_RST_REQ),
   .NMI(NMI),
-  .INTISR1(INTISR1),
-  .INTISR2(INTISR2),
+  .INTISR1(int_isr1),
+  .INTISR2(int_isr2),
 
   // System Tick Clock and System Timer Signals
   .STCLK(st_clk),
