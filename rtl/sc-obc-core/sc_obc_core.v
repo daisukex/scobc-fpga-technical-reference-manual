@@ -251,7 +251,7 @@ module sc_obc_core # (
 
 assign CPU_LOCKUP_RSTEN = 0;
 
-localparam LPAHB_CONSOLE_UART_DIV = 16'h01A0;
+localparam LPAHB_CONSOLE_UART_DIV = 16'h015A;
 localparam CM3SS_PRIMARY_ISR_NUM = 12;
 
 // SC-OBC-SS Interrupt Signal

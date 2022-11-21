@@ -45,7 +45,7 @@ initial begin
   simcount = 0;
   //--------------------------------------------------
   cm3_console.FINISH_CTRL(1);
-  cm3_console.UART_CLK_PERIOD_CTL(32'd104167); // 9.6Mbps
+  cm3_console.UART_CLK_PERIOD_CTL(32'd125000); // 8 Mbps
   cm3_console.RX_DATA_EXP_COMP_EN(1);
   @ (posedge CMC_REQ);
   @ (posedge CMC_ACK);

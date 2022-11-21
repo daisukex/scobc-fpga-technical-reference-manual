@@ -23,7 +23,7 @@ create_generated_clock -name pllclk96m -source [get_pins sysctrl/clk_gen/scobca1
                        -add -master_clock [get_clocks refclk1] \
                        [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT0]
 create_generated_clock -name pllclk48m -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKIN1] \
-                       -divide_by 20 -multiply_by 40 \
+                       -divide_by 24 -multiply_by 40 \
                        -add -master_clock [get_clocks refclk1] \
                        [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1]
 create_generated_clock -name ulpi_refclk -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKIN1] \
@@ -273,5 +273,5 @@ set_input_delay  -clock [get_clocks tclk] -clock_fall -min [expr - ${swjdp_delay
 set_output_delay -clock [get_clocks tclk]             -max [expr ${swjdp_setup} + ${board_delay_max}]  [get_ports CM3_TDO_SWO]
 set_output_delay -clock [get_clocks tclk]             -min [expr - ${swjdp_hold} + ${board_delay_min}] [get_ports CM3_TDO_SWO]
 
-set_max_delay -from [get_clocks pllclk48m] -to [get_clocks tclk]      [expr (${sysclk_period} / 40 * 20 * 2) -2]
-set_max_delay -from [get_clocks tclk]      -to [get_clocks pllclk48m] [expr (${sysclk_period} / 40 * 20 * 2) -2]
+set_max_delay -from [get_clocks pllclk48m] -to [get_clocks tclk]      [expr (${sysclk_period} / 40 * 24 * 2) -2]
+set_max_delay -from [get_clocks tclk]      -to [get_clocks pllclk48m] [expr (${sysclk_period} / 40 * 24 * 2) -2]
