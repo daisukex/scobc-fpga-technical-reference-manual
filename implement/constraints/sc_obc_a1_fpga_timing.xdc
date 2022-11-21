@@ -57,14 +57,16 @@ create_generated_clock -name sram1_oe_b -divide_by 2 -invert \
                        -add [get_ports SRAM1_OE_B]
 set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks sram1_oe_b]
 set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram1_oe_b]
-set_multicycle_path 2 -hold  -end   -from [get_clocks sram1_oe_b] -to [get_clocks pllclk48m]
+set_multicycle_path 2 -setup -end   -from [get_clocks sram1_oe_b] -to [get_clocks pllclk48m]
+set_multicycle_path 1 -hold  -end   -from [get_clocks sram1_oe_b] -to [get_clocks pllclk48m]
 
 create_generated_clock -name sram2_oe_b -divide_by 2 -invert \
                        -master_clock [get_clocks pllclk48m] -source [get_pins sysctrl/clk_gen/scobca1_pll/pll2_adv/CLKOUT1] \
                        -add [get_ports SRAM2_OE_B]
 set_multicycle_path 1 -setup -start -from [get_clocks pllclk48m] -to [get_clocks sram2_oe_b]
 set_multicycle_path 2 -hold  -start -from [get_clocks pllclk48m] -to [get_clocks sram2_oe_b]
-set_multicycle_path 2 -hold  -end   -from [get_clocks sram2_oe_b] -to [get_clocks pllclk48m]
+set_multicycle_path 2 -setup -end   -from [get_clocks sram2_oe_b] -to [get_clocks pllclk48m]
+set_multicycle_path 1 -hold  -end   -from [get_clocks sram2_oe_b] -to [get_clocks pllclk48m]
 
 # QSPI Flash (for Configuration Memory) test clock
 create_generated_clock -name cclk -divide_by 2 -invert \

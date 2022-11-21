@@ -33,11 +33,11 @@ always @ (posedge SYS_CLK) begin
     if (!cmc_ack_p[1] & cmc_ack_p[0])
       l_clkmode <= CLKMODE;
 
-    if (l_clkmode == 2'b10 & CLKMODE != 2'b10) begin
+    if (l_clkmode != 2'b00 & CLKMODE == 2'b00) begin
       if (!cmc_ack_p[1] & cmc_ack_p[0])
         LATENCY_SEL <= 0;
     end
-    else if (l_clkmode != 2'b10 & CLKMODE == 2'b10) begin
+    else if (l_clkmode == 2'b00 & CLKMODE != 2'b00) begin
       if (!cmc_req_p & CMC_REQ)
         LATENCY_SEL <= 1;
     end

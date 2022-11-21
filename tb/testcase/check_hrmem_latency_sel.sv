@@ -258,7 +258,7 @@ initial begin
   end
   @ (negedge CMC_ACK);
   #1;
-  if (LATENCY_MODE != MODE_1CYCLE) begin
+  if (LATENCY_MODE != MODE_2CYCLE) begin
     display_text("Read Latency Mode Error", 1, 1);
     repeat (100) @(posedge SYS_CLK);
     simfinish(1);
