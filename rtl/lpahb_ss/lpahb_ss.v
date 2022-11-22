@@ -356,13 +356,13 @@ assign shresp[2*AHB_EMPTY_CH +:2] = 0;
 i2c_master # (
   .P_FIFO_DPTBW(4),
   .P_FIFO_TYPE(0),
-  .P_INIT_THDSTA(16'h0063),
-  .P_INIT_TSUSTO(16'h0063),
-  .P_INIT_TSUSTA(16'h0063),
-  .P_INIT_THIGH(16'h0072),
-  .P_INIT_THDDAT(16'h0009),
-  .P_INIT_TSUDAT(16'h0072),
-  .P_INIT_TBUF(16'h008B)
+  .P_INIT_THDSTA(16'h0031),
+  .P_INIT_TSUSTO(16'h0031),
+  .P_INIT_TSUSTA(16'h0031),
+  .P_INIT_THIGH(16'h0039),
+  .P_INIT_THDDAT(16'h0004),
+  .P_INIT_TSUDAT(16'h0039),
+  .P_INIT_TBUF(16'h0045)
 ) external_i2cm (
   // System Interface
   .SYSCLK(hclk),
