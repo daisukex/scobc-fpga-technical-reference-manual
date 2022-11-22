@@ -251,6 +251,13 @@ set_output_delay -clock [get_clocks refclk] -max [expr ${sysclk_period} - ${can_
 set_output_delay -clock [get_clocks refclk] -max [expr ${sysclk_period} - ${can_delay_max}] [get_ports FPGA_CAN_SLEEP_EN]
 set_input_delay  -clock [get_clocks refclk] -max [expr ${sysclk_period} - ${can_delay_max}] [get_ports FPGA_CAN_RX]
 
+# Serial Console
+set uart_delay ${sysclk_period}
+## UART TX
+set_max_delay -from [get_clocks pllclk48m] -to [get_ports UIO4] ${uart_delay}
+## UART RX
+set_max_delay -from [get_ports CM3_NTRST]  -to [get_cells obc_core/lpahb/ahbuartlite/uart_core/uart_rx_sync/rx_retime_reg[0]] [expr ${uart_delay}/2]
+
 # Test Interface
 set swjdp_delay   5
 set swjdp_setup  10
