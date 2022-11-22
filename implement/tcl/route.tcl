@@ -35,12 +35,24 @@ file mkdir ${outdir}
 # Read Checkpoint
 read_checkpoint ${dcpfile}
 link_design -name ${topmodule} -part ${xil_part} -top ${topmodule}
+report_timing_summary -file ${rootd}/route/report_timing_summary_stage0.log
 
 # Route
 route_design -timing_summary
 
-# Optimize after Place
+# Optimize after Route (Stage 1)
 phys_opt_design -routing_opt
+report_timing_summary -file ${rootd}/route/report_timing_summary_stage1.log
+
+# Optimize (Stage 2)
+phys_opt_design -clock_opt
+route_design
+report_timing_summary -file ${rootd}/route/report_timing_summary_stage2.log
+
+# Optimize (Stage 3)
+phys_opt_design -critical_cell_opt
+route_design
+report_timing_summary -file ${rootd}/route/report_timing_summary_stage3.log
 
 # Export design report
 report_utilization -file ${reptd}/report_utilization.log
