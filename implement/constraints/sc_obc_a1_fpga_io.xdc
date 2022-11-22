@@ -126,8 +126,8 @@ set_property [get_ports {FRAM2_IO[2]}]        -dict { PACKAGE_PIN N23  IOSTANDAR
 set_property [get_ports {FRAM2_IO[3]}]        -dict { PACKAGE_PIN R23  IOSTANDARD LVCMOS33 DRIVE 4 SLEW FAST KEEPER TRUE}
 
 # CAN Interface
-set_property [get_ports FPGA_CAN_TX]          -dict { PACKAGE_PIN AD21 IOSTANDARD LVCMOS33 }
-set_property [get_ports FPGA_CAN_RX]          -dict { PACKAGE_PIN AE21 IOSTANDARD LVCMOS33 DRIVE 4}
+set_property [get_ports FPGA_CAN_TX]          -dict { PACKAGE_PIN AD21 IOSTANDARD LVCMOS33 DRIVE 4}
+set_property [get_ports FPGA_CAN_RX]          -dict { PACKAGE_PIN AE21 IOSTANDARD LVCMOS33}
 set_property [get_ports FPGA_CAN_SLEEP_EN]    -dict { PACKAGE_PIN AE20 IOSTANDARD LVCMOS33 DRIVE 4}
 
 # (Internal/External) I2C Interface
