@@ -43,7 +43,7 @@ route_design -timing_summary
 phys_opt_design -routing_opt
 
 # Export design report
-report_utilization -file ${reptd}/report_utilization_route.log
+report_utilization -file ${reptd}/report_utilization.log
 report_timing_summary -file ${reptd}/report_timing_summary.log
 report_timing_all_clock ${reptd}
 

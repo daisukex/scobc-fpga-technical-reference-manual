@@ -57,7 +57,7 @@ report_high_fanout_nets
 if { [file exists $reptd] == 0} then {
     file mkdir ${reptd}
 }
-report_io -file ${reptd}/report_io_place.log
+report_io -file ${reptd}/report_io.log
 
 # Export design
 write_verilog -force -mode funcsim -cell ${topmodule} ${rootd}/place/${topmodule}_place_funcsim_netlist.v
