@@ -215,3 +215,9 @@
 // Board Health Access Status Register
 `define SYSMON_BHM_ASR               16'h20C0
 `define  SYSMON_BHM_BUSY                    0
+
+// IP Version Register
+`define SYSMON_VER                   16'hF000
+`define  SYSMON_PATVER                      0
+`define  SYSMON_MINVER                     16
+`define  SYSMON_MAJVER                     24

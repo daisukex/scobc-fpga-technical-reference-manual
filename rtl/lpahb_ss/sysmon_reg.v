@@ -7,6 +7,7 @@
 //-----------------------------------------------
 
 `include "system_monitor_map.vh"
+`include "sysmon_version.vh"
 
 module sysmon_reg # (
   parameter [15:0] INIT_I2CPSC = 16'h00EF
@@ -1184,6 +1185,14 @@ wire [31:0] rd_bhmi2cacccntr = 32'h0000_0000 | (BHM_I2CACC_CNT << `SYSMON_BHM_I2
 // ----------------------------------------
 wire [31:0] rd_bhmasr = 32'h0000_0000 | (BHM_BUSY << `SYSMON_BHM_BUSY);
 
+// IP Version Register
+//----------------------------------------------
+wire [31:0] rd_version;
+assign rd_version = 32'h0000_0000 |
+                    (`SYSMON_MAJVERVAL << `SYSMON_MAJVER) |
+                    (`SYSMON_MINVERVAL << `SYSMON_MINVER) |
+                    (`SYSMON_PATVERVAL << `SYSMON_PATVER);
+
 // Register Read
 // ----------------------------------------
 always @ (posedge HCLK) begin
@@ -1226,6 +1235,7 @@ always @ (posedge HCLK) begin
     else if (RADR == `SYSMON_BHM_I2CPSCR) REG_RDAT <= rd_bhmi2cpscr;
     else if (RADR == `SYSMON_BHM_I2CACCCNTR) REG_RDAT <= rd_bhmi2cacccntr;
     else if (RADR == `SYSMON_BHM_ASR) REG_RDAT <= rd_bhmasr;
+    else if (RADR == `SYSMON_VER)        REG_RDAT <= rd_version;
     else                                 REG_RDAT <= 32'h0000_00000;
   end
 end
