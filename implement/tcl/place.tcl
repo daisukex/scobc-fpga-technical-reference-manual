@@ -47,7 +47,7 @@ read_xdc ${xdcd}/${topmodule}_io.xdc
 report_timing_summary -file ${rootd}/place/report_timing_summary_after_befor.log
 
 # Place
-place_design -timing_summary
+place_design -timing_summary -directive AltSpreadLogic_high
 
 # Post-Place
 place_design -post_place_opt
