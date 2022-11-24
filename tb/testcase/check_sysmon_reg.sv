@@ -371,6 +371,18 @@ initial begin
   cm3_sys_ipcore_interrupt_check_and_write_clear(`SYS_MON_BASE+`SYSMON_INT_STATUS, 1<<`PLL_UNLOCK_INT);
   repeat (100) @(posedge REF_CLK);
 
+  //--------------------------------------------------
+  label    = "Check System Monitor Version Regsiter";
+  simcount = 8;
+  //--------------------------------------------------
+  display_subcount_text(1, "Check Initial Value", 1);
+  read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_VER),   .expdata(32'h01000000), .check(1));
+
+  display_subcount_text(2, "Check 1-Hot Write/Read", 1);
+  for(i=0; i<32; i=i+1) begin
+    write_transaction(.master(2), .addr(`SYS_MON_BASE+`SYSMON_VER),    .data(1<<i));
+    read_transaction( .master(2), .addr(`SYS_MON_BASE+`SYSMON_VER),   .expdata(32'h01000000), .check(1));
+  end
 
   repeat (200) @ (posedge SYS_CLK);
   simfinish(0);
