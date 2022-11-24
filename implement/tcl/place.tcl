@@ -43,6 +43,9 @@ read_xdc ${xdcd}/${topmodule}_io.xdc
 # Pre-Place BlockRAM
 #source tcl/pre_place.tcl
 
+# Report timing summary (Befor Place)
+report_timing_summary -file ${rootd}/place/report_timing_summary_after_befor.log
+
 # Place
 place_design -timing_summary
 
@@ -52,6 +55,9 @@ place_design -post_place_opt
 # Optimize after Place
 phys_opt_design -placement_opt -critical_cell_opt
 report_high_fanout_nets
+
+# Report timing summary (Afrer Place)
+report_timing_summary -file ${rootd}/place/report_timing_summary_after_place.log
 
 # Export design report
 if { [file exists $reptd] == 0} then {
