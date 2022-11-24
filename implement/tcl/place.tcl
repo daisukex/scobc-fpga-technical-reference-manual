@@ -38,10 +38,10 @@ link_design -name ${topmodule} -part ${xil_part} -top ${topmodule}
 read_xdc ${xdcd}/${topmodule}_io.xdc
 
 # Floorplan
-#source tcl/floorplan.tcl
+source tcl/floorplan.tcl
 
 # Pre-Place BlockRAM
-#source tcl/pre_place.tcl
+source tcl/pre_place.tcl
 
 # Report timing summary (Befor Place)
 report_timing_summary -file ${rootd}/place/report_timing_summary_after_befor.log
