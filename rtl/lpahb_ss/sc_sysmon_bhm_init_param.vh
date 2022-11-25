@@ -1,4 +1,4 @@
-parameter [15:0] SC_SYSMON_BHM_INIT_I2CPSC = 16'h0063,
+parameter [15:0] SC_SYSMON_BHM_INIT_I2CPSC = 16'h018F,
 parameter [5:0] SC_SYSMON_BHM_INITSET_NUM = 6'd23,
 parameter [27*SC_SYSMON_BHM_INITSET_NUM-1:0] SC_SYSMON_BHM_INITSET_VAL = {3'h4, 8'h03, 16'h5000,
                                                                           3'h4, 8'h02, 16'h4B00,
