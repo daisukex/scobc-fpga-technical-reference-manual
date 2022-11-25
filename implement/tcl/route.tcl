@@ -45,14 +45,29 @@ phys_opt_design -routing_opt
 report_timing_summary -file ${rootd}/route/report_timing_summary_stage1.log
 
 # Optimize (Stage 2)
-phys_opt_design -clock_opt
+place_design -fanout_opt -post_place_opt
 route_design
 report_timing_summary -file ${rootd}/route/report_timing_summary_stage2.log
 
 # Optimize (Stage 3)
-phys_opt_design -critical_cell_opt
+phys_opt_design -clock_opt
 route_design
 report_timing_summary -file ${rootd}/route/report_timing_summary_stage3.log
+
+# Optimize (Stage 4)
+phys_opt_design -slr_crossing_opt
+route_design
+report_timing_summary -file ${rootd}/route/report_timing_summary_stage4.log
+
+# Optimize (Stage 5)
+phys_opt_design -critical_cell_opt
+route_design
+report_timing_summary -file ${rootd}/route/report_timing_summary_stage5.log
+
+# Optimize (Stage 5)
+phys_opt_design -critical_cell_opt
+route_design
+report_timing_summary -file ${rootd}/route/report_timing_summary_stage6.log
 
 # Export design report
 report_utilization -file ${reptd}/report_utilization.log
