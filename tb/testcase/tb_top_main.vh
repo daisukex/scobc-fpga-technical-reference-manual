@@ -47,7 +47,7 @@ wire CMC_REQ  = dut.cmc_req;
 wire CMC_ACK  = dut.cmc_ack;
 wire cfg_mem_sel;
 wire cfg_mem_mon;
-reg [1:0] FPGA_BOOT = 2'b01;
+wire (weak0, weak1) [1:0] FPGA_BOOT = 2'b01;
 wire FPGA_WATCHDOG;
 wire pwr_cycle_req;
 

@@ -86,8 +86,8 @@ module sc_obc_a1_fpga # (
   inout  FPGA_EXT_SDA,
 
   // TRCH Interface
-  input  FPGA_BOOT0,
-  input  FPGA_BOOT1,
+  inout  FPGA_BOOT0,
+  inout  FPGA_BOOT1,
   inout  FPGA_WATCHDOG,
   inout  FPGA_RESERVE,
   inout  FPGA_PWR_CYCLE_REQ,
@@ -331,9 +331,13 @@ wire [31:0] fpga_boot_shiftreg_in;
 wire [1:0] fpga_watchdog_gpio_mode_sel;
 wire [1:0] fpga_pwr_cycle_req_gpio_mode_sel;
 wire [1:0] fpga_reserve_gpio_mode_sel;
+wire [1:0] fpga_boot0_gpio_mode_sel;
+wire [1:0] fpga_boot1_gpio_mode_sel;
 wire fpga_watchdog_gpio_in;
 wire fpga_pwr_cycle_req_gpio_in;
 wire fpga_reserve_gpio_in;
+wire fpga_boot0_gpio_in;
+wire fpga_boot1_gpio_in;
 
 wire ulpi_clock_state;
 wire [1:0] ulpi_reset_b_gpio_mode_sel;
@@ -705,9 +709,13 @@ sc_obc_core # (
   .FPGA_WATCHDOG_GPIO_MODE_SEL(fpga_watchdog_gpio_mode_sel),
   .FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL(fpga_pwr_cycle_req_gpio_mode_sel),
   .FPGA_RESERVE_GPIO_MODE_SEL(fpga_reserve_gpio_mode_sel),
+  .FPGA_BOOT0_GPIO_MODE_SEL(fpga_boot0_gpio_mode_sel),
+  .FPGA_BOOT1_GPIO_MODE_SEL(fpga_boot1_gpio_mode_sel),
   .FPGA_WATCHDOG_GPIO_IN(fpga_watchdog_gpio_in),
   .FPGA_PWR_CYCLE_REQ_GPIO_IN(fpga_pwr_cycle_req_gpio_in),
   .FPGA_RESERVE_GPIO_IN(fpga_reserve_gpio_in),
+  .FPGA_BOOT0_GPIO_IN(fpga_boot0_gpio_in),
+  .FPGA_BOOT1_GPIO_IN(fpga_boot1_gpio_in),
 
   .ULPI_CLOCK_STATE(ulpi_clock_state),
   .ULPI_RESET_B_GPIO_MODE_SEL(ulpi_reset_b_gpio_mode_sel),
@@ -1035,9 +1043,13 @@ scobca1_dbgctrl_core dbgctrl_core (
   .FPGA_WATCHDOG_GPIO_MODE_SEL(fpga_watchdog_gpio_mode_sel),
   .FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL(fpga_pwr_cycle_req_gpio_mode_sel),
   .FPGA_RESERVE_GPIO_MODE_SEL(fpga_reserve_gpio_mode_sel),
+  .FPGA_BOOT0_GPIO_MODE_SEL(fpga_boot0_gpio_mode_sel),
+  .FPGA_BOOT1_GPIO_MODE_SEL(fpga_boot1_gpio_mode_sel),
   .FPGA_WATCHDOG_GPIO_IN(fpga_watchdog_gpio_in),
   .FPGA_PWR_CYCLE_REQ_GPIO_IN(fpga_pwr_cycle_req_gpio_in),
   .FPGA_RESERVE_GPIO_IN(fpga_reserve_gpio_in),
+  .FPGA_BOOT0_GPIO_IN(fpga_boot0_gpio_in),
+  .FPGA_BOOT1_GPIO_IN(fpga_boot1_gpio_in),
 
   .ULPI_CLOCK_STATE(ulpi_clock_state),
   .ULPI_RESET_B_GPIO_MODE_SEL(ulpi_reset_b_gpio_mode_sel),

@@ -138,9 +138,18 @@
 `define  DBG_RESERVE_GPIOMD               0
 // TRCH I/F Monitor Register
 `define DBG_TRCH_MONR              16'h0710
+`define  DBG_FPGA_BOOT1_MON               4
+`define  DBG_FPGA_BOOT0_MON               3
 `define  DBG_WATCHDOG_MON                 2
 `define  DBG_PWR_CYCLE_REQ_MON            1
 `define  DBG_RESERVE_MON                  0
+
+// FPGA_BOOT0 Control Register
+`define DBG_FPGA_BOOT0_CTRLR       16'h0720
+`define  DBG_FPGA_BOOT0_GPIOMD            0
+// FPGA_BOOT1 Control Register
+`define DBG_FPGA_BOOT1_CTRLR       16'h0724
+`define  DBG_FPGA_BOOT1_GPIOMD            0
 
 // ULPI_CLOCK Monitor Register
 `define DBG_ULPI_CLOCK_MONR        16'h0800

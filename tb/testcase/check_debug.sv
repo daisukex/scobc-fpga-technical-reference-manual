@@ -175,7 +175,7 @@ initial begin
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0704), .expdata(32'h0000_0000), .check(1));
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0708), .expdata(32'h0000_0000), .check(1));
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h070C), .expdata(32'h0000_0001), .check(1));
-  read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0710), .expdata(32'h0000_0001), .check(1));
+  read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0710), .expdata(32'h0000_0009), .check(1));
   display_subcount_text(9, "ULPI I/F", 1);
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0800), .expdata(32'h0000_0001), .check(1));
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0804), .expdata(32'h0000_0003), .check(1));
@@ -698,27 +698,31 @@ initial begin
   display_subcount_text(1, "FPGA_BOOT Monitor Check", 1);
   boot_data_in = 32'h1357_9BDF;
   for(i=0; i<32; i=i+1) begin
-    FPGA_BOOT[0] = boot_data_in[31-i];
+    force FPGA_BOOT[0] = boot_data_in[31-i];
     @(posedge SYS_CLK);
-    FPGA_BOOT[1] = 1'b1;
+    force FPGA_BOOT[1] = 1'b1;
     @(posedge SYS_CLK);
-    FPGA_BOOT[1] = 1'b0;
+    force FPGA_BOOT[1] = 1'b0;
   end
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0700), .expdata(32'h1357_9BDF), .check(1));
   boot_data_in = 32'hECA8_6421;
   for(i=0; i<32; i=i+1) begin
-    FPGA_BOOT[0] = boot_data_in[31-i];
+    force FPGA_BOOT[0] = boot_data_in[31-i];
     @(posedge SYS_CLK);
-    FPGA_BOOT[1] = 1'b1;
+    force FPGA_BOOT[1] = 1'b1;
     @(posedge SYS_CLK);
-    FPGA_BOOT[1] = 1'b0;
+    force FPGA_BOOT[1] = 1'b0;
   end
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0700), .expdata(32'hECA8_6421), .check(1));
+  release FPGA_BOOT[0];
+  release FPGA_BOOT[1];
 
   display_subcount_text(2, "ALL '0' Output", 1);
   write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0704), .data(32'h0000_0002));
   write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0708), .data(32'h0000_0002));
   write_transaction(.master(2), .addr(`DEBUG_BASE+16'h070C), .data(32'h0000_0002));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0720), .data(32'h0000_0002)); // FPGA_BOOT0
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0724), .data(32'h0000_0002)); // FPGA_BOOT1
   read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0710), .expdata(32'h0000_0000), .check(1));
 
   display_subcount_text(3, "FPGA_WATCHDOG Control", 1);
@@ -753,6 +757,26 @@ initial begin
     end
                // gpio_ctrl_adr                  gpio_moni_adr         moni_bit  mode00_nochk_flg
     GPIO_CTRL_CHK(`DEBUG_BASE+16'h0700 + (4*3),  `DEBUG_BASE+16'h0710, 0,        1);
+  join
+
+  display_subcount_text(5, "FPGA_BOOT0 Control", 1);
+  fork
+    begin
+      @(posedge mode01_en); force dut.obc_core.FPGA_BOOT[0] = external_sig;
+      @(negedge mode01_en); release dut.obc_core.FPGA_BOOT[0];
+    end
+               // gpio_ctrl_adr                  gpio_moni_adr         moni_bit  mode00_nochk_flg
+    GPIO_CTRL_CHK(`DEBUG_BASE+16'h0700 + (4*8),  `DEBUG_BASE+16'h0710, 3,        1);
+  join
+
+  display_subcount_text(5, "FPGA_BOOT1 Control", 1);
+  fork
+    begin
+      @(posedge mode01_en); force dut.obc_core.FPGA_BOOT[1] = external_sig;
+      @(negedge mode01_en); release dut.obc_core.FPGA_BOOT[1];
+    end
+               // gpio_ctrl_adr                  gpio_moni_adr         moni_bit  mode00_nochk_flg
+    GPIO_CTRL_CHK(`DEBUG_BASE+16'h0700 + (4*9),  `DEBUG_BASE+16'h0710, 4,        1);
   join
 
   //--------------------------------------------------

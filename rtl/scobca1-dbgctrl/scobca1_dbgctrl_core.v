@@ -45,8 +45,8 @@ module scobca1_dbgctrl_core (
   inout  FPGA_EXT_SCL,
   inout  FPGA_EXT_SDA,
 
-  input  FPGA_BOOT0,
-  input  FPGA_BOOT1,
+  inout  FPGA_BOOT0,
+  inout  FPGA_BOOT1,
   inout  FPGA_WATCHDOG,
   inout  FPGA_RESERVE,
   inout  FPGA_PWR_CYCLE_REQ,
@@ -161,6 +161,10 @@ module scobca1_dbgctrl_core (
   output EXT_I2C_SDA_GPIO_IN,
 
   output reg [31:0] FPGA_BOOT_SHIFTREG_IN,
+  input  [1:0] FPGA_BOOT0_GPIO_MODE_SEL,
+  output FPGA_BOOT0_GPIO_IN,
+  input  [1:0] FPGA_BOOT1_GPIO_MODE_SEL,
+  output FPGA_BOOT1_GPIO_IN,
   input  [1:0] FPGA_WATCHDOG_GPIO_MODE_SEL,
   input  [1:0] FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL,
   input  [1:0] FPGA_RESERVE_GPIO_MODE_SEL,
@@ -417,6 +421,18 @@ BUFR boot_clk_bufr (
 );
 always @ (posedge boot_clk)
   FPGA_BOOT_SHIFTREG_IN <= {FPGA_BOOT_SHIFTREG_IN[30:0], FPGA_BOOT0};
+
+// FPGA BOOT0 Control
+assign FPGA_BOOT0 = (FPGA_BOOT0_GPIO_MODE_SEL == 2'b00) ? 1'bz:
+                    (FPGA_BOOT0_GPIO_MODE_SEL == 2'b01) ? 1'bz:
+                    (FPGA_BOOT0_GPIO_MODE_SEL == 2'b10) ? 1'b0: 1'b1;
+assign FPGA_BOOT0_GPIO_IN = FPGA_BOOT0;
+
+// FPGA BOOT1 Control
+assign FPGA_BOOT1 = (FPGA_BOOT1_GPIO_MODE_SEL == 2'b00) ? 1'bz:
+                    (FPGA_BOOT1_GPIO_MODE_SEL == 2'b01) ? 1'bz:
+                    (FPGA_BOOT1_GPIO_MODE_SEL == 2'b10) ? 1'b0: 1'b1;
+assign FPGA_BOOT1_GPIO_IN = FPGA_BOOT1;
 
 // TRCH I/F GPIO Control
 assign FPGA_WATCHDOG = (FPGA_WATCHDOG_GPIO_MODE_SEL == 2'b00) ? FPGA_WATCHDOG_IPOUT:

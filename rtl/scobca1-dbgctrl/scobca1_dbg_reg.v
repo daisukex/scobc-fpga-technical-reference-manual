@@ -88,9 +88,13 @@ module scobca1_dbg_reg (
   output reg [1:0] FPGA_WATCHDOG_GPIO_MODE_SEL,
   output reg [1:0] FPGA_PWR_CYCLE_REQ_GPIO_MODE_SEL,
   output reg [1:0] FPGA_RESERVE_GPIO_MODE_SEL,
+  output reg [1:0] FPGA_BOOT0_GPIO_MODE_SEL,
+  output reg [1:0] FPGA_BOOT1_GPIO_MODE_SEL,
   input FPGA_WATCHDOG_GPIO_IN,
   input FPGA_PWR_CYCLE_REQ_GPIO_IN,
   input FPGA_RESERVE_GPIO_IN,
+  input FPGA_BOOT0_GPIO_IN,
+  input FPGA_BOOT1_GPIO_IN,
 
   input ULPI_CLOCK_STATE,
   output reg [1:0] ULPI_RESET_B_GPIO_MODE_SEL,
@@ -572,9 +576,31 @@ wire [31:0] rd_dbg_reserve_ctrlr = 32'h0000_0000 | (FPGA_RESERVE_GPIO_MODE_SEL <
 
 // TRCH I/F Monitor Register
 // ----------------------------------------
-wire [31:0] rd_dbg_trch_monr = 32'h0000_0000 | (FPGA_WATCHDOG_GPIO_IN      << `DBG_WATCHDOG_MON)
+wire [31:0] rd_dbg_trch_monr = 32'h0000_0000 | (FPGA_BOOT1_GPIO_IN         << `DBG_FPGA_BOOT1_MON)
+                                             | (FPGA_BOOT0_GPIO_IN         << `DBG_FPGA_BOOT0_MON)
+                                             | (FPGA_WATCHDOG_GPIO_IN      << `DBG_WATCHDOG_MON)
                                              | (FPGA_PWR_CYCLE_REQ_GPIO_IN << `DBG_PWR_CYCLE_REQ_MON)
                                              | (FPGA_RESERVE_GPIO_IN       << `DBG_RESERVE_MON);
+
+// FPGA_BOOT0 Control Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    FPGA_BOOT0_GPIO_MODE_SEL <= 0;
+  else if ((WADR == `DBG_FPGA_BOOT0_CTRLR) & REG_WENB[0])
+    FPGA_BOOT0_GPIO_MODE_SEL <= REG_WDAT[`DBG_FPGA_BOOT0_GPIOMD +: 2];
+end
+wire [31:0] rd_dbg_fpga_boot0_ctrlr = 32'h0000_0000 | (FPGA_BOOT0_GPIO_MODE_SEL << `DBG_FPGA_BOOT0_GPIOMD);
+
+// FPGA_BOOT1 Control Register
+// ----------------------------------------
+always @ (posedge HCLK) begin
+  if (!HRESETN)
+    FPGA_BOOT1_GPIO_MODE_SEL <= 0;
+  else if ((WADR == `DBG_FPGA_BOOT1_CTRLR) & REG_WENB[0])
+    FPGA_BOOT1_GPIO_MODE_SEL <= REG_WDAT[`DBG_FPGA_BOOT1_GPIOMD +: 2];
+end
+wire [31:0] rd_dbg_fpga_boot1_ctrlr = 32'h0000_0000 | (FPGA_BOOT1_GPIO_MODE_SEL << `DBG_FPGA_BOOT1_GPIOMD);
 
 // ULPI_CLOCK Monitor Register
 // ----------------------------------------
@@ -777,6 +803,8 @@ always @ (posedge HCLK) begin
     if (RADR == `DBG_PWR_CYCLE_REQ_CTRLR) REG_RDAT <= rd_dbg_pwr_cycle_req_ctrlr;
     if (RADR == `DBG_RESERVE_CTRLR) REG_RDAT <= rd_dbg_reserve_ctrlr;
     if (RADR == `DBG_TRCH_MONR) REG_RDAT <= rd_dbg_trch_monr;
+    if (RADR == `DBG_FPGA_BOOT0_CTRLR) REG_RDAT <= rd_dbg_fpga_boot0_ctrlr;
+    if (RADR == `DBG_FPGA_BOOT1_CTRLR) REG_RDAT <= rd_dbg_fpga_boot1_ctrlr;
     if (RADR == `DBG_ULPI_CLOCK_MONR) REG_RDAT <= rd_dbg_ulpi_clock_monr;
     if (RADR == `DBG_ULPI_RESET_B_CTRLR) REG_RDAT <= rd_dbg_ulpi_reset_b_ctrlr;
     if (RADR == `DBG_ULPI_CS_CTRLR) REG_RDAT <= rd_dbg_ulpi_cs_ctrlr;
