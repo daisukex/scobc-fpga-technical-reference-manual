@@ -23,6 +23,8 @@ module scobca1_dbgctrl_core (
   inout  SRAM2_WE_B,
   inout  SRAM2_BHE_B,
   inout  SRAM2_BLE_B,
+  input  [15:0] SRAM1_IO,
+  input  [15:0] SRAM2_IO,
 
   inout  CFG_MEM_CS_B,
   inout  [3:0] CFG_MEM_IO,

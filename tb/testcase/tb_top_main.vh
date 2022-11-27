@@ -63,14 +63,14 @@ wire sram1_oe_b;
 wire sram1_we_b;
 wire sram1_bhe_b;
 wire sram1_ble_b;
-wire sram1_err;
+wire (pull1, pull0) sram1_err = 1'b0;
 wire [15:0] sram1_io;
 wire sram2_ce_b;
 wire sram2_oe_b;
 wire sram2_we_b;
 wire sram2_bhe_b;
 wire sram2_ble_b;
-wire sram2_err;
+wire (pull1, pull0) sram2_err = 1'b0;
 wire [15:0] sram2_io;
 
 wire ulpi_cs;

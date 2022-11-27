@@ -931,8 +931,79 @@ initial begin
   end
 
   //--------------------------------------------------
-  label    = "HRMEM Memory Scrubbing Control Register Access Check ";
+  label    = "SRAM ECC Error Monitor";
   simcount = 15;
+  //--------------------------------------------------
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0000), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0004), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0008), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h000C), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0010), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0014), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0018), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h001C), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0020), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0024), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0028), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h002C), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0030), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0034), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0038), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h003C), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0040), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0044), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0048), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h004C), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0050), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0054), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0058), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h005C), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0060), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0064), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0068), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h006C), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0070), .data(32'h0000_0000));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0074), .data(32'h0000_0000));
+
+  force sram1_err = 1;
+  @(posedge SYS_CLK);
+  force sram1_err = 0;
+  release sram1_err;
+  read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0080), .expdata(32'h0000_0001), .check(1));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0080),    .data(32'h0000_0001));
+  read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0080), .expdata(32'h0000_0000), .check(1));
+
+  force sram2_err = 1;
+  @(posedge SYS_CLK);
+  force sram2_err = 0;
+  release sram1_err;
+  read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0080), .expdata(32'h0000_0002), .check(1));
+  write_transaction(.master(2), .addr(`DEBUG_BASE+16'h0080),    .data(32'h0000_0002));
+  read_transaction( .master(2), .addr(`DEBUG_BASE+16'h0080), .expdata(32'h0000_0000), .check(1));
+
+  //--------------------------------------------------
+  label    = "SRAM IO Monitor";
+  simcount = 16;
+  //--------------------------------------------------
+  force sram2_io = 16'h0000;
+  for (i=0; i<16; i=i+1) begin
+    force sram1_io = 16'h0000 | 1<<i;
+    @(posedge SYS_CLK);
+    read_transaction( .master(2), .addr(`DEBUG_BASE+16'h007C), .expdata(1<<i), .check(1));
+  end
+
+  force sram1_io = 16'h0000;
+  for (i=0; i<16; i=i+1) begin
+    force sram2_io = 16'h0000 | 1<<i;
+    @(posedge SYS_CLK);
+    read_transaction( .master(2), .addr(`DEBUG_BASE+16'h007C), .expdata(1<<16+i), .check(1));
+  end
+  release sram1_io;
+  release sram2_io;
+
+  //--------------------------------------------------
+  label    = "HRMEM Memory Scrubbing Control Register Access Check ";
+  simcount = 17;
   //--------------------------------------------------
   @(posedge SYS_CLK);
   read_transaction( .master(2), .addr(`HRMEMREG_BASE+`MEMSCRCTRLR), .expdata((0<<`MEMSCRBEN) |

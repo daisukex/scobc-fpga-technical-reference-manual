@@ -48,6 +48,9 @@ module scobca1_dbg_reg (
   input SRAM2_WE_B_GPIO_IN,
   input SRAM2_BHE_B_GPIO_IN,
   input SRAM2_BLE_B_GPIO_IN,
+  input [31:0] SRAM_IO,
+  input SRAM1_ERR,
+  input SRAM2_ERR,
 
   output reg [1:0] CFG_MEM_CS_B_GPIO_MODE_SEL,
   output reg [2*4-1:0] CFG_MEM_IO_GPIO_MODE_SEL,
@@ -309,6 +312,35 @@ wire [31:0] rd_dbg_sram_monr = 32'h0000_0000 | (SRAM_A_GPIO_IN      << `DBG_SRAM
                                              | (SRAM2_WE_B_GPIO_IN  << `DBG_SRAM2_WEB_MON)
                                              | (SRAM2_BHE_B_GPIO_IN << `DBG_SRAM2_BHEB_MON)
                                              | (SRAM2_BLE_B_GPIO_IN << `DBG_SRAM2_BLEB_MON);
+
+// SRAM ERR Monitor Register
+// ----------------------------------------
+reg sram1_err_1p;
+reg sram2_err_1p;
+reg sram1_err_monr;
+reg sram2_err_monr;
+always @ (posedge HCLK) begin
+  if (!HRESETN) begin
+    sram1_err_1p <= 0;
+    sram2_err_1p <= 0;
+    sram1_err_monr <= 0;
+    sram2_err_monr <= 0;
+  end
+  else begin
+    sram1_err_1p <= SRAM1_ERR;
+    sram2_err_1p <= SRAM2_ERR;
+    if (!sram1_err_1p & SRAM1_ERR)
+      sram1_err_monr <= 1;
+    if (!sram2_err_1p & SRAM2_ERR)
+      sram2_err_monr <= 1;
+    if ((WADR == `DBG_SRAM_ERR_MONR) & REG_WENB[0]) begin
+      sram1_err_monr <= 0;
+      sram2_err_monr <= 0;
+    end
+  end
+end
+wire [31:0] rd_dbg_sram_err_monr = 32'h0000_0000 | (sram1_err_monr << `DBG_SRAM1_ERR)
+                                                 | (sram2_err_monr << `DBG_SRAM2_ERR);
 
 // CFG_MEM_CS_B Control Register
 // ----------------------------------------
@@ -770,6 +802,8 @@ always @ (posedge HCLK) begin
     if (RADR == `DBG_SRAM2_BHEB_CTRLR) REG_RDAT <= rd_dbg_sram2_bheb_ctrlr;
     if (RADR == `DBG_SRAM2_BLEB_CTRLR) REG_RDAT <= rd_dbg_sram2_bleb_ctrlr;
     if (RADR == `DBG_SRAM_MONR) REG_RDAT <= rd_dbg_sram_monr;
+    if (RADR == `DBG_SRAM_IO_MONR) REG_RDAT <= SRAM_IO;
+    if (RADR == `DBG_SRAM_ERR_MONR) REG_RDAT <= rd_dbg_sram_err_monr;
     if (RADR == `DBG_CFG_MEM_CSB_CTRLR) REG_RDAT <= rd_dbg_cfg_mem_csb_ctrlr;
     for (num=0; num<4; num=num+1) begin
       if (RADR == `DBG_CFG_MEM_IO_CTRLR+(16'h4 * num)) REG_RDAT <= rd_dbg_cfg_mem_io_ctrlr[num];

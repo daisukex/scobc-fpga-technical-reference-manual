@@ -52,6 +52,11 @@
 `define  DBG_SRAM2_WEB_MON                2
 `define  DBG_SRAM2_BHEB_MON               1
 `define  DBG_SRAM2_BLEB_MON               0
+`define DBG_SRAM_IO_MONR           16'h007C
+`define  DBG_SRAM_IO_MON                  0
+`define DBG_SRAM_ERR_MONR          16'h0080
+`define  DBG_SRAM1_ERR                    0
+`define  DBG_SRAM2_ERR                    1
 
 // CFG_MEM_CS_B Control Register
 `define DBG_CFG_MEM_CSB_CTRLR      16'h0100
