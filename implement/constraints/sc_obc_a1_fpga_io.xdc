@@ -198,8 +198,8 @@ set_property [get_ports {UIO2[12]}]           -dict { PACKAGE_PIN A3   IOSTANDAR
 set_property [get_ports {UIO2[13]}]           -dict { PACKAGE_PIN A2   IOSTANDARD LVCMOS33 }
 set_property [get_ports {UIO2[14]}]           -dict { PACKAGE_PIN B4   IOSTANDARD LVCMOS33 }
 set_property [get_ports {UIO2[15]}]           -dict { PACKAGE_PIN A4   IOSTANDARD LVCMOS33 }
-set_property [get_ports {UIO4_11_06[0]}]      -dict { PACKAGE_PIN Y15  IOSTANDARD LVCMOS33 }
-set_property [get_ports {UIO4_11_06[1]}]      -dict { PACKAGE_PIN AA15 IOSTANDARD LVCMOS33 }
+set_property [get_ports {UIO4_11_06[0]}]      -dict { PACKAGE_PIN Y15  IOSTANDARD LVCMOS33 PULLDOWN TRUE}
+set_property [get_ports {UIO4_11_06[1]}]      -dict { PACKAGE_PIN AA15 IOSTANDARD LVCMOS33 PULLDOWN TRUE}
 set_property [get_ports {UIO4_11_06[2]}]      -dict { PACKAGE_PIN W14  IOSTANDARD LVCMOS33 }
 set_property [get_ports {UIO4_11_06[3]}]      -dict { PACKAGE_PIN W15  IOSTANDARD LVCMOS33 }
 set_property [get_ports {UIO4_11_06[4]}]      -dict { PACKAGE_PIN AE26 IOSTANDARD LVCMOS33 }
