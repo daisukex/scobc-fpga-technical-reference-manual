@@ -113,7 +113,7 @@ assign w_hit_hrmemver       = ({REG_ADDR[15:2] , 2'b00} == `HRMEMVER);
 //----------------------------------------------
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
-    REG_ECC_COL_EN <= 1'b1;
+    REG_ECC_COL_EN <= 1'b0;
   end else if (w_hit_ecccolenr & w_reg_write) begin
     if (REG_BYTEEN[0])
       REG_ECC_COL_EN <= REG_WDATA[`ECCCOLEN];
@@ -314,7 +314,7 @@ assign w_rd_eccerrinsr = (w_hit_eccerrinsr & w_reg_read) ?
 //----------------------------------------------
 always @ (posedge SYSCLK or negedge RESETB) begin
   if (!RESETB) begin
-    REG_PF_MODE_SEL <= 2'b01;
+    REG_PF_MODE_SEL <= 2'b00;
   end else if (w_hit_pfemdctlr & w_reg_write & REG_BYTEEN[0]) begin
     REG_PF_MODE_SEL <= REG_WDATA[`PFMDCTL +: 2];
   end
